@@ -32,8 +32,11 @@ h1{margin:0 0 8px}
 .badge{font-size:11px;padding:4px 8px;border-radius:99px;background:#eaf2ff;color:#0757bd}
 .live{background:#ffe4e4;color:#c00000}
 .news{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.news-card{cursor:pointer;transition:transform 0.15s, box-shadow 0.15s}
+.news-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
 .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.gallery img{width:100%;height:160px;object-fit:cover;border-radius:10px}
+.gallery-item{cursor:pointer;overflow:hidden;border-radius:10px;background:#fff;border:1px solid #e4eaf2;padding:4px}
+.gallery img{width:100%;height:160px;object-fit:cover;border-radius:8px;display:block}
 .medal{width:100%;border-collapse:collapse}
 .medal th,.medal td{padding:10px;border-bottom:1px solid #edf0f4;text-align:center}
 .medal th{background:#f0f5fb}
@@ -41,15 +44,28 @@ h1{margin:0 0 8px}
 .btn{background:#0869d7;color:#fff}
 .danger{background:#dc3545;color:#fff}
 .ok{background:#198754;color:#fff}
+.notice{padding:12px;background:#fff3cd;border-radius:8px;color:#705500}
 .formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-radius:8px;box-sizing:border-box;margin:4px 0 9px}
 textarea{min-height:100px}
-.admin-row{border:1px solid #e3e8ef;padding:12px;border-radius:10px;margin:9px 0}
-.bracket{display:flex;gap:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
-.round{min-width:180px}
-.slot{background:#fff;border:1px solid #dce3ed;border-radius:9px;margin:12px 0;padding:8px}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+
+/* PHÂN BIỆT TRẠNG THÁI CẬP NHẬT TRONG QUẢN TRỊ */
+.admin-row{border:1px solid #e3e8ef;padding:12px;border-radius:10px;margin:9px 0;background:#fff;transition:all 0.3s}
+.admin-row.recently-updated{border:2px solid #198754!important;background:#f0fff4!important;position:relative}
+.badge-updated{display:inline-block;background:#198754;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:bold}
+
+.bracket{display:flex;gap:18px;overflow:auto}
+.round{min-width:200px}
+.slot{background:#fff;border:1px solid #dce3ed;border-radius:99px;margin:16px 0;padding:8px}
 .slot div{padding:5px;border-bottom:1px solid #eee}
 .slot div:last-child{border:0}
+
+/* POPUP (MODAL) XEM CHI TIẾT TIN TỨC & HÌNH ẢNH */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:15px;backdrop-filter:blur(3px)}
+.modal-content{background:#fff;border-radius:15px;max-width:650px;width:100%;max-height:85vh;overflow-y:auto;padding:20px;position:relative;box-shadow:0 10px 25px rgba(0,0,0,0.2)}
+.modal-close{position:absolute;top:12px;right:15px;font-size:24px;border:none;background:none;cursor:pointer;color:#666;line-height:1}
+.modal-img{width:100%;max-height:70vh;object-fit:contain;border-radius:10px}
 
 @media(max-width:800px){
 body{font-size:15px;overflow-x:hidden}
@@ -64,20 +80,34 @@ nav button{padding:9px 10px;font-size:13px}
 .hero h1{font-size:22px;line-height:1.25}
 .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .card{padding:14px;margin-bottom:10px;overflow:hidden}
-.stat strong{font-size:22px}
+.stat strong{font-size:23px}
 .two,.news{grid-template-columns:1fr}
 .gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-.gallery img{height:120px}
+.gallery img{height:125px}
 .formgrid{grid-template-columns:1fr}
-.match{grid-template-columns:minmax(0,1fr) 65px minmax(0,1fr);gap:4px;padding:10px 0}
+.match{grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);gap:4px;padding:10px 0}
 .score{font-size:18px}
 .team{font-size:13px;line-height:1.25}
-.meta{font-size:10px}
-.badge{font-size:9px;padding:3px 5px}
-.round{min-width:160px}
-.medal{font-size:12px;min-width:360px}
-.page#medals,.page#medals .card{overflow-x:auto}
+.meta{font-size:11px;line-height:1.35}
+.badge{font-size:10px;padding:3px 5px}
+.bracket{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px}
+.round{min-width:175px}
+.slot{margin:10px 0}
+.medal{font-size:13px;min-width:100%}
+.page#medals,.page#medals .card{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.admin-row{overflow:hidden}
+.actions button{min-height:38px}
 input,select,textarea{font-size:16px;max-width:100%}
+}
+@media(max-width:430px){
+.grid{grid-template-columns:1fr 1fr}
+.grid .card{padding:11px}
+.hero h1{font-size:20px}
+.hero .muted{font-size:12px}
+.match{grid-template-columns:minmax(0,1fr) 52px minmax(0,1fr)}
+.team{font-size:12px}
+.score{font-size:16px}
+.gallery img{height:105px}
 }
 </style>
 </head>
@@ -115,7 +145,7 @@ input,select,textarea{font-size:16px;max-width:100%}
       <div class="card"><h2>🔴 Đang thi đấu</h2><div id="homeLive"></div></div>
       <div class="card"><h2>⏱ Sắp thi đấu</h2><div id="homeNext"></div></div>
     </div>
-    <div class="card"><h2>🏅 Bảng tổng sắp huy chương</h2><div id="homeMedals"></div></div>
+    <div class="card" style="overflow-x:auto;"><h2>🏅 Bảng tổng sắp huy chương</h2><div id="homeMedals"></div></div>
     <h2>Tin mới</h2>
     <div class="news" id="homeNews"></div>
   </section>
@@ -137,18 +167,17 @@ input,select,textarea{font-size:16px;max-width:100%}
     <div class="hero"><h1>Sơ đồ vòng đấu</h1></div>
     <div class="card">
       Môn thi đấu<select id="bracketFilter" onchange="renderBracket()"></select>
-      <div style="font-size:11px;color:#0869d7;margin:6px 0;">👉 Vuốt sang phải để xem toàn bộ nhánh đấu</div>
       <div class="bracket" id="bracketView"></div>
     </div>
   </section>
 
   <!-- LIVESTREAM -->
   <section id="live" class="page hidden">
-    <div class="hero"><h1>🔴 Livestream trực tiếp</h1></div>
+    <div class="hero"><h1>🔴 Livestream</h1></div>
     <div id="liveList"></div>
   </section>
 
-  <!-- HÌNH ÁNH -->
+  <!-- HÌNH ẢNH -->
   <section id="photos" class="page hidden">
     <div class="hero"><h1>📸 Hình ảnh sự kiện</h1></div>
     <div class="gallery" id="gallery"></div>
@@ -157,7 +186,7 @@ input,select,textarea{font-size:16px;max-width:100%}
   <!-- HUY CHƯƠNG -->
   <section id="medals" class="page hidden">
     <div class="hero"><h1>🏅 Bảng tổng sắp huy chương các lớp</h1></div>
-    <div class="card" id="medalTable"></div>
+    <div class="card" id="medalTable" style="overflow-x:auto;"></div>
   </section>
 
   <!-- TIN TỨC -->
@@ -170,7 +199,7 @@ input,select,textarea{font-size:16px;max-width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban tổ chức</h1>
-      <div class="muted">Đăng nhập tài khoản Ban tổ chức để quản lý dữ liệu.</div>
+      <div class="muted">Đăng nhập tài khoản Ban tổ chức để cập nhật dữ liệu.</div>
     </div>
 
     <!-- KHỐI ĐĂNG NHẬP -->
@@ -191,8 +220,8 @@ input,select,textarea{font-size:16px;max-width:100%}
         <div class="formgrid">
           <div>Môn thi<input id="mSport" placeholder="VD: Bóng đá"></div>
           <div>Vòng<select id="mRound"><option>Vòng bảng</option><option>Tứ kết</option><option>Bán kết</option><option>Chung kết</option></select></div>
-          <div>Đội A (VD: Nguyễn Văn A/ 12A1)<input id="mA"></div>
-          <div>Đội B (VD: Trần Văn B/ 12A2)<input id="mB"></div>
+          <div>Đội A (VĐV 1/ Lớp)<input id="mA"></div>
+          <div>Đội B (VĐV 2/ Lớp)<input id="mB"></div>
           <div>Thời gian<input id="mTime" type="datetime-local"></div>
           <div>Sân thi đấu<input id="mVenue"></div>
           <div>Trạng thái<select id="mStatus"><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
@@ -203,6 +232,7 @@ input,select,textarea{font-size:16px;max-width:100%}
 
       <div class="card">
         <h2>📝 Cập nhật tỷ số & kết quả</h2>
+        <p class="muted">Quản lý và điều chỉnh tỷ số trực tiếp các trận đấu. Trận có khung xanh lá là trận vừa được cập nhật/thêm mới.</p>
         <div class="formgrid">
           <div>Lọc môn<select id="adminSportFilter" onchange="renderAdminMatches()"><option value="">Tất cả các môn</option></select></div>
           <div>Lọc trạng thái<select id="adminStatusFilter" onchange="renderAdminMatches()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
@@ -212,9 +242,9 @@ input,select,textarea{font-size:16px;max-width:100%}
 
       <div class="card">
         <h2>🏅 Cập nhật Huy chương lớp</h2>
-        <p class="muted" style="font-size:12px;">Nhập tên lớp (VD: 12A1) hoặc VĐV/Cặp đôi (VD: Văn A - Thị B/ 12A1). Hệ thống tự cắt tên lớp sau dấu /.</p>
+        <p class="muted">Nhập tên lớp dạng "12A1" hoặc VĐV dạng "Nguyễn Văn A - Nguyễn Thị B/ 12A1" (Hệ thống tự nhận diện lớp sau dấu /).</p>
         <div class="formgrid">
-          <input id="medTeam" placeholder="Nhập tên đơn vị lớp / VĐV">
+          <input id="medTeam" placeholder="Đơn vị lớp / VĐV kèm lớp">
           <input id="gold" type="number" placeholder="Số Vàng" value="0">
           <input id="silver" type="number" placeholder="Số Bạc" value="0">
           <input id="bronze" type="number" placeholder="Số Đồng" value="0">
@@ -243,43 +273,54 @@ input,select,textarea{font-size:16px;max-width:100%}
   </section>
 </main>
 
-<footer class="wrap" style="padding:20px 5%;text-align:center;color:#667085;font-size:13px;">
+<!-- POPUP MODAL ĐỂ XEM CHI TIẾT TIN TỨC VÀ PHÓNG TO HÌNH ÁNH -->
+<div id="modalOverlay" class="modal-overlay hidden" onclick="closeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<footer class="wrap" style="padding:30px 5%;text-align:center;color:#667085">
   HKPĐ Cấp trường • Dữ liệu cập nhật trực tuyến
 </footer>
 
 <script>
+// --- LOGIC AUTH VÀ QUẢN LÝ DỮ LIỆU NỘI BỘ ---
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const DATA_MATCHES = 'hkpd_matches_v3';
-const DATA_MEDALS = 'hkpd_medals_v3';
-const DATA_NEWS = 'hkpd_news_v3';
-const DATA_PHOTOS = 'hkpd_photos_v3';
+const DATA_MATCHES = 'hkpd_matches_v2';
+const DATA_MEDALS = 'hkpd_medals_v2';
+const DATA_NEWS = 'hkpd_news_v2';
+const DATA_PHOTOS = 'hkpd_photos_v2';
 
-// DỮ LIỆU MẶC ĐỊNH CHO BẤT KỲ ĐIỆN THOẠI NÀO MỞ LINK CŨNG CÓ NỘI DUNG NAY
+// Dữ liệu sẵn có dự phòng khi mở ứng dụng lần đầu
 const defaultMatches = [
   { id: 1, sport: "Bóng đá Nam", round: "Tứ kết", teamA: "Nguyễn Văn A/ 12A1", teamB: "Trần Văn B/ 12A2", scoreA: 2, scoreB: 1, status: "done", time: "2026-09-30T08:00", venue: "Sân bóng đá", liveUrl: "" },
-  { id: 2, sport: "Bóng đá Nam", round: "Chung kết", teamA: "Nguyễn Văn A/ 12A1", teamB: "Phạm Văn D/ 10A3", scoreA: 3, scoreB: 2, status: "live", time: "2026-09-30T15:00", venue: "Sân bóng đá", liveUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
-  { id: 3, sport: "Cầu lông Đôi", round: "Chung kết", teamA: "Văn A - Thị B/ 12A1", teamB: "Văn C - Thị D/ 11B2", scoreA: 2, scoreB: 0, status: "done", time: "2026-09-30T10:00", venue: "Nhà thi đấu", liveUrl: "" }
+  { id: 2, sport: "Bóng đá Nam", round: "Chung kết", teamA: "Nguyễn Văn A/ 12A1", teamB: "Phạm Văn D/ 10A3", scoreA: 3, scoreB: 2, status: "live", time: "2026-09-30T15:00", venue: "Sân bóng đá", liveUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
 ];
 
 const defaultMedals = {
   "12A1": { gold: 3, silver: 1, bronze: 0 },
   "10A3": { gold: 1, silver: 2, bronze: 1 },
-  "11B2": { gold: 1, silver: 1, bronze: 2 },
-  "12A2": { gold: 0, silver: 1, bronze: 3 }
+  "11B2": { gold: 1, silver: 1, bronze: 2 }
 };
 
 const defaultNews = [
-  { id: 1, title: "Khai mạc Hội khỏe Phù Đổng cấp trường năm học 2026 - 2027", body: "Sự kiện diễn ra vô cùng sôi nổi với sự hưởng ứng nhiệt tình của học sinh tất cả các khối lớp.", date: "30/09/2026" }
+  { id: 1, title: "Khai mạc Hội khỏe Phù Đổng cấp trường năm học 2026 - 2027", body: "Sự kiện diễn ra vô cùng sôi nổi với sự tham gia nhiệt tình của học sinh các khối lớp. Các vận động viên đã thi đấu hết mình trên tinh thần đoàn kết, cao thượng và trung thực.", date: "30/09/2026" }
 ];
 
 const defaultPhotos = [
   { id: 1, title: "Lễ khai mạc rực rỡ", url: "https://images.unsplash.com/photo-1517649763962-0c6232662000?w=600" }
 ];
 
+// Khởi tạo dữ liệu
 let matches = JSON.parse(localStorage.getItem(DATA_MATCHES)) || defaultMatches;
 let medals = JSON.parse(localStorage.getItem(DATA_MEDALS)) || defaultMedals;
 let newsData = JSON.parse(localStorage.getItem(DATA_NEWS)) || defaultNews;
 let photos = JSON.parse(localStorage.getItem(DATA_PHOTOS)) || defaultPhotos;
+
+// Tập hợp theo dõi các ID trận đấu vừa được cập nhật/thêm mới trong phiên hiện tại
+let updatedMatchIds = new Set();
 
 function saveData() {
   localStorage.setItem(DATA_MATCHES, JSON.stringify(matches));
@@ -288,23 +329,27 @@ function saveData() {
   localStorage.setItem(DATA_PHOTOS, JSON.stringify(photos));
 }
 
+// Chuyển Tab
 function page(pId) {
   document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-  document.getElementById(pId).classList.remove('hidden');
   document.getElementById('n-' + pId).classList.add('active');
+  document.getElementById(pId).classList.remove('hidden');
   window.scrollTo({top: 0, behavior: 'smooth'});
+
   renderAll();
 }
 
+// Đăng nhập
 function login() {
   const u = document.getElementById('email').value.trim();
   const p = document.getElementById('password').value.trim();
+
   if (u !== "" && p !== "") {
     localStorage.setItem(AUTH_KEY, 'true');
     checkAuth();
   } else {
-    document.getElementById('loginMsg').innerText = "Vui lòng nhập đầy đủ tài khoản và mật khẩu!";
+    document.getElementById('loginMsg').innerText = "Vui lòng nhập tài khoản và mật khẩu!";
   }
 }
 
@@ -325,6 +370,7 @@ function checkAuth() {
   }
 }
 
+// Tách tên Lớp sau dấu /
 function parseClass(str) {
   if (!str) return 'KHÁC';
   if (str.includes('/')) {
@@ -335,14 +381,16 @@ function parseClass(str) {
   return parts[parts.length - 1].toUpperCase();
 }
 
+// Thêm trận đấu
 function addMatch() {
   const sport = document.getElementById('mSport').value.trim();
   const teamA = document.getElementById('mA').value.trim();
   const teamB = document.getElementById('mB').value.trim();
   if(!sport || !teamA || !teamB) return alert("Vui lòng nhập môn thi và tên 2 đội!");
 
+  const newId = Date.now();
   matches.push({
-    id: Date.now(),
+    id: newId,
     sport: sport,
     round: document.getElementById('mRound').value,
     teamA: teamA,
@@ -355,11 +403,15 @@ function addMatch() {
     liveUrl: document.getElementById('mLive').value.trim()
   });
 
+  // Đánh dấu trận này vừa thêm mới
+  updatedMatchIds.add(newId);
+
   saveData();
-  alert("Đã thêm trận đấu thành công!");
+  alert("Đã tạo trận đấu thành công!");
   renderAll();
 }
 
+// Cập nhật tỷ số
 function updateMatch(id) {
   const m = matches.find(x => x.id === id);
   if(!m) return;
@@ -368,6 +420,7 @@ function updateMatch(id) {
   m.scoreB = parseInt(document.getElementById(`sB_${id}`).value) || 0;
   m.status = document.getElementById(`st_${id}`).value;
 
+  // Tự động cộng huy chương nếu là Chung kết và trận đã kết thúc
   if(m.status === 'done' && m.round === 'Chung kết') {
     const winnerTeam = m.scoreA > m.scoreB ? m.teamA : (m.scoreB > m.scoreA ? m.teamB : null);
     if(winnerTeam) {
@@ -377,19 +430,24 @@ function updateMatch(id) {
     }
   }
 
+  // Đánh dấu trận này vừa cập nhật
+  updatedMatchIds.add(id);
+
   saveData();
-  alert("Đã lưu kết quả!");
+  alert("Đã lưu kết quả trận đấu!");
   renderAll();
 }
 
 function deleteMatch(id) {
   if(confirm("Xóa trận đấu này?")) {
     matches = matches.filter(x => x.id !== id);
+    updatedMatchIds.delete(id);
     saveData();
     renderAll();
   }
 }
 
+// Lưu Huy Chương
 function saveMedal() {
   const raw = document.getElementById('medTeam').value.trim();
   const cls = parseClass(raw);
@@ -410,6 +468,7 @@ function saveMedal() {
   renderAll();
 }
 
+// Đăng tin & Ảnh
 function addNews() {
   const title = document.getElementById('newsTitle').value.trim();
   const body = document.getElementById('newsBody').value.trim();
@@ -435,9 +494,11 @@ function addPhoto() {
   renderAll();
 }
 
+// RE-RENDER GIAO DIỆN
 function renderAll() {
   checkAuth();
   
+  // Stats
   document.getElementById('sDone').innerText = matches.filter(m => m.status === 'done').length;
   document.getElementById('sLive').innerText = matches.filter(m => m.status === 'live').length;
   document.getElementById('sNews').innerText = newsData.length;
@@ -446,12 +507,14 @@ function renderAll() {
   for(let c in medals) gTotal += medals[c].gold;
   document.getElementById('sGold').innerText = gTotal;
 
+  // Home Live & Upcoming
   const liveMatches = matches.filter(m => m.status === 'live');
   const nextMatches = matches.filter(m => m.status === 'upcoming');
 
-  document.getElementById('homeLive').innerHTML = liveMatches.length ? liveMatches.map(m => matchHTML(m)).join('') : '<p class="muted" style="font-size:13px;">Hiện chưa có trận đang thi đấu.</p>';
-  document.getElementById('homeNext').innerHTML = nextMatches.length ? nextMatches.slice(0,3).map(m => matchHTML(m)).join('') : '<p class="muted" style="font-size:13px;">Chưa có lịch thi đấu tiếp theo.</p>';
+  document.getElementById('homeLive').innerHTML = liveMatches.length ? liveMatches.map(m => matchHTML(m)).join('') : '<p class="muted">Hiện không có trận nào đang đấu.</p>';
+  document.getElementById('homeNext').innerHTML = nextMatches.length ? nextMatches.slice(0,3).map(m => matchHTML(m)).join('') : '<p class="muted">Chưa có lịch sắp tới.</p>';
 
+  // Filters setup
   const sports = [...new Set(matches.map(m => m.sport))];
   const sportOpts = '<option value="">Tất cả các môn</option>' + sports.map(s => `<option value="${s}">${s}</option>`).join('');
   document.getElementById('sportFilter').innerHTML = sportOpts;
@@ -498,7 +561,7 @@ function renderBracket() {
   rounds.forEach(r => {
     const rMatches = list.filter(m => m.round === r);
     if(rMatches.length) {
-      html += `<div class="round"><h4 style="text-align:center;color:#0869d7;margin:4px 0;">${r}</h4>`;
+      html += `<div class="round"><h4 style="text-align:center;color:#0869d7">${r}</h4>`;
       rMatches.forEach(m => {
         html += `
           <div class="slot">
@@ -510,7 +573,7 @@ function renderBracket() {
       html += `</div>`;
     }
   });
-  container.innerHTML = html || '<p class="muted">Chưa tạo sơ đồ cho môn này.</p>';
+  container.innerHTML = html || '<p class="muted">Chưa tạo sơ đồ vòng đấu cho môn này.</p>';
 }
 
 function renderMedals() {
@@ -536,60 +599,103 @@ function renderMedals() {
 }
 
 function renderMedia() {
+  // Live
   const lives = matches.filter(m => m.liveUrl);
   document.getElementById('liveList').innerHTML = lives.length ? lives.map(m => `
     <div class="card">
-      <h3 style="margin-top:0">🎥 ${m.sport} - ${m.round}</h3>
+      <h3>🎥 ${m.sport} - ${m.round}</h3>
       <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;">
         <iframe src="https://www.youtube.com/embed/${m.liveUrl.includes('v=')?m.liveUrl.split('v=')[1].split('&')[0]:m.liveUrl}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen></iframe>
       </div>
     </div>
-  `).join('') : '<div class="card muted">Hiện chưa có luồng phát trực tiếp.</div>';
+  `).join('') : '<div class="card muted">Chưa có luồng phát trực tiếp.</div>';
 
+  // Photos - Cho phép click xem ảnh
   document.getElementById('gallery').innerHTML = photos.map(p => `
-    <div><img src="${p.url}" alt="Photo"><div style="font-size:11px;margin-top:4px;text-align:center">${p.title}</div></div>
-  `).join('');
-
-  const newsHTML = newsData.map(n => `
-    <div class="card">
-      <h3 style="margin:0 0 6px">${n.title}</h3>
-      <div class="muted" style="font-size:11px;margin-bottom:8px">🕒 ${n.date}</div>
-      <div style="font-size:13px;">${n.body}</div>
+    <div class="gallery-item" onclick="openPhotoModal('${p.url}', '${p.title.replace(/'/g, "\\'")}')">
+      <img src="${p.url}" alt="${p.title}">
+      <div style="font-size:12px;margin-top:4px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title}</div>
     </div>
   `).join('');
+
+  // News - Cho phép click xem đầy đủ bài viết
+  const newsHTML = newsData.map(n => {
+    const isLong = n.body.length > 120;
+    const bodyText = isLong ? n.body.substring(0, 120) + '...' : n.body;
+    return `
+      <div class="card news-card" onclick="openNewsModal(${n.id})">
+        <h3 style="margin:0 0 6px;color:#0869d7">${n.title}</h3>
+        <div class="muted" style="font-size:11px;margin-bottom:8px">🕒 ${n.date}</div>
+        <div style="line-height:1.5">${bodyText}</div>
+        ${isLong ? '<div style="font-size:12px;color:#0869d7;font-weight:bold;margin-top:8px">Xem chi tiết ➔</div>' : ''}
+      </div>
+    `;
+  }).join('');
   document.getElementById('newsList').innerHTML = newsHTML;
   document.getElementById('homeNews').innerHTML = newsHTML;
 }
 
+// XỬ LÝ XEM CHI TIẾT MODAL
+function openNewsModal(id) {
+  const n = newsData.find(x => x.id === id);
+  if(!n) return;
+  document.getElementById('modalBody').innerHTML = `
+    <h2 style="margin-top:0;color:#0869d7">${n.title}</h2>
+    <div class="muted" style="font-size:12px;margin-bottom:15px">🕒 ${n.date}</div>
+    <div style="line-height:1.6;white-space:pre-line;font-size:15px">${n.body}</div>
+  `;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+
+function openPhotoModal(url, title) {
+  document.getElementById('modalBody').innerHTML = `
+    <img src="${url}" class="modal-img" alt="${title}">
+    <h3 style="text-align:center;margin:12px 0 0;color:#333">${title}</h3>
+  `;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+
+function closeModal(e) {
+  document.getElementById('modalOverlay').classList.add('hidden');
+}
+
+// RENDER DANH SÁCH CẬP NHẬT TRONG QUẢN TRỊ (PHÂN BIỆT MÀU SẮC)
 function renderAdminMatches() {
   const sp = document.getElementById('adminSportFilter').value;
   const st = document.getElementById('adminStatusFilter').value;
   const list = matches.filter(m => (!sp || m.sport === sp) && (!st || m.status === st));
 
-  document.getElementById('adminMatches').innerHTML = list.map(m => `
-    <div class="admin-row">
-      <div style="font-weight:bold;color:#0869d7">${m.sport} (${m.round})</div>
-      <div class="formgrid" style="margin:8px 0">
-        <div>${m.teamA}<input type="number" id="sA_${m.id}" value="${m.scoreA}"></div>
-        <div>${m.teamB}<input type="number" id="sB_${m.id}" value="${m.scoreB}"></div>
-      </div>
-      <div class="formgrid">
-        <div>Trạng thái
-          <select id="st_${m.id}">
-            <option value="upcoming" ${m.status==='upcoming'?'selected':''}>Sắp đấu</option>
-            <option value="live" ${m.status==='live'?'selected':''}>Đang đấu</option>
-            <option value="done" ${m.status==='done'?'selected':''}>Đã kết thúc</option>
-          </select>
+  document.getElementById('adminMatches').innerHTML = list.map(m => {
+    const isUpdated = updatedMatchIds.has(m.id);
+    return `
+      <div class="admin-row ${isUpdated ? 'recently-updated' : ''}">
+        <div style="font-weight:bold;color:#0869d7;display:flex;align-items:center;justify-content:space-between">
+          <span>${m.sport} (${m.round})</span>
+          ${isUpdated ? '<span class="badge-updated">✔ MỚI / VỪA CẬP NHẬT</span>' : ''}
         </div>
-        <div style="display:flex;gap:5px;align-items:flex-end">
-          <button class="btn ok" style="flex:1" onclick="updateMatch(${m.id})">💾 Lưu</button>
-          <button class="danger" onclick="deleteMatch(${m.id})">🗑️</button>
+        <div class="formgrid" style="margin:8px 0">
+          <div>${m.teamA}<input type="number" id="sA_${m.id}" value="${m.scoreA}"></div>
+          <div>${m.teamB}<input type="number" id="sB_${m.id}" value="${m.scoreB}"></div>
+        </div>
+        <div class="formgrid">
+          <div>Trạng thái
+            <select id="st_${m.id}">
+              <option value="upcoming" ${m.status==='upcoming'?'selected':''}>Sắp đấu</option>
+              <option value="live" ${m.status==='live'?'selected':''}>Đang đấu</option>
+              <option value="done" ${m.status==='done'?'selected':''}>Đã kết thúc</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:5px;align-items:flex-end">
+            <button class="btn ok" style="flex:1" onclick="updateMatch(${m.id})">💾 Lưu</button>
+            <button class="danger" onclick="deleteMatch(${m.id})">🗑️</button>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
+// Khởi chạy khi load trang
 window.onload = function() {
   renderAll();
 };
