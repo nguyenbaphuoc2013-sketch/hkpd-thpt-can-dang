@@ -56,16 +56,18 @@ textarea{min-height:90px}
 .badge-updated-tag{background:#198754;color:#fff}
 .input-changed{border:2px solid #ffc107!important;background:#fffdf5!important}
 
-/* SƠ ĐỒ NHÁNH VÒNG ĐẤU */
-.sport-bracket-block{margin-bottom:22px;border-bottom:1px dashed #cbd5e1;padding-bottom:16px}
-.sport-bracket-block:last-child{border-bottom:0;margin-bottom:0}
-.sport-title{font-size:16px;font-weight:bold;color:#073b8f;margin:0 0 10px;display:flex;align-items:center;gap:6px}
-.bracket-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0}
-.bracket{display:flex;gap:14px;min-width:max-content}
-.round{min-width:190px;background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #e2e8f0}
-.slot{background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin:8px 0;padding:8px;font-size:12px}
-.slot div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f1f5f9}
+/* SƠ ĐỒ NHÁNH VÒNG ĐẤU CẢI TIẾN HIỂN THỊ ĐẦY ĐỦ TRÊN MOBILE */
+.sport-bracket-block{margin-bottom:24px;background:#fcfdfe;border:1px solid #e2e8f0;padding:12px;border-radius:12px}
+.sport-title{font-size:16px;font-weight:bold;color:#073b8f;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid #0877e8;display:flex;align-items:center;justify-content:space-between}
+.bracket-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:4px 0}
+.bracket{display:flex;gap:12px;min-width:max-content}
+.round{min-width:180px;max-width:220px;background:#f1f5f9;padding:8px;border-radius:10px;border:1px solid #cbd5e1}
+.round-title{text-align:center;color:#0869d7;font-weight:bold;font-size:13px;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #cbd5e1}
+.slot{background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin:8px 0;padding:8px;font-size:12px;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+.slot div{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #f1f5f9}
 .slot div:last-child{border:0}
+.slot .name{font-weight:600;color:#1e293b;word-break:break-word;padding-right:6px}
+.slot .score{font-weight:800;color:#073b8f;font-size:13px}
 
 /* POPUP (MODAL) XEM TIN TỨC VÀ ẢNH */
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:100;display:flex;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(3px)}
@@ -145,7 +147,7 @@ nav{width:100%}
   <section id="bracket" class="page hidden">
     <div class="hero"><h1>Sơ đồ nhánh thi đấu các môn</h1></div>
     <div class="card">
-      <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn thi đấu:</label>
+      <label style="font-weight:bold;display:block;margin-bottom:6px">Lọc theo môn thi đấu:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
@@ -200,8 +202,8 @@ nav{width:100%}
       <div class="card">
         <h2>➕ Tạo trận đấu mới</h2>
         <div class="formgrid">
-          <div>Môn thi<input id="mSport" placeholder="VD: Đẩy gậy, Cầu lông, Bóng đá..."></div>
-          <div>Vòng đấu<select id="mRound"><option>Vòng bảng</option><option>Tứ kết</option><option>Bán kết</option><option>Chung kết</option></select></div>
+          <div>Môn thi<input id="mSport" placeholder="VD: Đẩy gậy Nam, Cầu lông Nam, Bóng đá..."></div>
+          <div>Vòng đấu<input id="mRoundInput" placeholder="VD: Vòng 1, Vòng bảng, Tứ kết, Bán kết, Chung kết"></div>
           <div>Đội A (VĐV 1/ Lớp)<input id="mA" placeholder="Võ Thị Vi Vi / 10A4"></div>
           <div>Đội B (VĐV 2/ Lớp)<input id="mB" placeholder="Mai Thị Như Ý / 10A3"></div>
           <div>Thời gian<input id="mTime" type="datetime-local"></div>
@@ -269,41 +271,58 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const DATA_MATCHES = 'hkpd_matches_v4';
-const DATA_MEDALS = 'hkpd_medals_v4';
-const DATA_NEWS = 'hkpd_news_v4';
-const DATA_PHOTOS = 'hkpd_photos_v4';
+const DATA_MATCHES = 'hkpd_matches_v5';
+const DATA_MEDALS = 'hkpd_medals_v5';
+const DATA_NEWS = 'hkpd_news_v5';
+const DATA_PHOTOS = 'hkpd_photos_v5';
 
-// TOÀN BỘ DỮ LIỆU CÁC MÔN THI TỪ FILE EXCEL THPT CẦN ĐĂNG
+// BỘ DỮ LIỆU ĐẦY ĐỦ CÁC VÒNG ĐẤU CHO TẤT CẢ CÁC MÔN CỦA THPT CẦN ĐĂNG
 const defaultMatches = [
   // 1. BÓNG ĐÁ NAM
-  { id: 101, sport: "Bóng đá Nam", round: "Tứ kết", teamA: "Phạm Huỳnh Trung Kiên/ 12A2", teamB: "Trần Đăng Khoa/ 10A3", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Sân bóng đá", liveUrl: "" },
-  { id: 102, sport: "Bóng đá Nam", round: "Tứ kết", teamA: "Phạm Tấn Lễ/ 11A6", teamB: "Bùi Tuấn Kha/ 10A5", scoreA: 3, scoreB: 0, status: "done", time: "", venue: "Sân bóng đá", liveUrl: "" },
-  { id: 103, sport: "Bóng đá Nam", round: "Bán kết", teamA: "Phạm Huỳnh Trung Kiên/ 12A2", teamB: "Phạm Tấn Lễ/ 11A6", scoreA: 1, scoreB: 2, status: "done", time: "", venue: "Sân bóng đá", liveUrl: "" },
-  { id: 104, sport: "Bóng đá Nam", round: "Chung kết", teamA: "Phạm Tấn Lễ/ 11A6", teamB: "Phùng Lý Vỹ Quân/ 11A1", scoreA: 2, scoreB: 1, status: "live", time: "", venue: "Sân bóng đá", liveUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+  { id: 101, sport: "Bóng đá Nam", round: "Vòng 1", teamA: "Nguyễn Văn A/ 12A1", teamB: "Trần Văn B/ 12A2", scoreA: 3, scoreB: 1, status: "done", time: "", venue: "Sân bóng đá", liveUrl: "" },
+  { id: 102, sport: "Bóng đá Nam", round: "Vòng 1", teamA: "Phạm Huỳnh Trung Kiên/ 12A2", teamB: "Đặng Văn Hiếu/ 12A5", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Sân bóng đá", liveUrl: "" },
+  { id: 103, sport: "Bóng đá Nam", round: "Tứ kết", teamA: "Phạm Huỳnh Trung Kiên/ 12A2", teamB: "Trần Đăng Khoa/ 10A3", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Sân bóng đá", liveUrl: "" },
+  { id: 104, sport: "Bóng đá Nam", round: "Tứ kết", teamA: "Phạm Tấn Lễ/ 11A6", teamB: "Bùi Tuấn Kha/ 10A5", scoreA: 3, scoreB: 0, status: "done", time: "", venue: "Sân bóng đá", liveUrl: "" },
+  { id: 105, sport: "Bóng đá Nam", round: "Bán kết", teamA: "Phạm Huỳnh Trung Kiên/ 12A2", teamB: "Phạm Tấn Lễ/ 11A6", scoreA: 1, scoreB: 2, status: "done", time: "", venue: "Sân bóng đá", liveUrl: "" },
+  { id: 106, sport: "Bóng đá Nam", round: "Chung kết", teamA: "Phạm Tấn Lễ/ 11A6", teamB: "Phùng Lý Vỹ Quân/ 11A1", scoreA: 2, scoreB: 1, status: "live", time: "", venue: "Sân bóng đá", liveUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
 
-  // 2. CẦU LÔNG
-  { id: 201, sport: "Cầu lông Nam", round: "Vòng bảng", teamA: "Phạm Bá Ngạt/ 11A8", teamB: "Trần Đăng Khoa/ 10A3", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
-  { id: 202, sport: "Cầu lông Nam", round: "Bán kết", teamA: "Huỳnh Chí Thiện/ 11A8", teamB: "Phạm Tấn Lễ/ 11A6", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
-  { id: 203, sport: "Cầu lông Nam", round: "Chung kết", teamA: "Huỳnh Chí Thiện/ 11A8", teamB: "Nguyễn Thành Tân/ 10A1", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
-  { id: 204, sport: "Cầu lông Nữ", round: "Chung kết", teamA: "Nguyễn Ngọc Bảo Ngân/ 11A6", teamB: "Ngô Thị Mộng Tuyền/ 12A3", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
+  // 2. CẦU LÔNG NAM
+  { id: 201, sport: "Cầu lông Nam", round: "Vòng loại", teamA: "Phạm Bá Ngạt/ 11A8", teamB: "Nguyễn Thành Tân/ 10A1", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
+  { id: 202, sport: "Cầu lông Nam", round: "Vòng loại", teamA: "Phạm Tấn Lễ/ 11A6", teamB: "Trần Đăng Khoa/ 10A3", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
+  { id: 203, sport: "Cầu lông Nam", round: "Bán kết", teamA: "Huỳnh Chí Thiện/ 11A8", teamB: "Phạm Bá Ngạt/ 11A8", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
+  { id: 204, sport: "Cầu lông Nam", round: "Bán kết", teamA: "Phạm Tấn Lễ/ 11A6", teamB: "Nguyễn Thành Tân/ 10A1", scoreA: 1, scoreB: 2, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
+  { id: 205, sport: "Cầu lông Nam", round: "Chung kết", teamA: "Huỳnh Chí Thiện/ 11A8", teamB: "Nguyễn Thành Tân/ 10A1", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
 
-  // 3. ĐẨY GẬY
-  { id: 301, sport: "Đẩy gậy Nam", round: "Vòng bảng", teamA: "Lại Vũ Hà/ 10A3", teamB: "Nguyễn Minh Tâm/ 10A3", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
+  // 3. CẦU LÔNG NỮ
+  { id: 210, sport: "Cầu lông Nữ", round: "Bán kết", teamA: "Nguyễn Ngọc Bảo Ngân/ 11A6", teamB: "Nguyễn Thị Mỹ Huyền/ 11A3", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
+  { id: 211, sport: "Cầu lông Nữ", round: "Bán kết", teamA: "Ngô Thị Mộng Tuyền/ 12A3", teamB: "Huỳnh Anh Thư/ 11A4", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
+  { id: 212, sport: "Cầu lông Nữ", round: "Chung kết", teamA: "Nguyễn Ngọc Bảo Ngân/ 11A6", teamB: "Ngô Thị Mộng Tuyền/ 12A3", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Nhà đa năng", liveUrl: "" },
+
+  // 4. ĐẨY GẬY NAM
+  { id: 301, sport: "Đẩy gậy Nam", round: "Vòng 1", teamA: "Lại Vũ Hà/ 10A3", teamB: "Nguyễn Minh Tâm/ 10A3", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
   { id: 302, sport: "Đẩy gậy Nam", round: "Tứ kết", teamA: "Nguyễn Văn Ngọc Hải/ 10A4", teamB: "Nguyễn Lê Thiên Phúc/ 10A3", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
-  { id: 303, sport: "Đẩy gậy Nam", round: "Bán kết", teamA: "Trần Văn Thế Vững/ 10A4", teamB: "Lại Vũ Hà/ 10A3", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
-  { id: 304, sport: "Đẩy gậy Nam", round: "Chung kết", teamA: "Trần Văn Thế Vững/ 10A4", teamB: "Lê Hoàng Quí/ 11A5", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
-  { id: 305, sport: "Đẩy gậy Nữ", round: "Chung kết", teamA: "Võ Thị Vi Vi/ 10A4", teamB: "Mai Thị Như Ý/ 10A3", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
+  { id: 303, sport: "Đẩy gậy Nam", round: "Tứ kết", teamA: "Phùng Lý Vỹ Quân/ 11A1", teamB: "Lại Vũ Hà/ 10A3", scoreA: 1, scoreB: 2, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
+  { id: 304, sport: "Đẩy gậy Nam", round: "Bán kết", teamA: "Trần Văn Thế Vững/ 10A4", teamB: "Nguyễn Văn Ngọc Hải/ 10A4", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
+  { id: 305, sport: "Đẩy gậy Nam", round: "Bán kết", teamA: "Lê Hoàng Quí/ 11A5", teamB: "Lại Vũ Hà/ 10A3", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
+  { id: 306, sport: "Đẩy gậy Nam", round: "Chung kết", teamA: "Trần Văn Thế Vững/ 10A4", teamB: "Lê Hoàng Quí/ 11A5", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
 
-  // 4. VÕ CỔ TRUYỀN
-  { id: 401, sport: "Võ cổ truyền", round: "Bán kết", teamA: "Phạm Võ Thành Đức/ 10A2", teamB: "Trần Quốc Thái/ 10A8", scoreA: 27, scoreB: 25, status: "done", time: "", venue: "Nhà tập võ", liveUrl: "" },
-  { id: 402, sport: "Võ cổ truyền", round: "Chung kết", teamA: "Phạm Võ Thành Đức/ 10A2", teamB: "Lê Hoàng Phúc/ 11A6", scoreA: 29, scoreB: 28, status: "done", time: "", venue: "Nhà tập võ", liveUrl: "" },
+  // 5. ĐẨY GẬY NỮ
+  { id: 310, sport: "Đẩy gậy Nữ", round: "Bán kết", teamA: "Võ Thị Vi Vi/ 10A4", teamB: "Nguyễn Thị Kim Anh/ 10A4", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
+  { id: 311, sport: "Đẩy gậy Nữ", round: "Chung kết", teamA: "Võ Thị Vi Vi/ 10A4", teamB: "Mai Thị Như Ý/ 10A3", scoreA: 2, scoreB: 0, status: "done", time: "", venue: "Sân thể thao", liveUrl: "" },
 
-  // 5. VOVINAM
-  { id: 501, sport: "Vovinam", round: "Chung kết", teamA: "Nguyễn Quốc Tích/ 11A1", teamB: "Nguyễn Thành Phúc/ 11A2", scoreA: 1, scoreB: 0, status: "done", time: "", venue: "Nhà tập võ", liveUrl: "" },
+  // 6. VÕ CỔ TRUYỀN
+  { id: 401, sport: "Võ cổ truyền", round: "Vòng loại", teamA: "Trần Quốc Thái/ 10A8", teamB: "Lê Hoàng Đức Huy/ 10A7", scoreA: 26, scoreB: 24, status: "done", time: "", venue: "Nhà tập võ", liveUrl: "" },
+  { id: 402, sport: "Võ cổ truyền", round: "Bán kết", teamA: "Phạm Võ Thành Đức/ 10A2", teamB: "Trần Quốc Thái/ 10A8", scoreA: 27, scoreB: 25, status: "done", time: "", venue: "Nhà tập võ", liveUrl: "" },
+  { id: 403, sport: "Võ cổ truyền", round: "Bán kết", teamA: "Lê Hoàng Phúc/ 11A6", teamB: "Đặng Văn Hiếu/ 12A5", scoreA: 28, scoreB: 26, status: "done", time: "", venue: "Nhà tập võ", liveUrl: "" },
+  { id: 404, sport: "Võ cổ truyền", round: "Chung kết", teamA: "Phạm Võ Thành Đức/ 10A2", teamB: "Lê Hoàng Phúc/ 11A6", scoreA: 29, scoreB: 28, status: "done", time: "", venue: "Nhà tập võ", liveUrl: "" },
 
-  // 6. ĐIỀN KINH
-  { id: 601, sport: "Điền kinh 100m Nam", round: "Chung kết", teamA: "Phạm Huỳnh Trung Kiên/ 12A2", teamB: "Bùi Tuấn Kha/ 10A5", scoreA: 11, scoreB: 12, status: "done", time: "", venue: "Đường chạy", liveUrl: "" }
+  // 7. VOVINAM
+  { id: 501, sport: "Vovinam", round: "Bán kết", teamA: "Nguyễn Quốc Tích/ 11A1", teamB: "Lê Thị Mỹ Xuyên/ 12A4", scoreA: 1, scoreB: 0, status: "done", time: "", venue: "Nhà tập võ", liveUrl: "" },
+  { id: 502, sport: "Vovinam", round: "Chung kết", teamA: "Nguyễn Quốc Tích/ 11A1", teamB: "Nguyễn Thành Phúc/ 11A2", scoreA: 1, scoreB: 0, status: "done", time: "", venue: "Nhà tập võ", liveUrl: "" },
+
+  // 8. ĐIỀN KINH
+  { id: 601, sport: "Điền kinh 100m Nam", round: "Vòng loại", teamA: "Phạm Huỳnh Trung Kiên/ 12A2", teamB: "Lê Hoàng Định/ 12A2", scoreA: 11, scoreB: 12, status: "done", time: "", venue: "Đường chạy", liveUrl: "" },
+  { id: 602, sport: "Điền kinh 100m Nam", round: "Chung kết", teamA: "Phạm Huỳnh Trung Kiên/ 12A2", teamB: "Bùi Tuấn Kha/ 10A5", scoreA: 11, scoreB: 12, status: "done", time: "", venue: "Đường chạy", liveUrl: "" }
 ];
 
 const defaultMedals = {
@@ -387,6 +406,7 @@ function parseClass(str) {
 
 function addMatch() {
   const sport = document.getElementById('mSport').value.trim();
+  const round = document.getElementById('mRoundInput').value.trim() || 'Chung kết';
   const teamA = document.getElementById('mA').value.trim();
   const teamB = document.getElementById('mB').value.trim();
   if(!sport || !teamA || !teamB) return alert("Vui lòng nhập tên môn và 2 đội/VĐV!");
@@ -395,7 +415,7 @@ function addMatch() {
   matches.push({
     id: newId,
     sport: sport,
-    round: document.getElementById('mRound').value,
+    round: round,
     teamA: teamA,
     teamB: teamB,
     scoreA: 0,
@@ -511,7 +531,6 @@ function renderAll() {
   document.getElementById('homeLive').innerHTML = liveMatches.length ? liveMatches.map(m => matchHTML(m)).join('') : '<p class="muted">Hiện không có trận nào đang đấu.</p>';
   document.getElementById('homeNext').innerHTML = nextMatches.length ? nextMatches.slice(0,3).map(m => matchHTML(m)).join('') : '<p class="muted">Chưa có lịch sắp tới.</p>';
 
-  // QUÉT TẤT CẢ CÁC MÔN CÓ TRONG FILE EXCEL
   const sports = [...new Set(matches.map(m => m.sport))];
   const sportOpts = '<option value="">Tất cả các môn</option>' + sports.map(s => `<option value="${s}">${s}</option>`).join('');
   
@@ -547,7 +566,7 @@ function renderSchedule() {
   document.getElementById('scheduleList').innerHTML = list.length ? list.map(m => `<div class="card">${matchHTML(m)}</div>`).join('') : '<div class="card muted">Không có trận đấu phù hợp.</div>';
 }
 
-// HIỂN THỊ CHI TIẾT SƠ ĐỒ NHÁNH VÒNG ĐẤU CHO CÁC MÔN & TẤT CẢ CÁC VÒNG
+// XỬ LÝ SƠ ĐỒ NHÁNH VẼ TẤT CẢ CÁC VÒNG ĐẤU ĐƯỢC TẠO
 function renderBracket() {
   const selectedSport = document.getElementById('bracketFilter').value;
   const container = document.getElementById('bracketView');
@@ -561,23 +580,36 @@ function renderBracket() {
     return;
   }
 
-  // Đầy đủ 4 vòng đấu chính
-  const rounds = ["Vòng bảng", "Tứ kết", "Bán kết", "Chung kết"];
   let fullHtml = '';
 
   sportsToRender.forEach(sportName => {
     const sportMatches = matches.filter(m => m.sport === sportName);
+    if (!sportMatches.length) return;
+
+    // Tự động gom tất cả tên vòng đấu phát sinh trong dữ liệu
+    const detectedRounds = [...new Set(sportMatches.map(m => m.round))];
+
+    // Sắp xếp thứ tự ưu tiên hiển thị các vòng đấu
+    const priority = ["Vòng 1", "Vòng loại", "Vòng bảng", "Tứ kết", "Bán kết", "Chung kết"];
+    detectedRounds.sort((a, b) => {
+      let idxA = priority.indexOf(a);
+      let idxB = priority.indexOf(b);
+      if (idxA === -1) idxA = 99;
+      if (idxB === -1) idxB = 99;
+      return idxA - idxB;
+    });
+
     let roundsHtml = '';
 
-    rounds.forEach(r => {
+    detectedRounds.forEach(r => {
       const rMatches = sportMatches.filter(m => m.round === r);
       if (rMatches.length) {
-        roundsHtml += `<div class="round"><h4 style="text-align:center;color:#0869d7;margin:0 0 8px">${r}</h4>`;
+        roundsHtml += `<div class="round"><div class="round-title">${r}</div>`;
         rMatches.forEach(m => {
           roundsHtml += `
             <div class="slot">
-              <div><span style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.teamA}</span><b>${m.scoreA}</b></div>
-              <div><span style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.teamB}</span><b>${m.scoreB}</b></div>
+              <div><span class="name">${m.teamA}</span><span class="score">${m.scoreA}</span></div>
+              <div><span class="name">${m.teamB}</span><span class="score">${m.scoreB}</span></div>
             </div>
           `;
         });
@@ -588,7 +620,10 @@ function renderBracket() {
     if (roundsHtml) {
       fullHtml += `
         <div class="sport-bracket-block">
-          <div class="sport-title">🏆 Môn: ${sportName}</div>
+          <div class="sport-title">
+            <span>🏆 Môn: ${sportName}</span>
+            <small style="font-size:11px;font-weight:normal;color:#667085">Tổng số trận: ${sportMatches.length}</small>
+          </div>
           <div class="bracket-wrap">
             <div class="bracket">${roundsHtml}</div>
           </div>
@@ -597,7 +632,7 @@ function renderBracket() {
     }
   });
 
-  container.innerHTML = fullHtml || '<p class="muted">Chưa tạo sơ đồ vòng đấu cho môn đã chọn.</p>';
+  container.innerHTML = fullHtml || '<p class="muted">Chưa có dữ liệu sơ đồ nhánh.</p>';
 }
 
 function renderMedals() {
@@ -706,7 +741,7 @@ function renderAdminMatches() {
           </div>
           <div style="display:flex;gap:5px;align-items:flex-end">
             <button class="btn ok" style="flex:1" onclick="updateMatch(${m.id})">💾 Lưu</button>
-            <button class="danger" onclick="deleteMatch(${m.id})">🗑️️</button>
+            <button class="danger" onclick="deleteMatch(${m.id})">🗑</button>
           </div>
         </div>
       </div>
