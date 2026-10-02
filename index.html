@@ -201,9 +201,9 @@ nav{width:100%}
     <!-- PANEL BẢNG ĐIỀU KHIỂN QUẢN TRỊ -->
     <div id="adminPanel" class="hidden">
       <div class="card" style="background:#fff5f5;border:1px solid #feb2b2">
-        <h3 style="margin-top:0;color:#c53030">🧹 Quản lý dữ liệu hệ thống</h3>
-        <p class="muted" style="margin-bottom:10px">Xóa sạch các trận đấu tùy chỉnh và khôi phục lại danh sách môn chính thức chuẩn từ File Excel.</p>
-        <button class="danger" onclick="resetToExcelData()">🗑 Reset & Xóa sạch dữ liệu mẫu</button>
+        <h3 style="margin-top:0;color:#c53030">🧹 Quản lý & Làm sạch dữ liệu bộ nhớ</h3>
+        <p class="muted" style="margin-bottom:10px">Xóa triệt để toàn bộ bộ nhớ đệm cũ (Cache) trên trình duyệt và khôi phục 100% dữ liệu chuẩn từ Excel.</p>
+        <button class="danger" onclick="resetToExcelData()">🗑 XÓA TẤT CẢ DỮ LIỆU CŨ & RESET VỀ CHUẨN EXCEL</button>
       </div>
 
       <div class="card">
@@ -222,7 +222,7 @@ nav{width:100%}
       </div>
 
       <div class="card">
-        <h2>📝 Cập nhật tỷ số & Kết quả (Lưu cập nhật ngay)</h2>
+        <h2>📝 Cập nhật tỷ số & Kết quả (Cập nhật ngay lập tức)</h2>
         <div class="formgrid">
           <div>Lọc môn<select id="adminSportFilter" onchange="renderAdminMatches()"><option value="">Tất cả các môn</option></select></div>
           <div>Lọc trạng thái<select id="adminStatusFilter" onchange="renderAdminMatches()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
@@ -276,12 +276,12 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const DATA_MATCHES = 'hkpd_matches_excel_v6';
-const DATA_MEDALS = 'hkpd_medals_excel_v6';
-const DATA_NEWS = 'hkpd_news_excel_v6';
-const DATA_PHOTOS = 'hkpd_photos_excel_v6';
+const DATA_MATCHES = 'hkpd_matches_clean_v7';
+const DATA_MEDALS = 'hkpd_medals_clean_v7';
+const DATA_NEWS = 'hkpd_news_clean_v7';
+const DATA_PHOTOS = 'hkpd_photos_clean_v7';
 
-// BAN ĐẦU CHỈ LẤY ĐÚNG CÁC TRẬN CỦA VĐV THỰC TẾ TRONG EXCEL - KHÔNG NGUYỄN VĂN A/B/C
+// BAN ĐẦU CHỈ LẤY ĐÚNG CÁC TRẬN CỦA VĐV THỰC TẾ TRONG EXCEL
 const excelMatches = [
   // 1. BÓNG ĐÁ NAM
   { id: 101, sport: "Bóng đá Nam", round: "Tứ kết", teamA: "Phạm Huỳnh Trung Kiên/ 12A2", teamB: "Trần Đăng Khoa/ 10A3", scoreA: 2, scoreB: 1, status: "done", time: "", venue: "Sân bóng đá", liveUrl: "" },
@@ -344,9 +344,7 @@ let medals = JSON.parse(localStorage.getItem(DATA_MEDALS)) || excelMedals;
 let newsData = JSON.parse(localStorage.getItem(DATA_NEWS)) || defaultNews;
 let photos = JSON.parse(localStorage.getItem(DATA_PHOTOS)) || defaultPhotos;
 
-// LƯU LẠI BẢN SAO ĐỂ SỬ DỤNG NÚT HOÀN TÁC
 let previousMatchesBackup = null;
-
 let updatedMatchIds = new Set();
 
 function saveData() {
@@ -356,14 +354,21 @@ function saveData() {
   localStorage.setItem(DATA_PHOTOS, JSON.stringify(photos));
 }
 
+// XÓA TRIỆT ĐỂ BỘ NHỚ LOCALSTORAGE
 function resetToExcelData() {
-  if(confirm("Bạn có chắc chắn muốn xóa dữ liệu chỉnh sửa và khôi phục toàn bộ danh sách chuẩn từ Excel?")) {
+  if(confirm("Bạn có chắc chắn muốn XÓA SẠCH toàn bộ dữ liệu lưu trữ cũ và khôi phục về bản Excel chính thức?")) {
+    localStorage.clear(); // Xóa sạch toàn bộ bộ nhớ trình duyệt
+    localStorage.setItem(AUTH_KEY, 'true'); // Giữ lại trạng thái đăng nhập
+    
     matches = JSON.parse(JSON.stringify(excelMatches));
     medals = JSON.parse(JSON.stringify(excelMedals));
+    newsData = JSON.parse(JSON.stringify(defaultNews));
+    photos = JSON.parse(JSON.stringify(defaultPhotos));
+    
     updatedMatchIds.clear();
     saveData();
     renderAll();
-    alert("Đã xóa sạch dữ liệu mẫu và tải lại các môn từ Excel!");
+    alert("Đã xóa sạch bộ nhớ đệm và khôi phục dữ liệu Excel gốc!");
   }
 }
 
@@ -440,7 +445,7 @@ function addMatch() {
 
   updatedMatchIds.add(newId);
   saveData();
-  renderAll(); // CẬP NHẬT NGAY TỨC THÌ
+  renderAll();
   alert("Đã tạo trận đấu mới thành công!");
 }
 
@@ -449,12 +454,10 @@ function markInputChanged(id) {
   if(row) row.classList.add('input-changed');
 }
 
-// CẬP NHẬT TỶ SỐ CÓ HOÀN TÁC VÀ TỰ ĐỘNG LƯU NGAY
 function updateMatch(id) {
   const m = matches.find(x => x.id === id);
   if(!m) return;
 
-  // LƯU BACKUP ĐỂ HOÀN TÁC
   previousMatchesBackup = JSON.parse(JSON.stringify(matches));
 
   m.scoreA = parseInt(document.getElementById(`sA_${id}`).value) || 0;
@@ -472,7 +475,7 @@ function updateMatch(id) {
 
   updatedMatchIds.add(id);
   saveData();
-  renderAll(); // CẬP NHẬT TẤT CẢ TRANG NGAY LẬP TỨC
+  renderAll();
 }
 
 function undoLastChange() {
@@ -558,7 +561,6 @@ function renderAll() {
   document.getElementById('homeLive').innerHTML = liveMatches.length ? liveMatches.map(m => matchHTML(m)).join('') : '<p class="muted">Hiện không có trận nào đang đấu.</p>';
   document.getElementById('homeNext').innerHTML = nextMatches.length ? nextMatches.slice(0,3).map(m => matchHTML(m)).join('') : '<p class="muted">Chưa có lịch sắp tới.</p>';
 
-  // LẤY CÁC MÔN TỪ DỮ LIỆU EXCEL LÊN DROPDOWN
   const sports = [...new Set(matches.map(m => m.sport))];
   const sportOpts = '<option value="">Tất cả các môn</option>' + sports.map(s => `<option value="${s}">${s}</option>`).join('');
   
@@ -749,7 +751,7 @@ function renderAdminMatches() {
     const isUpdated = updatedMatchIds.has(m.id);
     return `
       <div class="admin-row ${isUpdated ? 'updated' : ''}" id="row_${m.id}">
-        <div style="font-weight:bold;color:#0869d7;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-weight:bold;color:#0869d7;display:flex;align-items:center;justify-space-between">
           <span>${m.sport} (${m.round})</span>
           ${isUpdated ? '<span class="badge-status badge-updated-tag">✔ ĐÃ CẬP NHẬT TỶ SỐ</span>' : '<span class="badge-status" style="background:#e2e8f0;color:#475569">Chưa sửa</span>'}
         </div>
