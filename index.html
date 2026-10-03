@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
 <title>HKPĐ THPT Cần Đăng 2024-2025</title>
-<!-- Thư viện đọc File Excel trực tiếp -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--primary:#073b8f;--accent:#0877e8;--bg:#f4f7fb;--card:#ffffff;--text:#172033;--border:#e4eaf2;--success:#198754;--danger:#dc3545}
@@ -56,26 +55,20 @@ h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:
 input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-radius:8px;box-sizing:border-box;margin:4px 0 8px;font-size:14px;background:#fff}
 textarea{min-height:90px;resize:vertical}
 
-/* PANEL QUẢN TRỊ */
-.admin-card{border-left:4px solid var(--accent)}
-.admin-card.danger-zone{border-left:4px solid var(--danger);background:#fff8f8}
-.admin-row{border:1px solid #e3e8ef;padding:12px;border-radius:10px;margin:10px 0;background:#fff}
-
-/* SƠ ĐỒ NHÁNH THI ĐẤU HIỆN ĐẦY ĐỦ TẤT CẢ CÁC TRẬN CẦU LÔNG */
+/* SƠ ĐỒ NHÁNH THI ĐẤU DẠNG CÂY TRUẨN NHƯ EXCEL */
 .sport-bracket-block{margin-bottom:24px;background:#fcfdfe;border:1px solid #e2e8f0;padding:14px;border-radius:12px}
 .sport-title{font-size:16px;font-weight:bold;color:var(--primary);margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid var(--accent);display:flex;align-items:center;justify-content:space-between}
 .bracket-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0}
-.bracket{display:flex;gap:18px;min-width:max-content}
-.round{min-width:220px;max-width:260px;background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #cbd5e1;display:flex;flex-direction:column;gap:10px}
-.round-title{text-align:center;color:var(--accent);font-weight:bold;font-size:13px;margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid #cbd5e1;text-transform:uppercase}
-.slot{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;font-size:12px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.bracket{display:flex;gap:20px;min-width:max-content}
+.round{min-width:230px;max-width:270px;background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #cbd5e1;display:flex;flex-direction:column;justify-content:space-around}
+.round-title{text-align:center;color:var(--accent);font-weight:bold;font-size:13px;margin:0 0 10px;padding-bottom:4px;border-bottom:1px solid #cbd5e1;text-transform:uppercase}
+.slot{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;font-size:12px;margin:4px 0;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
 .slot.final-slot{border:2px solid #ffc107;background:#fffdf5}
 .slot div{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f1f5f9}
 .slot div:last-child{border:0}
 .slot .name{font-weight:600;color:#1e293b;word-break:break-word;padding-right:6px}
 .slot .score{font-weight:800;color:var(--primary);font-size:13px;background:#eef2ff;padding:2px 6px;border-radius:4px}
 
-/* POPUP MODAL */
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:1000;display:flex;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(3px)}
 .modal-content{background:#fff;border-radius:14px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;padding:18px;position:relative}
 .modal-close{position:absolute;top:10px;right:12px;font-size:22px;border:0;background:none;cursor:pointer;color:#888;font-weight:bold}
@@ -152,11 +145,11 @@ nav{width:100%}
 
   <!-- SƠ ĐỒ NHÁNH VÒNG ĐẤU -->
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Đầy đủ 100% tất cả các trận Cầu Lông)</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Cập nhật chuẩn 100% theo File Excel)</h1></div>
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Vuốt nhẹ sang phải để xem toàn bộ các vòng thi đấu từ Vòng loại đến Chung kết.</p>
+      <p class="muted" style="margin-top:6px">👉 Vuốt sang phải để xem tiếp Vòng 2, Tứ kết, Bán kết và Chung kết.</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -194,7 +187,6 @@ nav{width:100%}
       <div class="muted">Hệ thống cập nhật bảng thi đấu, tỷ số và hình ảnh đơn giản</div>
     </div>
 
-    <!-- BẢNG ĐĂNG NHẬP -->
     <div id="login">
       <div class="card" style="max-width:400px;margin:30px auto">
         <h3 style="margin-top:0">Đăng nhập Ban Tổ Chức</h3>
@@ -205,27 +197,23 @@ nav{width:100%}
       </div>
     </div>
 
-    <!-- BẢNG ĐIỀU KHIỂN SAU KHI ĐĂNG NHẬP -->
     <div id="adminPanel" class="hidden">
-      <!-- CẬP NHẬT TỪ EXCEL -->
       <div class="card admin-card" style="background:#f0f7ff">
         <h3 style="margin-top:0;color:#0869d7">📂 Cập nhật 1 lần từ File Excel Bảng Thi Đấu</h3>
-        <p class="muted" style="margin-bottom:10px">Chọn file Excel lịch thi đấu (định dạng <code>.xlsx</code> hoặc <code>.xls</code>), hệ thống sẽ tự động vẽ đủ tất cả các trận Cầu lông.</p>
+        <p class="muted" style="margin-bottom:10px">Chọn file Excel lịch thi đấu (định dạng <code>.xlsx</code> hoặc <code>.xls</code>).</p>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
         <button class="btn ok" onclick="importExcelFile()">📥 Cập Nhật Ngay Từ File Excel Này</button>
       </div>
 
-      <!-- XÓA SẠCH TRẮNG TẤT CẢ DỮ LIỆU -->
       <div class="card admin-card danger-zone">
         <h3 style="margin-top:0;color:#c53030">🧹 Dọn Dẹp & Xóa Sạch Hoàn Toàn Dữ Liệu</h3>
         <p class="muted" style="margin-bottom:10px">Bấm nút này sẽ <b>XÓA SẠCH TRẮNG 100%</b> toàn bộ Trận đấu, Sắp thi đấu, Sơ đồ nhánh, Huy chương, Tin tức và Hình ảnh.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="danger" onclick="clearAllDataAbsoluteZero()">🗑 XÓA SẠCH TRẮNG HOÀN TOÀN DỮ LIỆU (TRẮNG TINH)</button>
-          <button class="warn" onclick="loadDefaultExcelMatches()">🔄 Nạp lại danh sách đấu từ Excel mẫu</button>
+          <button class="warn" onclick="loadDefaultExcelMatches()">🔄 Nạp lại danh sách đấu chuẩn từ Excel</button>
         </div>
       </div>
 
-      <!-- CẬP NHẬT TỶ SỐ TRỰC TIẾP -->
       <div class="card admin-card">
         <h2>📝 Cập Nhật Tỷ Số & Trạng Thái</h2>
         <div class="formgrid">
@@ -235,12 +223,11 @@ nav{width:100%}
         <div id="adminMatches" style="margin-top:10px"></div>
       </div>
 
-      <!-- TẠO TRẬN ĐẤU MỚI -->
       <div class="card admin-card">
         <h2>➕ Thêm Trận Đấu Mới Tự Chọn</h2>
         <div class="formgrid">
           <div>Môn thi đấu:<select id="mSportSelect"></select></div>
-          <div>Vòng đấu:<input id="mRoundInput" placeholder="VD: Vòng 1, Tứ kết, Bán kết, Chung kết"></div>
+          <div>Vòng đấu:<input id="mRoundInput" placeholder="VD: Vòng 1, Vòng 2, Tứ kết, Bán kết, Chung kết"></div>
           <div>Đội A (VĐV 1 / Lớp):<input id="mA" placeholder="Tên VĐV hoặc Lớp A"></div>
           <div>Đội B (VĐV 2 / Lớp):<input id="mB" placeholder="Tên VĐV hoặc Lớp B"></div>
           <div>Địa điểm sân:<input id="mVenue" placeholder="Sân bóng / Nhà đa năng"></div>
@@ -249,7 +236,6 @@ nav{width:100%}
         <button class="btn" onclick="addMatch()">Tạo Trận Đấu Mới</button>
       </div>
 
-      <!-- CẬP NHẬT HUY CHƯƠNG LỚP -->
       <div class="card admin-card">
         <h2>🏅 Cập Nhật Huy Chương Lớp</h2>
         <div class="formgrid">
@@ -261,7 +247,6 @@ nav{width:100%}
         <button class="btn" onclick="saveMedal()">Cập Nhật Huy Chương Lớp</button>
       </div>
 
-      <!-- ĐĂNG TIN TỨC & HÌNH ÁNH -->
       <div class="card admin-card">
         <h2>📰 Đăng Tin Tức Mới</h2>
         <input id="newsTitle" placeholder="Tiêu đề thông báo / bài viết">
@@ -296,53 +281,40 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_badminton_full_v16';
+const STORAGE_VER = 'hkpd_2025_exact_bracket_v18';
 
-// DỮ LIỆU EXCEL TẤT CẢ CÁC MÔN
+// DỮ LIỆU CHUẨN CÁC TRẬN ĐẤU CẦU LÔNG VÀ CÁC MÔN THEO CHÍNH XÁC SƠ ĐỒ
 const rawExcel2025 = [
-  // BÓNG ĐÁ NAM K12
-  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A6", teamB: "12A2" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A7", teamB: "12A4" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A1", teamB: "12A8" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A3", teamB: "Miễn đấu (Đặc cách)" },
+  // CẦU LÔNG ĐÔI NAM - VÒNG 1 (Chỉ có 3 trận loại)
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", teamA: "Hồ Quang Khang - La Phát Tài /10A1", teamB: "Nguyễn Tấn Thành - Cù Trương Phúc Minh /10A6" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", teamA: "Lê Hoàng Thịnh - Hà Văn Luân /10A5", teamB: "Nguyễn Thành Tân - Nguyễn Hoàng Thành /11A1" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", teamA: "Hồ Vĩ Tường - Lê Văn Razalee /11A7", teamB: "Trần Đăng Khoa - Đào Hải Đạt /11A3" },
 
-  // BÓNG ĐÁ NAM K11
+  // CẦU LÔNG ĐÔI NAM - VÒNG 2 (16 Đội / Vòng 1/8)
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Thắng Trận 1 Vòng 1", teamB: "Huỳnh Trần Hạo Nam - Trần Minh Trung /11A2" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Phạm Tấn Lễ - Trương Minh Đạt /12A6", teamB: "Nguyễn Hoàng Đăng Khôi - Trần Hoàng Khôi /12A7" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Thắng Trận 2 Vòng 1", teamB: "Nguyễn Tấn Thành - Nguyễn Dương Thành Quân /10A8" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Nguyễn Nhựt Minh - Nguyễn Thanh Hiếu /10A3", teamB: "Huỳnh Chí Thiện - Nguyễn Văn Thuận /12A8" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Thắng Trận 3 Vòng 1", teamB: "Nguyễn Duy An - Nguyễn Phạm Trí Khoa /11A5" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Võ Hữu Thành - Trần Thái Bảo /10A2", teamB: "Võ Trung Tín - Trương Hoàng Khang /11A6" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Nguyễn Quốc Dũng - Trần Thành Đạt /11A8", teamB: "Phan Thanh Hoàng - Nguyễn Lê Gia Lạc /12A2" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Cao Ngọc Huy - Lê Phước Thuận /10A7", teamB: "Phan Bảo Minh - Phạm Nguyễn Thành Thiện /12A1" },
+
+  // BÓNG ĐÁ KHỐI 10
+  { sport: "Bóng đá Nam K10", round: "Vòng 1", teamA: "10A5", teamB: "10A2" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 1", teamA: "10A6", teamB: "10A4" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 1", teamA: "10A8", teamB: "10A3" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 1", teamA: "10A7", teamB: "10A1" },
+
+  // BÓNG ĐÁ KHỐI 11
   { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A1", teamB: "11A2" },
   { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A8", teamB: "11A7" },
 
-  // CẦU LÔNG ĐÔI NAM (19 ĐỘI TOÀN BỘ TRONG EXCEL)
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Hồ Quang Khang - La Phát Tài /10A1", teamB: "Nguyễn Tấn Thành - Cù Trương Phúc Minh /10A6" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Huỳnh Trần Hạo Nam - Trần Minh Trung /11A2", teamB: "Phạm Tấn Lễ - Trương Minh Đạt /12A6" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Nguyễn Hoàng Đăng Khôi - Trần Hoàng Khôi /12A7", teamB: "Lê Hoàng Thịnh - Hà Văn Luân /10A5" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Nguyễn Thành Tân - Nguyễn Hoàng Thành /11A1", teamB: "Nguyễn Tấn Thành - Nguyễn Dương Thành Quân /10A8" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Nguyễn Nhựt Minh - Nguyễn Thanh Hiếu /10A3", teamB: "Huỳnh Chí Thiện - Nguyễn Văn Thuận /12A8" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Hồ Vĩ Tường - Lê Văn Razalee /11A7", teamB: "Trần Đăng Khoa - Đào Hải Đạt /11A3" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Nguyễn Duy An - Nguyễn Phạm Trí Khoa /11A5", teamB: "Võ Hữu Thành - Trần Thái Bảo /10A2" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Võ Trung Tín - Trương Hoàng Khang /11A6", teamB: "Nguyễn Quốc Dũng - Trần Thành Đạt /11A8" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Phan Thanh Hoàng - Nguyễn Lê Gia Lạc /12A2", teamB: "Cao Ngọc Huy - Lê Phước Thuận /10A7" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Phan Bảo Minh - Phạm Nguyễn Thành Thiện /12A1", teamB: "Đặc cách Tứ kết" },
-
-  // CẦU LÔNG ĐÔI NAM NỮ (19 ĐỘI TOÀN BỘ TRONG EXCEL)
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Trịnh Thị Ngọc Quyên - Nguyễn Dương Thành Quân /10A8", teamB: "Huỳnh Trần Hạo Nam - Nguyễn Thị Ngọc Bích /11A2" },
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Danh Thị Huỳnh Anh - Nguyễn Văn Ân /12A7", teamB: "Nguyễn Thị Mỹ Trân - Trần Bảo Toàn /10A6" },
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Nguyễn Quốc Dũng - Trần Thị Kim Ngọc /11A8", teamB: "Lê Hoài Anh - Trương Quân Bão /11A7" },
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Huỳnh Lê Anh Thơ - Nguyễn Phú Trọng /12A5", teamB: "Nguyễn Thành Tân - Ngô Thị Anh Thư /11A1" },
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Trần Đăng Khoa - Đàm Thị Tố Quyên /11A3", teamB: "Huỳnh Thị Hồng Vy - Nguyễn Đăng Khoa /10A5" },
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Hồ Văn Huy - Mách A Si Yah /11A5", teamB: "Nguyễn Thị Thanh Thư - Võ Trung Tín /11A6" },
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Phạm Tấn Lễ - Nguyễn Ngọc Bảo Ngân /12A6", teamB: "Nguyễn Trang Kiều Trúc - Trần Chí Bền /10A2" },
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Huỳnh Chí Thiện - Phạm Thị Thơ /12A8", teamB: "Phạm Bá Ngạt - Phùng Thị Trúc An /12A1" },
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Nguyễn Thị Ngọc Hân - Phạm Minh Phúc /10A4", teamB: "Phùng Tuấn Vỹ - Nguyễn Thị Kim Anh / 11A4" },
-  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1", teamA: "Lê Trâm Anh - Võ Ngọc Đăng Khoa /12A2", teamB: "Đặc cách Tứ kết" },
-
-  // CẦU LÔNG ĐÔI NỮ (15 ĐỘI TOÀN BỘ TRONG EXCEL)
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", teamA: "Ngô Thị Anh Thư - Nguyễn Ngọc Thùy / 11A1", teamB: "Trần Thị Bảo Châu - Phạm Xuân Nghi /10A7" },
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", teamA: "Trần Hồ Khánh Băng - Trần Ngọc Như Quỳnh /12A1", teamB: "Trần Huyền Cơ - Phạm Minh Thư /10A4" },
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", teamA: "Phạm Thị Tuyết - Bùi Nguyễn Ngọc Linh /12A4", teamB: "Trần Thị Kim Ngọc - Nguyễn Thị Thúy Ngân /11A8" },
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", teamA: "Nguyễn Ngọc Bảo Ngân - Nguyễn Ngọc Bảo Thy /12A6", teamB: "Lê Thị Ái My - Mai Thị Minh Thúy /11A7" },
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", teamA: "Nguyễn Trang Kiều Trúc - Võ Huỳnh Ái /10A2", teamB: "Huỳnh Thị Như - Lê Thị Bích Ngân /11A5" },
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", teamA: "Mai Ngọc Như Ý - Nguyễn Phương Đào /10A5", teamB: "Lê Nguyễn Thanh Trúc - Trần Thị Bảo Trân /12A5" },
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", teamA: "Nguyễn Thị Thanh Thư - Võ Thị Ngọc Giàu /11A6", teamB: "Đàm Thị Tố Quyên - Lê Thị Kim Xuyến /11A3" },
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", teamA: "Phan Nguyễn Nhựt Lam - Trương Thị Thảo Nguyên /10A6", teamB: "Đặc cách Tứ kết" }
+  // BÓNG ĐÁ KHỐI 12
+  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A6", teamB: "12A2" },
+  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A7", teamB: "12A4" },
+  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A1", teamB: "12A8" },
+  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A3", teamB: "Miễn đấu (Vào Bán kết)" }
 ];
 
 const defaultMatches = rawExcel2025.map((m, idx) => ({
@@ -373,23 +345,16 @@ function clearAllDataAbsoluteZero() {
   if(confirm("XÁC NHẬN CHẮC CHẮN: Bạn muốn XÓA TRẮNG 100% tất cả Trận đấu, Sơ đồ, Huy chương, Tin tức về RỖNG?")) {
     localStorage.clear();
     localStorage.setItem(AUTH_KEY, 'true');
-    
-    matches = [];
-    medals = {};
-    newsData = [];
-    photos = [];
-    
-    saveData();
-    renderAll();
+    matches = []; medals = {}; newsData = []; photos = [];
+    saveData(); renderAll();
     alert("Đã xóa sạch trắng hoàn toàn 100% dữ liệu!");
   }
 }
 
 function loadDefaultExcelMatches() {
-  if(confirm("Bạn có muốn nạp lại danh sách lịch đấu gốc từ Excel?")) {
+  if(confirm("Bạn có muốn nạp lại danh sách lịch đấu gốc chuẩn từ Excel?")) {
     matches = JSON.parse(JSON.stringify(defaultMatches));
-    saveData();
-    renderAll();
+    saveData(); renderAll();
     alert("Đã nạp lại danh sách đấu từ Excel!");
   }
 }
@@ -405,9 +370,8 @@ function importExcelFile() {
     try {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, {type: 'array'});
-      
       let newMatches = [];
-      let count = 7000;
+      let count = 8000;
 
       workbook.SheetNames.forEach(sheetName => {
         const worksheet = workbook.Sheets[sheetName];
@@ -432,8 +396,7 @@ function importExcelFile() {
             round: "Vòng 1",
             teamA: items[i],
             teamB: items[i+1],
-            scoreA: 0,
-            scoreB: 0,
+            scoreA: 0, scoreB: 0,
             status: "upcoming",
             venue: "Sân Cần Đăng"
           });
@@ -442,17 +405,13 @@ function importExcelFile() {
 
       if(newMatches.length > 0) {
         matches = newMatches;
-        saveData();
-        renderAll();
+        saveData(); renderAll();
         alert(`Đã cập nhật ${newMatches.length} trận đấu từ File Excel!`);
-      } else {
-        alert("Không tìm thấy dữ liệu thi đấu trong File Excel.");
       }
     } catch(err) {
       alert("Lỗi đọc File Excel: " + err.message);
     }
   };
-
   reader.readAsArrayBuffer(file);
 }
 
@@ -496,21 +455,17 @@ function checkAuth() {
 function updateMatchScore(id) {
   const m = matches.find(x => x.id === id);
   if(!m) return;
-
   m.scoreA = parseInt(document.getElementById(`sA_${id}`).value) || 0;
   m.scoreB = parseInt(document.getElementById(`sB_${id}`).value) || 0;
   m.status = document.getElementById(`st_${id}`).value;
-
-  saveData();
-  renderAll();
+  saveData(); renderAll();
   alert("Đã lưu tỷ số trận đấu!");
 }
 
 function deleteMatch(id) {
   if(confirm("Xóa trận đấu này khỏi danh sách?")) {
     matches = matches.filter(x => x.id !== id);
-    saveData();
-    renderAll();
+    saveData(); renderAll();
   }
 }
 
@@ -529,8 +484,7 @@ function addMatch() {
     venue: document.getElementById('mVenue').value || 'Sân Cần Đăng'
   });
 
-  saveData();
-  renderAll();
+  saveData(); renderAll();
   alert("Đã tạo trận đấu mới!");
 }
 
@@ -558,8 +512,7 @@ function saveMedal() {
   medals[cls].silver += s;
   medals[cls].bronze += b;
 
-  saveData();
-  renderAll();
+  saveData(); renderAll();
   alert(`Đã cập nhật huy chương cho lớp ${cls}`);
   document.getElementById('medTeam').value = '';
 }
@@ -570,8 +523,7 @@ function addNews() {
   if(!title) return alert("Vui lòng nhập tiêu đề bài viết!");
 
   newsData.unshift({ id: Date.now(), title, body, date: new Date().toLocaleDateString('vi-VN') });
-  saveData();
-  renderAll();
+  saveData(); renderAll();
   alert("Đã đăng bài viết mới!");
   document.getElementById('newsTitle').value = '';
   document.getElementById('newsBody').value = '';
@@ -585,8 +537,7 @@ function addPhoto() {
     const reader = new FileReader();
     reader.onload = function(e) {
       photos.unshift({ id: Date.now(), title, url: e.target.result });
-      saveData();
-      renderAll();
+      saveData(); renderAll();
       alert("Đã thêm hình ảnh mới!");
     };
     reader.readAsDataURL(fileInput.files[0]);
@@ -648,7 +599,7 @@ function renderSchedule() {
   document.getElementById('scheduleList').innerHTML = list.length ? list.map(m => `<div class="card">${matchHTML(m)}</div>`).join('') : '<div class="card muted">Không có trận đấu phù hợp.</div>';
 }
 
-// HÀM VẼ SƠ ĐỒ NHÁNH HIỆN ĐẦY ĐỦ 100% TẤT CẢ CÁC TRẬN CẦU LÔNG VÀ CÁC MÔN
+// HÀM VẼ SƠ ĐỒ CÂY TỪNG VÒNG ĐÚNG CHUẨN EXCEL
 function renderBracket() {
   const selectedSport = document.getElementById('bracketFilter').value;
   const container = document.getElementById('bracketView');
@@ -666,62 +617,56 @@ function renderBracket() {
     const sportMatches = matches.filter(m => m.sport === sportName);
     if (!sportMatches.length) return;
 
-    // Lấy tất cả các vòng đấu có trong môn này
-    const roundsList = [...new Set(sportMatches.map(m => m.round))];
+    // Lấy các vòng đấu độc lập
+    const rNames = [...new Set(sportMatches.map(m => m.round))];
 
-    // Vẽ Vòng loại 1 (Hiện 100% tất cả các trận)
-    let r1Html = `<div class="round"><div class="round-title">VÒNG LOẠI / TỨ KẾT (${sportMatches.length} TRẬN)</div>`;
-    sportMatches.forEach((m, idx) => {
-      r1Html += `
-        <div class="slot">
-          <div style="font-size:10px;color:#0869d7;font-weight:bold">Trận ${idx+1} (${m.round})</div>
-          <div><span class="name">${m.teamA}</span><span class="score">${m.scoreA}</span></div>
-          <div><span class="name">${m.teamB}</span><span class="score">${m.scoreB}</span></div>
+    let bracketColsHtml = '';
+
+    rNames.forEach(rName => {
+      const rMatches = sportMatches.filter(m => m.round === rName);
+      let rHtml = `<div class="round"><div class="round-title">${rName}</div>`;
+      
+      rMatches.forEach((m, idx) => {
+        rHtml += `
+          <div class="slot">
+            <div style="font-size:10px;color:#0869d7;font-weight:bold">Trận ${idx+1}</div>
+            <div><span class="name">${m.teamA}</span><span class="score">${m.scoreA}</span></div>
+            <div><span class="name">${m.teamB}</span><span class="score">${m.scoreB}</span></div>
+          </div>
+        `;
+      });
+      rHtml += `</div>`;
+      bracketColsHtml += rHtml;
+    });
+
+    // Thêm các vòng Tứ kết / Bán kết / Chung kết nếu môn có Vòng 2
+    if(!rNames.includes("Bán kết")) {
+      bracketColsHtml += `
+        <div class="round">
+          <div class="round-title">TỨ KẾT</div>
+          <div class="slot"><div><span class="name">Thắng Nhánh 1</span><span class="score">-</span></div><div><span class="name">Thắng Nhánh 2</span><span class="score">-</span></div></div>
+          <div class="slot"><div><span class="name">Thắng Nhánh 3</span><span class="score">-</span></div><div><span class="name">Thắng Nhánh 4</span><span class="score">-</span></div></div>
+        </div>
+        <div class="round">
+          <div class="round-title">BÁN KẾT</div>
+          <div class="slot"><div><span class="name">Thắng Tứ kết 1</span><span class="score">-</span></div><div><span class="name">Thắng Tứ kết 2</span><span class="score">-</span></div></div>
+        </div>
+        <div class="round">
+          <div class="round-title">CHUNG KẾT 🏆</div>
+          <div class="slot final-slot"><div><span class="name">Thắng Bán kết 1</span><span class="score">-</span></div><div><span class="name">Thắng Bán kết 2</span><span class="score">-</span></div></div>
         </div>
       `;
-    });
-    r1Html += `</div>`;
-
-    // Tự động tính Vòng Bán kết
-    let semiHtml = `
-      <div class="round">
-        <div class="round-title">VÒNG BÁN KẾT</div>
-        <div class="slot">
-          <div style="font-size:10px;color:#0869d7;font-weight:bold">Bán kết 1</div>
-          <div><span class="name">Thắng Nhánh 1</span><span class="score">-</span></div>
-          <div><span class="name">Thắng Nhánh 2</span><span class="score">-</span></div>
-        </div>
-        <div class="slot">
-          <div style="font-size:10px;color:#0869d7;font-weight:bold">Bán kết 2</div>
-          <div><span class="name">Thắng Nhánh 3</span><span class="score">-</span></div>
-          <div><span class="name">Thắng Nhánh 4</span><span class="score">-</span></div>
-        </div>
-      </div>
-    `;
-
-    // Tự động tính Vòng Chung kết
-    let finalHtml = `
-      <div class="round">
-        <div class="round-title">CHUNG KẾT 🏆</div>
-        <div class="slot final-slot">
-          <div style="font-size:10px;color:#c00000;font-weight:bold">Tranh Huy Chương Vàng</div>
-          <div><span class="name">Thắng Bán kết 1</span><span class="score">-</span></div>
-          <div><span class="name">Thắng Bán kết 2</span><span class="score">-</span></div>
-        </div>
-      </div>
-    `;
+    }
 
     fullHtml += `
       <div class="sport-bracket-block">
         <div class="sport-title">
           <span>🏆 Môn: ${sportName}</span>
-          <small style="font-size:11px;color:#667085">Tổng số: ${sportMatches.length} trận đấu</small>
+          <small style="font-size:11px;color:#667085">Sơ đồ nhánh chính thức</small>
         </div>
         <div class="bracket-wrap">
           <div class="bracket">
-            ${r1Html}
-            ${semiHtml}
-            ${finalHtml}
+            ${bracketColsHtml}
           </div>
         </div>
       </div>
