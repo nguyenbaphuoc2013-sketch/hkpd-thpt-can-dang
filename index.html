@@ -55,14 +55,14 @@ h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:
 input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-radius:8px;box-sizing:border-box;margin:4px 0 8px;font-size:14px;background:#fff}
 textarea{min-height:90px;resize:vertical}
 
-/* SƠ ĐỒ NHÁNH THI ĐẤU DẠNG CÂY TRUẨN NHƯ EXCEL */
+/* SƠ ĐỒ NHÁNH CHUẨN XÁC THEO ĐƯỜNG KẺ XANH EXCEL */
 .sport-bracket-block{margin-bottom:24px;background:#fcfdfe;border:1px solid #e2e8f0;padding:14px;border-radius:12px}
 .sport-title{font-size:16px;font-weight:bold;color:var(--primary);margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid var(--accent);display:flex;align-items:center;justify-content:space-between}
 .bracket-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0}
 .bracket{display:flex;gap:20px;min-width:max-content}
-.round{min-width:230px;max-width:270px;background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #cbd5e1;display:flex;flex-direction:column;justify-content:space-around}
+.round{min-width:240px;max-width:280px;background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #cbd5e1;display:flex;flex-direction:column;justify-content:space-around}
 .round-title{text-align:center;color:var(--accent);font-weight:bold;font-size:13px;margin:0 0 10px;padding-bottom:4px;border-bottom:1px solid #cbd5e1;text-transform:uppercase}
-.slot{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;font-size:12px;margin:4px 0;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.slot{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;font-size:12px;margin:5px 0;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
 .slot.final-slot{border:2px solid #ffc107;background:#fffdf5}
 .slot div{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f1f5f9}
 .slot div:last-child{border:0}
@@ -145,11 +145,11 @@ nav{width:100%}
 
   <!-- SƠ ĐỒ NHÁNH VÒNG ĐẤU -->
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Cập nhật chuẩn 100% theo File Excel)</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Được ghép nối chuẩn 100% theo File Excel)</h1></div>
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Vuốt sang phải để xem tiếp Vòng 2, Tứ kết, Bán kết và Chung kết.</p>
+      <p class="muted" style="margin-top:6px">👉 Vuốt sang phải để xem toàn bộ các vòng đấu từ Vòng loại đến Chung kết.</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -281,21 +281,21 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_exact_bracket_v18';
+const STORAGE_VER = 'hkpd_2025_line_matched_v19';
 
-// DỮ LIỆU CHUẨN CÁC TRẬN ĐẤU CẦU LÔNG VÀ CÁC MÔN THEO CHÍNH XÁC SƠ ĐỒ
+// DANH SÁCH CÁC TRẬN ĐẤU GHÉP CHUẨN XÁC 100% THEO ĐƯỜNG KẺ XANH CỦA FILE EXCEL
 const rawExcel2025 = [
-  // CẦU LÔNG ĐÔI NAM - VÒNG 1 (Chỉ có 3 trận loại)
+  // CẦU LÔNG ĐÔI NAM - VÒNG 1 (SƠ LOẠI - CHỈ CÓ ĐÚNG 3 TRẬN ĐƯỜNG NỐI XANH CỘT 1)
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", teamA: "Hồ Quang Khang - La Phát Tài /10A1", teamB: "Nguyễn Tấn Thành - Cù Trương Phúc Minh /10A6" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", teamA: "Lê Hoàng Thịnh - Hà Văn Luân /10A5", teamB: "Nguyễn Thành Tân - Nguyễn Hoàng Thành /11A1" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", teamA: "Hồ Vĩ Tường - Lê Văn Razalee /11A7", teamB: "Trần Đăng Khoa - Đào Hải Đạt /11A3" },
 
-  // CẦU LÔNG ĐÔI NAM - VÒNG 2 (16 Đội / Vòng 1/8)
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Thắng Trận 1 Vòng 1", teamB: "Huỳnh Trần Hạo Nam - Trần Minh Trung /11A2" },
+  // CẦU LÔNG ĐÔI NAM - VÒNG 2 (VÒNG 1/8 - 8 TRẬN CHÍNH THỨC CỘT 2)
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Thắng Trận Sơ loại 1 (10A1 vs 10A6)", teamB: "Huỳnh Trần Hạo Nam - Trần Minh Trung /11A2" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Phạm Tấn Lễ - Trương Minh Đạt /12A6", teamB: "Nguyễn Hoàng Đăng Khôi - Trần Hoàng Khôi /12A7" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Thắng Trận 2 Vòng 1", teamB: "Nguyễn Tấn Thành - Nguyễn Dương Thành Quân /10A8" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Thắng Trận Sơ loại 2 (10A5 vs 11A1)", teamB: "Nguyễn Tấn Thành - Nguyễn Dương Thành Quân /10A8" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Nguyễn Nhựt Minh - Nguyễn Thanh Hiếu /10A3", teamB: "Huỳnh Chí Thiện - Nguyễn Văn Thuận /12A8" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Thắng Trận 3 Vòng 1", teamB: "Nguyễn Duy An - Nguyễn Phạm Trí Khoa /11A5" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Thắng Trận Sơ loại 3 (11A7 vs 11A3)", teamB: "Nguyễn Duy An - Nguyễn Phạm Trí Khoa /11A5" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Võ Hữu Thành - Trần Thái Bảo /10A2", teamB: "Võ Trung Tín - Trương Hoàng Khang /11A6" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Nguyễn Quốc Dũng - Trần Thành Đạt /11A8", teamB: "Phan Thanh Hoàng - Nguyễn Lê Gia Lạc /12A2" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", teamA: "Cao Ngọc Huy - Lê Phước Thuận /10A7", teamB: "Phan Bảo Minh - Phạm Nguyễn Thành Thiện /12A1" },
@@ -309,12 +309,14 @@ const rawExcel2025 = [
   // BÓNG ĐÁ KHỐI 11
   { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A1", teamB: "11A2" },
   { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A8", teamB: "11A7" },
+  { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A4", teamB: "11A3" },
+  { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A6", teamB: "11A5" },
 
   // BÓNG ĐÁ KHỐI 12
   { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A6", teamB: "12A2" },
   { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A7", teamB: "12A4" },
   { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A1", teamB: "12A8" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A3", teamB: "Miễn đấu (Vào Bán kết)" }
+  { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A3", teamB: "Miễn đấu (Đặc cách vào Bán kết)" }
 ];
 
 const defaultMatches = rawExcel2025.map((m, idx) => ({
@@ -352,7 +354,7 @@ function clearAllDataAbsoluteZero() {
 }
 
 function loadDefaultExcelMatches() {
-  if(confirm("Bạn có muốn nạp lại danh sách lịch đấu gốc chuẩn từ Excel?")) {
+  if(confirm("Bạn có muốn nạp lại danh sách lịch đấu chuẩn từ Excel?")) {
     matches = JSON.parse(JSON.stringify(defaultMatches));
     saveData(); renderAll();
     alert("Đã nạp lại danh sách đấu từ Excel!");
@@ -371,7 +373,7 @@ function importExcelFile() {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, {type: 'array'});
       let newMatches = [];
-      let count = 8000;
+      let count = 9000;
 
       workbook.SheetNames.forEach(sheetName => {
         const worksheet = workbook.Sheets[sheetName];
@@ -599,7 +601,6 @@ function renderSchedule() {
   document.getElementById('scheduleList').innerHTML = list.length ? list.map(m => `<div class="card">${matchHTML(m)}</div>`).join('') : '<div class="card muted">Không có trận đấu phù hợp.</div>';
 }
 
-// HÀM VẼ SƠ ĐỒ CÂY TỪNG VÒNG ĐÚNG CHUẨN EXCEL
 function renderBracket() {
   const selectedSport = document.getElementById('bracketFilter').value;
   const container = document.getElementById('bracketView');
@@ -617,7 +618,6 @@ function renderBracket() {
     const sportMatches = matches.filter(m => m.sport === sportName);
     if (!sportMatches.length) return;
 
-    // Lấy các vòng đấu độc lập
     const rNames = [...new Set(sportMatches.map(m => m.round))];
 
     let bracketColsHtml = '';
@@ -639,17 +639,19 @@ function renderBracket() {
       bracketColsHtml += rHtml;
     });
 
-    // Thêm các vòng Tứ kết / Bán kết / Chung kết nếu môn có Vòng 2
     if(!rNames.includes("Bán kết")) {
       bracketColsHtml += `
         <div class="round">
           <div class="round-title">TỨ KẾT</div>
-          <div class="slot"><div><span class="name">Thắng Nhánh 1</span><span class="score">-</span></div><div><span class="name">Thắng Nhánh 2</span><span class="score">-</span></div></div>
-          <div class="slot"><div><span class="name">Thắng Nhánh 3</span><span class="score">-</span></div><div><span class="name">Thắng Nhánh 4</span><span class="score">-</span></div></div>
+          <div class="slot"><div><span class="name">Thắng Trận 1 (Vòng 2)</span><span class="score">-</span></div><div><span class="name">Thắng Trận 2 (Vòng 2)</span><span class="score">-</span></div></div>
+          <div class="slot"><div><span class="name">Thắng Trận 3 (Vòng 2)</span><span class="score">-</span></div><div><span class="name">Thắng Trận 4 (Vòng 2)</span><span class="score">-</span></div></div>
+          <div class="slot"><div><span class="name">Thắng Trận 5 (Vòng 2)</span><span class="score">-</span></div><div><span class="name">Thắng Trận 6 (Vòng 2)</span><span class="score">-</span></div></div>
+          <div class="slot"><div><span class="name">Thắng Trận 7 (Vòng 2)</span><span class="score">-</span></div><div><span class="name">Thắng Trận 8 (Vòng 2)</span><span class="score">-</span></div></div>
         </div>
         <div class="round">
           <div class="round-title">BÁN KẾT</div>
           <div class="slot"><div><span class="name">Thắng Tứ kết 1</span><span class="score">-</span></div><div><span class="name">Thắng Tứ kết 2</span><span class="score">-</span></div></div>
+          <div class="slot"><div><span class="name">Thắng Tứ kết 3</span><span class="score">-</span></div><div><span class="name">Thắng Tứ kết 4</span><span class="score">-</span></div></div>
         </div>
         <div class="round">
           <div class="round-title">CHUNG KẾT 🏆</div>
@@ -662,7 +664,7 @@ function renderBracket() {
       <div class="sport-bracket-block">
         <div class="sport-title">
           <span>🏆 Môn: ${sportName}</span>
-          <small style="font-size:11px;color:#667085">Sơ đồ nhánh chính thức</small>
+          <small style="font-size:11px;color:#667085">Sơ đồ ghép nhánh chính thức</small>
         </div>
         <div class="bracket-wrap">
           <div class="bracket">
