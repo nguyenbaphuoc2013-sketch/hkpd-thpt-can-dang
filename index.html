@@ -213,11 +213,14 @@ nav{width:100%}
         <button class="btn ok" onclick="importExcelFile()">📥 Cập Nhật Ngay Từ File Excel Này</button>
       </div>
 
-      <!-- LÀM SẠCH BỘ NHỚ TRẮNG TINH 100% -->
+      <!-- XÓA SẠCH TRẮNG TẤT CẢ DỮ LIỆU -->
       <div class="card admin-card danger-zone">
-        <h3 style="margin-top:0;color:#c53030">🧹 Dọn Dẹp & Xóa Sạch Trắng Dữ Liệu</h3>
-        <p class="muted" style="margin-bottom:10px">Bấm nút này sẽ <b>XÓA SẠCH VỀ 0</b> tất cả Huy chương, Tin tức, Hình ảnh và đưa Bảng thi đấu về trạng thái ban đầu.</p>
-        <button class="danger" onclick="clearAllDataToZero()">🗑 XÓA SẠCH TRẮNG DỮ LIỆU (VỀ 0)</button>
+        <h3 style="margin-top:0;color:#c53030">🧹 Dọn Dẹp & Xóa Sạch Hoàn Toàn Dữ Liệu</h3>
+        <p class="muted" style="margin-bottom:10px">Bấm nút này sẽ <b>XÓA SẠCH TRẮNG 100%</b> toàn bộ Trận đấu, Sắp thi đấu, Sơ đồ nhánh, Huy chương, Tin tức và Hình ảnh.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="danger" onclick="clearAllDataAbsoluteZero()">🗑 XÓA SẠCH TRẮNG HOÀN TOÀN DỮ LIỆU (TRẮNG TINH)</button>
+          <button class="warn" onclick="loadDefaultExcelMatches()">🔄 Nạp lại danh sách đấu từ Excel mẫu</button>
+        </div>
       </div>
 
       <!-- CẬP NHẬT TỶ SỐ TRỰC TIẾP -->
@@ -291,9 +294,9 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_zero_clean_v13';
+const STORAGE_VER = 'hkpd_2025_absolute_zero_v14';
 
-// DỮ LIỆU BẢNG ĐẤU EXCEL GỐC
+// DỮ LIỆU EXCEL GỐC
 const rawExcel2025 = [
   { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A6", teamB: "12A2" },
   { sport: "Bóng đá Nam K12", round: "Vòng 1", teamA: "12A7", teamB: "12A4" },
@@ -302,20 +305,13 @@ const rawExcel2025 = [
 
   { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A1", teamB: "11A2" },
   { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A8", teamB: "11A7" },
-  { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A4", teamB: "11A3" },
-  { sport: "Bóng đá Nam K11", round: "Vòng 1", teamA: "11A6", teamB: "11A5" },
 
   { sport: "Bóng đá Nam K10", round: "Vòng 1", teamA: "10A5", teamB: "10A2" },
   { sport: "Bóng đá Nam K10", round: "Vòng 1", teamA: "10A6", teamB: "10A4" },
-  { sport: "Bóng đá Nam K10", round: "Vòng 1", teamA: "10A8", teamB: "10A3" },
-  { sport: "Bóng đá Nam K10", round: "Vòng 1", teamA: "10A7", teamB: "10A1" },
 
   { sport: "Bóng chuyền Nữ K12", round: "Vòng 1", teamA: "12A4", teamB: "12A5" },
-  { sport: "Bóng chuyền Nữ K12", round: "Vòng 1", teamA: "12A2", teamB: "12A8" },
-  { sport: "Bóng chuyền Nữ K12", round: "Vòng 1", teamA: "12A7", teamB: "12A3" },
 
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Hồ Quang Khang - La Phát Tài /10A1", teamB: "Nguyễn Tấn Thành - Cù Trương Phúc Minh /10A6" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 1", teamA: "Huỳnh Trần Hạo Nam - Trần Minh Trung /11A2", teamB: "Phạm Tấn Lễ - Trương Minh Đạt /12A6" },
 
   { sport: "Đá cầu Đôi Nam", round: "Vòng 1", teamA: "Nguyễn Hào Kiệt - Huỳnh Nhân / 11A7", teamB: "Nguyễn Quốc Bảo - Nguyễn Đăng Khoa / 12A1" }
 ];
@@ -332,11 +328,11 @@ const defaultMatches = rawExcel2025.map((m, idx) => ({
   venue: "Sân HKPĐ Cần Đăng"
 }));
 
-// BỘ DỮ LIỆU ĐƯỢC LOAD
-let matches = JSON.parse(localStorage.getItem(STORAGE_VER + '_matches')) || JSON.parse(JSON.stringify(defaultMatches));
-let medals = JSON.parse(localStorage.getItem(STORAGE_VER + '_medals')) || {};
-let newsData = JSON.parse(localStorage.getItem(STORAGE_VER + '_news')) || [];
-let photos = JSON.parse(localStorage.getItem(STORAGE_VER + '_photos')) || [];
+// KHÔNG TỰ NẠP LẠI DỮ LIỆU KHI MẢNG ĐÃ BỊ XÓA VỀ RỖNG []
+let matches = JSON.parse(localStorage.getItem(STORAGE_VER + '_matches')) ?? JSON.parse(JSON.stringify(defaultMatches));
+let medals = JSON.parse(localStorage.getItem(STORAGE_VER + '_medals')) ?? {};
+let newsData = JSON.parse(localStorage.getItem(STORAGE_VER + '_news')) ?? [];
+let photos = JSON.parse(localStorage.getItem(STORAGE_VER + '_photos')) ?? [];
 
 function saveData() {
   localStorage.setItem(STORAGE_VER + '_matches', JSON.stringify(matches));
@@ -345,24 +341,34 @@ function saveData() {
   localStorage.setItem(STORAGE_VER + '_photos', JSON.stringify(photos));
 }
 
-// CHỨC NĂNG XÓA SẠCH TRẮNG DỮ LIỆU VỀ 0
-function clearAllDataToZero() {
-  if(confirm("XÁC NHẬN: Bạn muốn XÓA SẠCH TRẮNG tất cả Huy chương, Tin tức, Hình ảnh về 0?")) {
+// XÓA SẠCH TRẮNG HOÀN TOÀN 100% TẤT CẢ DỮ LIỆU VỀ RỖNG
+function clearAllDataAbsoluteZero() {
+  if(confirm("XÁC NHẬN CHẮC CHẮN: Bạn muốn XÓA TRẮNG 100% tất cả Trận đấu, Sơ đồ, Huy chương, Tin tức về RỖNG?")) {
     localStorage.clear();
     localStorage.setItem(AUTH_KEY, 'true');
     
-    matches = JSON.parse(JSON.stringify(defaultMatches)); // Đưa tỷ số các trận về 0
-    medals = {}; // Huy chương về RỖNG (0 Vàng, 0 Bạc, 0 Đồng)
-    newsData = []; // Tin tức về RỖNG
-    photos = []; // Hình ảnh về RỖNG
+    matches = []; // Mảng trận đấu RỖNG 100%
+    medals = {};  // Bảng huy chương RỖNG 100%
+    newsData = []; // Tin tức RỖNG 100%
+    photos = [];   // Hình ảnh RỖNG 100%
     
     saveData();
     renderAll();
-    alert("Đã xóa sạch trắng toàn bộ dữ liệu thành công!");
+    alert("Đã xóa sạch trắng hoàn toàn 100% dữ liệu!");
   }
 }
 
-// CẬP NHẬT NHANH TỪ FILE EXCEL
+// NẠP LẠI DANH SÁCH MẪU TỪ EXCEL
+function loadDefaultExcelMatches() {
+  if(confirm("Bạn có muốn nạp lại danh sách lịch đấu gốc từ Excel?")) {
+    matches = JSON.parse(JSON.stringify(defaultMatches));
+    saveData();
+    renderAll();
+    alert("Đã nạp lại danh sách đấu từ Excel!");
+  }
+}
+
+// CẬP NHẬT TỪ FILE EXCEL MỚI
 function importExcelFile() {
   const fileInput = document.getElementById('excelFileInput');
   if(!fileInput.files.length) return alert("Vui lòng chọn 1 file Excel (.xlsx hoặc .xls)!");
@@ -376,7 +382,7 @@ function importExcelFile() {
       const workbook = XLSX.read(data, {type: 'array'});
       
       let newMatches = [];
-      let count = 4000;
+      let count = 5000;
 
       workbook.SheetNames.forEach(sheetName => {
         const worksheet = workbook.Sheets[sheetName];
@@ -484,11 +490,11 @@ function deleteMatch(id) {
 }
 
 function addMatch() {
-  const sport = document.getElementById('mSportSelect').value;
+  const sport = document.getElementById('mSportSelect').value || 'Môn thể thao';
   const round = document.getElementById('mRoundInput').value.trim() || 'Vòng 1';
   const teamA = document.getElementById('mA').value.trim();
   const teamB = document.getElementById('mB').value.trim();
-  if(!sport || !teamA || !teamB) return alert("Vui lòng nhập tên 2 Đội/VĐV!");
+  if(!teamA || !teamB) return alert("Vui lòng nhập tên 2 Đội/VĐV!");
 
   matches.push({
     id: Date.now(),
@@ -587,7 +593,7 @@ function renderAll() {
   document.getElementById('sportFilter').innerHTML = sportOpts;
   document.getElementById('bracketFilter').innerHTML = sportOpts;
   document.getElementById('adminSportFilter').innerHTML = sportOpts;
-  document.getElementById('mSportSelect').innerHTML = sports.map(s => `<option value="${s}">${s}</option>`).join('');
+  document.getElementById('mSportSelect').innerHTML = sports.length ? sports.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="Bóng đá">Bóng đá</option><option value="Cầu lông">Cầu lông</option>';
 
   renderSchedule();
   renderBracket();
@@ -624,7 +630,7 @@ function renderBracket() {
   const sportsToRender = selectedSport ? [selectedSport] : [...new Set(matches.map(m => m.sport))];
 
   if (!sportsToRender.length) {
-    container.innerHTML = '<p class="muted">Chưa có dữ liệu môn thi.</p>';
+    container.innerHTML = '<p class="muted">Chưa có dữ liệu môn thi nào.</p>';
     return;
   }
 
@@ -665,7 +671,7 @@ function renderBracket() {
     }
   });
 
-  container.innerHTML = fullHtml || '<p class="muted">Chưa có dữ liệu sơ đồ nhánh.</p>';
+  container.innerHTML = fullHtml || '<p class="muted">Chưa có dữ liệu môn thi nào.</p>';
 }
 
 function renderMedals() {
@@ -677,8 +683,8 @@ function renderMedals() {
   list.sort((a,b) => b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze);
 
   if(!list.length) {
-    document.getElementById('medalTable').innerHTML = '<p class="muted" style="text-align:center;padding:15px">Chưa có huy chương nào được cập nhật.</p>';
-    document.getElementById('homeMedals').innerHTML = '<p class="muted" style="text-align:center;padding:15px">Chưa có huy chương nào được cập nhật.</p>';
+    document.getElementById('medalTable').innerHTML = '<p class="muted" style="text-align:center;padding:15px">Chưa có dữ liệu huy chương.</p>';
+    document.getElementById('homeMedals').innerHTML = '<p class="muted" style="text-align:center;padding:15px">Chưa có dữ liệu huy chương.</p>';
     return;
   }
 
@@ -747,6 +753,11 @@ function renderAdminMatches() {
   const sp = document.getElementById('adminSportFilter').value;
   const st = document.getElementById('adminStatusFilter').value;
   const list = matches.filter(m => (!sp || m.sport === sp) && (!st || m.status === st));
+
+  if(!list.length) {
+    document.getElementById('adminMatches').innerHTML = '<p class="muted">Chưa có trận đấu nào trong danh sách.</p>';
+    return;
+  }
 
   document.getElementById('adminMatches').innerHTML = list.map(m => `
     <div class="admin-row" id="row_${m.id}">
