@@ -113,7 +113,7 @@ nav{width:100%}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2024 - 2025</h1>
-      <div class="muted">Trường THPT Cần Đăng • Đầy đủ tất cả các môn & Tự động mở rộng môn mới</div>
+      <div class="muted">Trường THPT Cần Đăng • Đã cập nhật 100% tất cả các môn & toàn bộ các vòng thi đấu</div>
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
@@ -147,11 +147,11 @@ nav{width:100%}
 
   <!-- SƠ ĐỒ NHÁNH VÒNG ĐẤU -->
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Đầy đủ tất cả các môn & Tranh Hạng 3 🥉)</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Tất cả 11 môn & các trận Tranh Hạng 3 🥉)</h1></div>
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Tự động liên kết tỷ số: Thắng Bán kết vào Tranh Vàng (🥇), Thua Bán kết vào Tranh Đồng (🥉)!</p>
+      <p class="muted" style="margin-top:6px">👉 Cập nhật kết quả ở Quản trị: Thắng vào Tranh Vàng (🥇), Thua Bán kết vào Tranh Đồng (🥉)!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -186,7 +186,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số, thêm môn thi đấu mới, nạp file Excel linh hoạt</div>
+      <div class="muted">Cập nhật tỷ số, nạp file Excel linh hoạt và tự động liên kết sơ đồ nhánh</div>
     </div>
 
     <div id="login">
@@ -201,7 +201,7 @@ nav{width:100%}
 
     <div id="adminPanel" class="hidden">
       <div class="card admin-card" style="background:#f0f7ff">
-        <h3 style="margin-top:0;color:#0869d7">📂 Cập nhật từ File Excel (Tự tạo môn mới nếu file có môn mới)</h3>
+        <h3 style="margin-top:0;color:#0869d7">📂 Cập nhật từ File Excel</h3>
         <p class="muted" style="margin-bottom:10px">Chọn file Excel lịch thi đấu (định dạng <code>.xlsx</code> hoặc <code>.xls</code>).</p>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
         <button class="btn ok" onclick="importExcelFile()">📥 Cập Nhật Ngay Từ File Excel Này</button>
@@ -226,13 +226,13 @@ nav{width:100%}
       </div>
 
       <div class="card admin-card">
-        <h2>➕ Thêm Trận Đấu Mới / Thêm Môn Thi Đấu Mới</h2>
+        <h2>➕ Thêm Trận Đấu Mới / Môn Thi Đấu Mới</h2>
         <div class="formgrid">
-          <div>Môn thi đấu:<input id="mSportInput" placeholder="Tên môn (VD: Cầu lông Đơn Nam, Điền kinh...)"></div>
-          <div>Vòng đấu:<input id="mRoundInput" placeholder="VD: Vòng 1, Vòng 1/8, Tứ kết, Bán kết, Chung kết"></div>
+          <div>Môn thi đấu:<input id="mSportInput" placeholder="Tên môn thi đấu"></div>
+          <div>Vòng đấu:<input id="mRoundInput" placeholder="VD: Vòng 1, Tứ kết, Bán kết, Chung kết"></div>
           <div>VĐV / Đội A:<input id="mA" placeholder="Tên VĐV hoặc Lớp A"></div>
           <div>VĐV / Đội B:<input id="mB" placeholder="Tên VĐV hoặc Lớp B"></div>
-          <div>Địa điểm sân:<input id="mVenue" placeholder="Sân cầu lông / Nhà đa năng"></div>
+          <div>Địa điểm sân:<input id="mVenue" placeholder="Sân Cần Đăng"></div>
           <div>Trạng thái:<select id="mStatus"><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
         </div>
         <button class="btn" onclick="addMatch()">Tạo Trận Đấu Mới</button>
@@ -283,9 +283,9 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_ultimate_auto_expand_v28';
+const STORAGE_VER = 'hkpd_2025_100percent_complete_v29';
 
-// NẠP DỮ LIỆU ĐẦY ĐỦ CHO TẤT CẢ CÁC MÔN
+// NẠP DỮ LIỆU CHUẨN ĐẦY ĐỦ 100% CỦA TẤT CẢ CÁC MÔN
 const rawExcel2025 = [
   // 1. BÓNG ĐÁ NAM K12
   { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "BD12_M1", teamA: "12A6", teamB: "12A2" },
@@ -342,7 +342,7 @@ const rawExcel2025 = [
   { sport: "Bóng chuyền Nữ K10", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BC10_CK", teamAFeed: "BC10_BK1", teamBFeed: "BC10_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
   { sport: "Bóng chuyền Nữ K10", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BC10_H3", teamALoserFeed: "BC10_BK1", teamBLoserFeed: "BC10_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
 
-  // 7. CẦU LÔNG ĐÔI NAM
+  // 7. CẦU LÔNG ĐÔI NAM (19 ĐÔI)
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", matchCode: "CL_SL1", teamA: "Hồ Quang Khang - La Phát Tài /10A1", teamB: "Nguyễn Tấn Thành - Cù Trương Phúc Minh /10A6" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", matchCode: "CL_SL2", teamA: "Lê Hoàng Thịnh - Hà Văn Luân /10A5", teamB: "Nguyễn Thành Tân - Nguyễn Hoàng Thành /11A1" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", matchCode: "CL_SL3", teamA: "Hồ Vĩ Tường - Lê Văn Razalee /11A7", teamB: "Trần Đăng Khoa - Đào Hải Đạt /11A3" },
@@ -354,40 +354,90 @@ const rawExcel2025 = [
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", matchCode: "CL_V2_6", teamA: "Võ Hữu Thành - Trần Thái Bảo /10A2", teamB: "Võ Trung Tín - Trương Hoàng Khang /11A6" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", matchCode: "CL_V2_7", teamA: "Nguyễn Quốc Dũng - Trần Thành Đạt /11A8", teamB: "Phan Thanh Hoàng - Nguyễn Lê Gia Lạc /12A2" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", matchCode: "CL_V2_8", teamA: "Cao Ngọc Huy - Lê Phước Thuận /10A7", teamB: "Phan Bảo Minh - Phạm Nguyễn Thành Thiện /12A1" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 3 (Tứ kết)", matchCode: "CL_TK1", teamAFeed: "CL_V2_1", teamBFeed: "CL_V2_2", teamA: "Thắng Trận 1 (1/8)", teamB: "Thắng Trận 2 (1/8)" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 3 (Tứ kết)", matchCode: "CL_TK2", teamAFeed: "CL_V2_3", teamBFeed: "CL_V2_4", teamA: "Thắng Trận 3 (1/8)", teamB: "Thắng Trận 4 (1/8)" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 3 (Tứ kết)", matchCode: "CL_TK3", teamAFeed: "CL_V2_5", teamBFeed: "CL_V2_6", teamA: "Thắng Trận 5 (1/8)", teamB: "Thắng Trận 6 (1/8)" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 3 (Tứ kết)", matchCode: "CL_TK4", teamAFeed: "CL_V2_7", teamBFeed: "CL_V2_8", teamA: "Thắng Trận 7 (1/8)", teamB: "Thắng Trận 8 (1/8)" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 3 (Tứ kết)", matchCode: "CL_TK1", teamAFeed: "CL_V2_1", teamBFeed: "CL_V2_2", teamA: "Thắng Trận 1 1/8", teamB: "Thắng Trận 2 1/8" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 3 (Tứ kết)", matchCode: "CL_TK2", teamAFeed: "CL_V2_3", teamBFeed: "CL_V2_4", teamA: "Thắng Trận 3 1/8", teamB: "Thắng Trận 4 1/8" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 3 (Tứ kết)", matchCode: "CL_TK3", teamAFeed: "CL_V2_5", teamBFeed: "CL_V2_6", teamA: "Thắng Trận 5 1/8", teamB: "Thắng Trận 6 1/8" },
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 3 (Tứ kết)", matchCode: "CL_TK4", teamAFeed: "CL_V2_7", teamBFeed: "CL_V2_8", teamA: "Thắng Trận 7 1/8", teamB: "Thắng Trận 8 1/8" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 4 (Bán kết)", matchCode: "CL_BK1", teamAFeed: "CL_TK1", teamBFeed: "CL_TK2", teamA: "Thắng Tứ kết 1", teamB: "Thắng Tứ kết 2" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 4 (Bán kết)", matchCode: "CL_BK2", teamAFeed: "CL_TK3", teamBFeed: "CL_TK4", teamA: "Thắng Tứ kết 3", teamB: "Thắng Tứ kết 4" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 5 (Chung kết & Tranh Hạng 3)", matchCode: "CL_CK", teamAFeed: "CL_BK1", teamBFeed: "CL_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 5 (Chung kết & Tranh Hạng 3)", matchCode: "CL_H3", teamALoserFeed: "CL_BK1", teamBLoserFeed: "CL_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
 
-  // 8. CẦU LÔNG ĐÔI NAM NỮ
+  // 8. CẦU LÔNG ĐÔI NAM NỮ (19 ĐÔI - CẬP NHẬT ĐẦY ĐỦ 5 VÒNG)
   { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1 (Sơ loại)", matchCode: "CLNN_SL1", teamA: "Trịnh Thị Ngọc Quyên - Nguyễn Dương Thành Quân /10A8", teamB: "Huỳnh Trần Hạo Nam - Nguyễn Thị Ngọc Bích /11A2" },
   { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1 (Sơ loại)", matchCode: "CLNN_SL2", teamA: "Nguyễn Quốc Dũng - Trần Thị Kim Ngọc /11A8", teamB: "Lê Hoài Anh - Trương Quân Bão /11A7" },
   { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1 (Sơ loại)", matchCode: "CLNN_SL3", teamA: "Huỳnh Lê Anh Thơ - Nguyễn Phú Trọng /12A5", teamB: "Nguyễn Thành Tân - Ngô Thị Anh Thư /11A1" },
 
-  // 9. CẦU LÔNG ĐÔI NỮ
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", matchCode: "CLNU_M1", teamA: "Ngô Thị Anh Thư - Nguyễn Ngọc Thùy / 11A1", teamB: "Trần Thị Bảo Châu - Phạm Xuân Nghi /10A7" },
-  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", matchCode: "CLNU_M2", teamA: "Trần Hồ Khánh Băng - Trần Ngọc Như Quỳnh /12A1", teamB: "Trần Huyền Cơ - Phạm Minh Thư /10A4" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 2 (1/8)", matchCode: "CLNN_V2_1", teamAFeed: "CLNN_SL1", teamA: "Thắng Sơ loại 1", teamB: "Danh Thị Huỳnh Anh - Nguyễn Văn Ân /12A7" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 2 (1/8)", matchCode: "CLNN_V2_2", teamA: "Nguyễn Thị Mỹ Trân - Trần Bảo Toàn /10A6", teamB: "Trần Đăng Khoa - Đàm Thị Tố Quyên /11A3" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 2 (1/8)", matchCode: "CLNN_V2_3", teamAFeed: "CLNN_SL2", teamA: "Thắng Sơ loại 2", teamB: "Huỳnh Thị Hồng Vy - Nguyễn Đăng Khoa /10A5" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 2 (1/8)", matchCode: "CLNN_V2_4", teamA: "Hồ Văn Huy - Mách A Si Yah /11A5", teamB: "Nguyễn Thị Thanh Thư - Võ Trung Tín /11A6" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 2 (1/8)", matchCode: "CLNN_V2_5", teamAFeed: "CLNN_SL3", teamA: "Thắng Sơ loại 3", teamB: "Phạm Tấn Lễ - Nguyễn Ngọc Bảo Ngân /12A6" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 2 (1/8)", matchCode: "CLNN_V2_6", teamA: "Nguyễn Trang Kiều Trúc - Trần Chí Bền /10A2", teamB: "Huỳnh Chí Thiện - Phạm Thị Thơ /12A8" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 2 (1/8)", matchCode: "CLNN_V2_7", teamA: "Phạm Bá Ngạt - Phùng Thị Trúc An /12A1", teamB: "Nguyễn Thị Ngọc Hân - Phạm Minh Phúc /10A4" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 2 (1/8)", matchCode: "CLNN_V2_8", teamA: "Phùng Tuấn Vỹ - Nguyễn Thị Kim Anh / 11A4", teamB: "Lê Trâm Anh - Võ Ngọc Đăng Khoa /12A2" },
 
-  // 10. ĐÁ CẦU ĐÔI NAM
-  { sport: "Đá cầu Đôi Nam", round: "Vòng 1", matchCode: "DCN_M1", teamA: "Nguyễn Hào Kiệt - Huỳnh Nhân / 11A7", teamB: "Nguyễn Quốc Bảo - Nguyễn Đăng Khoa / 12A1" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 3 (Tứ kết)", matchCode: "CLNN_TK1", teamAFeed: "CLNN_V2_1", teamBFeed: "CLNN_V2_2", teamA: "Thắng Trận 1 1/8", teamB: "Thắng Trận 2 1/8" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 3 (Tứ kết)", matchCode: "CLNN_TK2", teamAFeed: "CLNN_V2_3", teamBFeed: "CLNN_V2_4", teamA: "Thắng Trận 3 1/8", teamB: "Thắng Trận 4 1/8" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 3 (Tứ kết)", matchCode: "CLNN_TK3", teamAFeed: "CLNN_V2_5", teamBFeed: "CLNN_V2_6", teamA: "Thắng Trận 5 1/8", teamB: "Thắng Trận 6 1/8" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 3 (Tứ kết)", matchCode: "CLNN_TK4", teamAFeed: "CLNN_V2_7", teamBFeed: "CLNN_V2_8", teamA: "Thắng Trận 7 1/8", teamB: "Thắng Trận 8 1/8" },
 
-  // 11. ĐÁ CẦU ĐÔI NAM NỮ
-  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 1", matchCode: "DCNN_M1", teamA: "Võ Thành Nhân - Nguyễn Thị Tuyết Thùy / 11A4", teamB: "Nguyễn Thị Thùy Dương - Huỳnh Hoàng Phúc / 10A2" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 4 (Bán kết)", matchCode: "CLNN_BK1", teamAFeed: "CLNN_TK1", teamBFeed: "CLNN_TK2", teamA: "Thắng Tứ kết 1", teamB: "Thắng Tứ kết 2" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 4 (Bán kết)", matchCode: "CLNN_BK2", teamAFeed: "CLNN_TK3", teamBFeed: "CLNN_TK4", teamA: "Thắng Tứ kết 3", teamB: "Thắng Tứ kết 4" },
 
-  // MÔN CÁ NHÂN ĐƠN MỚI
-  { sport: "Cầu lông Đơn Nam", round: "Vòng 1 (Bán kết)", matchCode: "CLDN_BK1", teamA: "Hồ Quang Khang /10A1", teamB: "Nguyễn Thành Tân /11A1" },
-  { sport: "Cầu lông Đơn Nam", round: "Vòng 1 (Bán kết)", matchCode: "CLDN_BK2", teamA: "Phạm Tấn Lễ /12A6", teamB: "Trần Đăng Khoa /11A3" },
-  { sport: "Cầu lông Đơn Nam", round: "Vòng 2 (Chung kết & Tranh Hạng 3)", matchCode: "CLDN_CK", teamAFeed: "CLDN_BK1", teamBFeed: "CLDN_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
-  { sport: "Cầu lông Đơn Nam", round: "Vòng 2 (Chung kết & Tranh Hạng 3)", matchCode: "CLDN_H3", teamALoserFeed: "CLDN_BK1", teamBLoserFeed: "CLDN_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 5 (Chung kết & Tranh Hạng 3)", matchCode: "CLNN_CK", teamAFeed: "CLNN_BK1", teamBFeed: "CLNN_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 5 (Chung kết & Tranh Hạng 3)", matchCode: "CLNN_H3", teamALoserFeed: "CLNN_BK1", teamBLoserFeed: "CLNN_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
 
-  { sport: "Cầu lông Đơn Nữ", round: "Vòng 1 (Bán kết)", matchCode: "CLDNU_BK1", teamA: "Ngô Thị Anh Thư /11A1", teamB: "Trần Huyền Cơ /10A4" },
-  { sport: "Cầu lông Đơn Nữ", round: "Vòng 1 (Bán kết)", matchCode: "CLDNU_BK2", teamA: "Phạm Thị Tuyết /12A4", teamB: "Lê Thị Ái My /11A7" },
-  { sport: "Cầu lông Đơn Nữ", round: "Vòng 2 (Chung kết & Tranh Hạng 3)", matchCode: "CLDNU_CK", teamAFeed: "CLDNU_BK1", teamBFeed: "CLDNU_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
-  { sport: "Cầu lông Đơn Nữ", round: "Vòng 2 (Chung kết & Tranh Hạng 3)", matchCode: "CLDNU_H3", teamALoserFeed: "CLDNU_BK1", teamBLoserFeed: "CLDNU_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" }
+  // 9. CẦU LÔNG ĐÔI NỮ (15 ĐÔI - CẬP NHẬT ĐẦY ĐỦ 4 VÒNG)
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1 (1/8)", matchCode: "CLNU_V1_1", teamA: "Ngô Thị Anh Thư - Nguyễn Ngọc Thùy / 11A1", teamB: "Trần Thị Bảo Châu - Phạm Xuân Nghi /10A7" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1 (1/8)", matchCode: "CLNU_V1_2", teamA: "Trần Hồ Khánh Băng - Trần Ngọc Như Quỳnh /12A1", teamB: "Trần Huyền Cơ - Phạm Minh Thư /10A4" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1 (1/8)", matchCode: "CLNU_V1_3", teamA: "Phạm Thị Tuyết - Bùi Nguyễn Ngọc Linh /12A4", teamB: "Trần Thị Kim Ngọc - Nguyễn Thị Thúy Ngân /11A8" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1 (1/8)", matchCode: "CLNU_V1_4", teamA: "Nguyễn Ngọc Bảo Ngân - Nguyễn Ngọc Bảo Thy /12A6", teamB: "Lê Thị Ái My - Mai Thị Minh Thúy /11A7" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1 (1/8)", matchCode: "CLNU_V1_5", teamA: "Nguyễn Trang Kiều Trúc - Võ Huỳnh Ái /10A2", teamB: "Huỳnh Thị Như - Lê Thị Bích Ngân /11A5" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1 (1/8)", matchCode: "CLNU_V1_6", teamA: "Mai Ngọc Như Ý - Nguyễn Phương Đào /10A5", teamB: "Lê Nguyễn Thanh Trúc - Trần Thị Bảo Trân /12A5" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1 (1/8)", matchCode: "CLNU_V1_7", teamA: "Nguyễn Thị Thanh Thư - Võ Thị Ngọc Giàu /11A6", teamB: "Đàm Thị Tố Quyên - Lê Thị Kim Xuyến /11A3" },
+
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 2 (Tứ kết)", matchCode: "CLNU_TK1", teamAFeed: "CLNU_V1_1", teamBFeed: "CLNU_V1_2", teamA: "Thắng Trận 1 1/8", teamB: "Thắng Trận 2 1/8" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 2 (Tứ kết)", matchCode: "CLNU_TK2", teamAFeed: "CLNU_V1_3", teamBFeed: "CLNU_V1_4", teamA: "Thắng Trận 3 1/8", teamB: "Thắng Trận 4 1/8" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 2 (Tứ kết)", matchCode: "CLNU_TK3", teamAFeed: "CLNU_V1_5", teamBFeed: "CLNU_V1_6", teamA: "Thắng Trận 5 1/8", teamB: "Thắng Trận 6 1/8" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 2 (Tứ kết)", matchCode: "CLNU_TK4", teamAFeed: "CLNU_V1_7", teamB: "Phan Nguyễn Nhựt Lam - Trương Thị Thảo Nguyên /10A6", teamA: "Thắng Trận 7 1/8" },
+
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 3 (Bán kết)", matchCode: "CLNU_BK1", teamAFeed: "CLNU_TK1", teamBFeed: "CLNU_TK2", teamA: "Thắng Tứ kết 1", teamB: "Thắng Tứ kết 2" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 3 (Bán kết)", matchCode: "CLNU_BK2", teamAFeed: "CLNU_TK3", teamBFeed: "CLNU_TK4", teamA: "Thắng Tứ kết 3", teamB: "Thắng Tứ kết 4" },
+
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 4 (Chung kết & Tranh Hạng 3)", matchCode: "CLNU_CK", teamAFeed: "CLNU_BK1", teamBFeed: "CLNU_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 4 (Chung kết & Tranh Hạng 3)", matchCode: "CLNU_H3", teamALoserFeed: "CLNU_BK1", teamBLoserFeed: "CLNU_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
+
+  // 10. ĐÁ CẦU ĐÔI NAM (15 ĐÔI - CẬP NHẬT ĐẦY ĐỦ 4 VÒNG)
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 1 (1/8)", matchCode: "DCN_V1_1", teamA: "Nguyễn Hào Kiệt - Huỳnh Nhân / 11A7", teamB: "Nguyễn Quốc Bảo - Nguyễn Đăng Khoa / 12A1" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 1 (1/8)", matchCode: "DCN_V1_2", teamA: "Võ Thành Nhân - Nguyễn Văn Ngọc Hải / 11A4", teamB: "Lê Phước Nghĩa - Nguyên Hồ Lý Đạt Thành / 12A8" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 1 (1/8)", matchCode: "DCN_V1_3", teamA: "Huỳnh Hoàng Phúc - Nguyễn Tấn Đạt / 10A2", teamB: "Nguyễn Phú Trọng - Lê Hoàng Quí / 12A5" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 1 (1/8)", matchCode: "DCN_V1_4", teamA: "Nguyễn Tấn An - Phạm Ngọc Tỷ / 10A6", teamB: "Trần Ngọc Vinh - Trần Quốc Tuấn / 11A2" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 1 (1/8)", matchCode: "DCN_V1_5", teamA: "Nguyễn Minh Tâm - Nguyễn Công Đức / 11A3", teamB: "Mai Cảnh - Lê Thành Nhân / 10A7" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 1 (1/8)", matchCode: "DCN_V1_6", teamA: "Nguyễn Thành Phúc - Nguyễn Viết Nguyên / 12A2", teamB: "Phạm Kim Long - Mốs Đa / 12A4" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 1 (1/8)", matchCode: "DCN_V1_7", teamA: "Mai Chí Khang - Nguyễn Hoàng Nhật / 10A1", teamB: "Phạm Văn Tuấn - Trần Vĩ Tuấn / 12A3" },
+
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 2 (Tứ kết)", matchCode: "DCN_TK1", teamAFeed: "DCN_V1_1", teamBFeed: "DCN_V1_2", teamA: "Thắng Trận 1 1/8", teamB: "Thắng Trận 2 1/8" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 2 (Tứ kết)", matchCode: "DCN_TK2", teamAFeed: "DCN_V1_3", teamBFeed: "DCN_V1_4", teamA: "Thắng Trận 3 1/8", teamB: "Thắng Trận 4 1/8" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 2 (Tứ kết)", matchCode: "DCN_TK3", teamAFeed: "DCN_V1_5", teamBFeed: "DCN_V1_6", teamA: "Thắng Trận 5 1/8", teamB: "Thắng Trận 6 1/8" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 2 (Tứ kết)", matchCode: "DCN_TK4", teamAFeed: "DCN_V1_7", teamB: "Lê Văn Tiến - Dương Tuấn Khang / 11A1", teamA: "Thắng Trận 7 1/8" },
+
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 3 (Bán kết)", matchCode: "DCN_BK1", teamAFeed: "DCN_TK1", teamBFeed: "DCN_TK2", teamA: "Thắng Tứ kết 1", teamB: "Thắng Tứ kết 2" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 3 (Bán kết)", matchCode: "DCN_BK2", teamAFeed: "DCN_TK3", teamBFeed: "DCN_TK4", teamA: "Thắng Tứ kết 3", teamB: "Thắng Tứ kết 4" },
+
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 4 (Chung kết & Tranh Hạng 3)", matchCode: "DCN_CK", teamAFeed: "DCN_BK1", teamBFeed: "DCN_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 4 (Chung kết & Tranh Hạng 3)", matchCode: "DCN_H3", teamALoserFeed: "DCN_BK1", teamBLoserFeed: "DCN_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
+
+  // 11. ĐÁ CẦU ĐÔI NAM NỮ (7 ĐÔI - CẬP NHẬT ĐẦY ĐỦ 3 VÒNG)
+  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 1 (Tứ kết)", matchCode: "DCNN_M1", teamA: "Võ Thành Nhân - Nguyễn Thị Tuyết Thùy / 11A4", teamB: "Nguyễn Thị Thùy Dương - Huỳnh Hoàng Phúc / 10A2" },
+  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 1 (Tứ kết)", matchCode: "DCNN_M2", teamA: "Nguyễn Minh Hiệp - Nguyễn Thị Mỹ / 11A1", teamB: "Trần Đức Tiến - Nguyễn Ngọc Kim Ngân / 12A1" },
+  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 1 (Tứ kết)", matchCode: "DCNN_M3", teamA: "Nguyễn Minh Tâm - Lê Hoàng Anh Thư / 11A3", teamB: "Trần Lê Song Hồ - Nguyễn Như Ý / 12A4" },
+
+  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 2 (Bán kết)", matchCode: "DCNN_BK1", teamAFeed: "DCNN_M1", teamBFeed: "DCNN_M2", teamA: "Thắng Trận 1", teamB: "Thắng Trận 2" },
+  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 2 (Bán kết)", matchCode: "DCNN_BK2", teamAFeed: "DCNN_M3", teamB: "Nguyễn Thị Nhi - Đặng Ngọc Thiện / 12A8", teamA: "Thắng Trận 3" },
+
+  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "DCNN_CK", teamAFeed: "DCNN_BK1", teamBFeed: "DCNN_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "DCNN_H3", teamALoserFeed: "DCNN_BK1", teamBLoserFeed: "DCNN_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" }
 ];
 
 const defaultMatches = rawExcel2025.map((m, idx) => ({
@@ -452,7 +502,7 @@ function loadDefaultExcelMatches() {
   if(confirm("Bạn có muốn nạp lại danh sách lịch đấu chuẩn từ Excel?")) {
     matches = JSON.parse(JSON.stringify(defaultMatches));
     saveData(); renderAll();
-    alert("Đã nạp lại danh sách đấu từ Excel!");
+    alert("Đã nạp lại danh sách đấu đầy đủ 11 môn!");
   }
 }
 
@@ -577,7 +627,7 @@ function updateMatchScore(id) {
   
   saveData(); 
   renderAll();
-  alert("Đã lưu tỷ số thành công! Tên đội thắng/thua đã được cập nhật tự động vào sơ đồ.");
+  alert("Đã lưu tỷ số thành công! Tên đội thắng/thua đã nhảy tự động vào sơ đồ.");
 }
 
 function deleteMatch(id) {
@@ -684,7 +734,6 @@ function renderAll() {
   document.getElementById('homeLive').innerHTML = liveMatches.length ? liveMatches.map(m => matchHTML(m)).join('') : '<p class="muted">Hiện không có trận nào đang đấu.</p>';
   document.getElementById('homeNext').innerHTML = nextMatches.length ? nextMatches.slice(0,5).map(m => matchHTML(m)).join('') : '<p class="muted">Chưa có lịch sắp tới.</p>';
 
-  // TỰ ĐỘNG TẠO DANH SÁCH TẤT CẢ CÁC MÔN (BAO GỒM CẢ CÁC MÔN THÊM MỚI SAU NÀY)
   const allSports = [...new Set(matches.map(m => m.sport))];
   const sportOpts = '<option value="">Tất cả các môn</option>' + allSports.map(s => `<option value="${s}">${s}</option>`).join('');
 
