@@ -55,7 +55,7 @@ h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:
 input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-radius:8px;box-sizing:border-box;margin:4px 0 8px;font-size:14px;background:#fff}
 textarea{min-height:90px;resize:vertical}
 
-/* STYLING SƠ ĐỒ NHÁNH VÒNG ĐẤU HOÀN HẢO */
+/* SƠ ĐỒ NHÁNH VÀ KHUNG TRANH VÀNG / TRANH ĐỒNG */
 .sport-bracket-block{margin-bottom:24px;background:#fcfdfe;border:1px solid #e2e8f0;padding:14px;border-radius:12px}
 .sport-title{font-size:16px;font-weight:bold;color:var(--primary);margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid var(--accent);display:flex;align-items:center;justify-content:space-between}
 .bracket-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0}
@@ -113,7 +113,7 @@ nav{width:100%}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2024 - 2025</h1>
-      <div class="muted">Trường THPT Cần Đăng • Bảng tin và sơ đồ thi đấu tự động</div>
+      <div class="muted">Trường THPT Cần Đăng • Cập nhật trực tiếp kết quả tất cả các môn thi đấu</div>
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
@@ -147,11 +147,11 @@ nav{width:100%}
 
   <!-- SƠ ĐỒ NHÁNH VÒNG ĐẤU -->
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Tự động cập nhật tên đội thắng/thua & Tranh Hạng 3)</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Đầy đủ Tranh Vàng 🥇 & Tranh Đồng 🥉)</h1></div>
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Khi nhập kết quả trong Quản trị, tên đội Thắng tự động lên Chung kết, tên đội Thua tự động xuống Tranh Hạng 3!</p>
+      <p class="muted" style="margin-top:6px">👉 Khi nhập tỷ số Bán kết trong Quản trị: Trận Vàng tự động điền Đội thắng Bán kết 1 & 2; Trận Đồng tự động điền Đội thua Bán kết 1 & 2!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -186,7 +186,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Hệ thống nhập điểm tự động điều hướng nhánh đấu chuẩn xác</div>
+      <div class="muted">Cập nhật tỷ số trận đấu để tự động đẩy tên đội vào sơ đồ nhánh</div>
     </div>
 
     <div id="login">
@@ -283,11 +283,11 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_ultimate_final_v24';
+const STORAGE_VER = 'hkpd_2025_perfect_feeds_v25';
 
-// TOÀN BỘ CƠ SỞ DỮ LIỆU ĐẤU ĐƯỢC CẤU TRÚC CHUẨN XÁC VỐN CÓ CỦA FILE EXCEL
+// DANH SÁCH CHUẨN XÁC TẤT CẢ CÁC MÔN VÀ MÃ LIÊN KẾT BÁN KẾT ➔ CHUNG KẾT / TRANH HẠNG 3
 const rawExcel2025 = [
-  // 1. BÓNG ĐÁ NAM K12 (7 ĐỘI)
+  // 1. BÓNG ĐÁ NAM K12
   { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "BD12_M1", teamA: "12A6", teamB: "12A2" },
   { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "BD12_M2", teamA: "12A7", teamB: "12A4" },
   { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "BD12_M3", teamA: "12A1", teamB: "12A8" },
@@ -296,7 +296,7 @@ const rawExcel2025 = [
   { sport: "Bóng đá Nam K12", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD12_CK", teamAFeed: "BD12_BK1", teamBFeed: "BD12_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
   { sport: "Bóng đá Nam K12", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD12_H3", teamALoserFeed: "BD12_BK1", teamBLoserFeed: "BD12_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
 
-  // 2. BÓNG ĐÁ NAM K11 (8 ĐỘI)
+  // 2. BÓNG ĐÁ NAM K11
   { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "BD11_M1", teamA: "11A1", teamB: "11A2" },
   { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "BD11_M2", teamA: "11A8", teamB: "11A7" },
   { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "BD11_M3", teamA: "11A4", teamB: "11A3" },
@@ -306,7 +306,7 @@ const rawExcel2025 = [
   { sport: "Bóng đá Nam K11", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD11_CK", teamAFeed: "BD11_BK1", teamBFeed: "BD11_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
   { sport: "Bóng đá Nam K11", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD11_H3", teamALoserFeed: "BD11_BK1", teamBLoserFeed: "BD11_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
 
-  // 3. BÓNG ĐÁ NAM K10 (8 ĐỘI)
+  // 3. BÓNG ĐÁ NAM K10
   { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "BD10_M1", teamA: "10A5", teamB: "10A2" },
   { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "BD10_M2", teamA: "10A6", teamB: "10A4" },
   { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "BD10_M3", teamA: "10A8", teamB: "10A3" },
@@ -403,6 +403,7 @@ function saveData() {
   localStorage.setItem(STORAGE_VER + '_photos', JSON.stringify(photos));
 }
 
+// LẤY ĐỘI THẮNG
 function getWinnerOfMatch(matchCode) {
   if (!matchCode) return null;
   const m = matches.find(x => x.matchCode === matchCode);
@@ -412,6 +413,7 @@ function getWinnerOfMatch(matchCode) {
   return null;
 }
 
+// LẤY ĐỘI THUA (DÙNG CHO TRANH HẠNG 3)
 function getLoserOfMatch(matchCode) {
   if (!matchCode) return null;
   const m = matches.find(x => x.matchCode === matchCode);
@@ -560,7 +562,7 @@ function updateMatchScore(id) {
   
   saveData(); 
   renderAll();
-  alert("Đã lưu tỷ số! Tên đội thắng/thua đã được đẩy tự động vào sơ đồ nhánh.");
+  alert("Đã lưu tỷ số! Tên đội thắng Bán kết đã nhảy vào Tranh Vàng, đội thua Bán kết đã nhảy vào Tranh Hạng 3.");
 }
 
 function deleteMatch(id) {
@@ -730,6 +732,7 @@ function renderBracket() {
         let displayA = m.teamA;
         let displayB = m.teamB;
 
+        // Đẩy tên Đội thắng từ vòng trước
         if (m.teamAFeed) {
           const winnerA = getWinnerOfMatch(m.teamAFeed);
           if (winnerA) displayA = winnerA;
@@ -739,6 +742,7 @@ function renderBracket() {
           if (winnerB) displayB = winnerB;
         }
 
+        // Đẩy tên Đội thua Bán kết xuống Tranh Hạng 3
         if (m.teamALoserFeed) {
           const loserA = getLoserOfMatch(m.teamALoserFeed);
           if (loserA) displayA = loserA;
@@ -776,7 +780,7 @@ function renderBracket() {
       <div class="sport-bracket-block">
         <div class="sport-title">
           <span>🏆 Môn: ${sportName}</span>
-          <small style="font-size:11px;color:#667085">Sơ đồ nhánh hoàn chỉnh</small>
+          <small style="font-size:11px;color:#667085">Sơ đồ nhánh đầy đủ 11 môn thi</small>
         </div>
         <div class="bracket-wrap">
           <div class="bracket">
