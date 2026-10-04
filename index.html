@@ -55,7 +55,7 @@ h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:
 input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-radius:8px;box-sizing:border-box;margin:4px 0 8px;font-size:14px;background:#fff}
 textarea{min-height:90px;resize:vertical}
 
-/* SƠ ĐỒ NHÁNH VÀ Ô TRANH HẠNG 3 BRONZE */
+/* SƠ ĐỒ NHÁNH HIỂN THỊ CẬP NHẬT TÊN ĐỘI THẮNG THỜI GIAN THỰC */
 .sport-bracket-block{margin-bottom:24px;background:#fcfdfe;border:1px solid #e2e8f0;padding:14px;border-radius:12px}
 .sport-title{font-size:16px;font-weight:bold;color:var(--primary);margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid var(--accent);display:flex;align-items:center;justify-content:space-between}
 .bracket-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0}
@@ -113,7 +113,7 @@ nav{width:100%}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2024 - 2025</h1>
-      <div class="muted">Trường THPT Cần Đăng • Cập nhật trực tiếp kết quả các môn thi đấu</div>
+      <div class="muted">Trường THPT Cần Đăng • Cập nhật trực tiếp kết quả tất cả các môn thi đấu</div>
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
@@ -147,11 +147,11 @@ nav{width:100%}
 
   <!-- SƠ ĐỒ NHÁNH VÒNG ĐẤU -->
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Đầy đủ Tranh Vàng 🥇 & Tranh Hạng 3 🥉 Bóng đá)</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Đầy đủ 11 môn & Tranh Hạng 3 🥉)</h1></div>
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Khi nhập kết quả Bán kết, Đội thắng tự động lên trận Chung kết, Đội thua tự động xuống trận Tranh Hạng 3!</p>
+      <p class="muted" style="margin-top:6px">👉 Tên đội thắng/thua sẽ tự động nhảy vào các vòng trong khi cập nhật tỷ số ở mục Quản trị!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -186,7 +186,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số trận đấu và đẩy tự động đội Thắng/Thua vào sơ đồ nhánh</div>
+      <div class="muted">Cập nhật tỷ số trận đấu để tự động đẩy tên đội vào sơ đồ nhánh</div>
     </div>
 
     <div id="login">
@@ -283,40 +283,66 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_football_bronze_v22';
+const STORAGE_VER = 'hkpd_2025_full_11_sports_v23';
 
-// DANH SÁCH CHUẨN XÁC BÓNG ĐÁ CÓ BỔ SUNG TRẬN TRANH HẠNG 3 (🥉)
+// DANH SÁCH CHUẨN XÁC TOÀN BỘ 11 MÔN THI ĐẤU
 const rawExcel2025 = [
-  // BÓNG ĐÁ NAM K12 (7 ĐỘI - BỔ SUNG TRANH HẠNG 3)
-  { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "K12_M1", teamA: "12A6", teamB: "12A2" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "K12_M2", teamA: "12A7", teamB: "12A4" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "K12_M3", teamA: "12A1", teamB: "12A8" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 2 (Bán kết)", matchCode: "K12_BK1", teamAFeed: "K12_M1", teamBFeed: "K12_M2", teamA: "Thắng Trận 1 (12A6 vs 12A2)", teamB: "Thắng Trận 2 (12A7 vs 12A4)" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 2 (Bán kết)", matchCode: "K12_BK2", teamAFeed: "K12_M3", teamB: "12A3", teamA: "Thắng Trận 3 (12A1 vs 12A8)" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "K12_CK", teamAFeed: "K12_BK1", teamBFeed: "K12_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
-  { sport: "Bóng đá Nam K12", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "K12_H3", teamALoserFeed: "K12_BK1", teamBLoserFeed: "K12_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
+  // 1. BÓNG ĐÁ NAM K12
+  { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "BD12_M1", teamA: "12A6", teamB: "12A2" },
+  { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "BD12_M2", teamA: "12A7", teamB: "12A4" },
+  { sport: "Bóng đá Nam K12", round: "Vòng 1 (Tứ kết)", matchCode: "BD12_M3", teamA: "12A1", teamB: "12A8" },
+  { sport: "Bóng đá Nam K12", round: "Vòng 2 (Bán kết)", matchCode: "BD12_BK1", teamAFeed: "BD12_M1", teamBFeed: "BD12_M2", teamA: "Thắng Trận 1 (12A6 vs 12A2)", teamB: "Thắng Trận 2 (12A7 vs 12A4)" },
+  { sport: "Bóng đá Nam K12", round: "Vòng 2 (Bán kết)", matchCode: "BD12_BK2", teamAFeed: "BD12_M3", teamB: "12A3", teamA: "Thắng Trận 3 (12A1 vs 12A8)" },
+  { sport: "Bóng đá Nam K12", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD12_CK", teamAFeed: "BD12_BK1", teamBFeed: "BD12_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Bóng đá Nam K12", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD12_H3", teamALoserFeed: "BD12_BK1", teamBLoserFeed: "BD12_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
 
-  // BÓNG ĐÁ NAM K11 (8 ĐỘI - BỔ SUNG TRANH HẠNG 3)
-  { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "K11_M1", teamA: "11A1", teamB: "11A2" },
-  { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "K11_M2", teamA: "11A8", teamB: "11A7" },
-  { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "K11_M3", teamA: "11A4", teamB: "11A3" },
-  { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "K11_M4", teamA: "11A6", teamB: "11A5" },
-  { sport: "Bóng đá Nam K11", round: "Vòng 2 (Bán kết)", matchCode: "K11_BK1", teamAFeed: "K11_M1", teamBFeed: "K11_M2", teamA: "Thắng Tứ kết 1", teamB: "Thắng Tứ kết 2" },
-  { sport: "Bóng đá Nam K11", round: "Vòng 2 (Bán kết)", matchCode: "K11_BK2", teamAFeed: "K11_M3", teamBFeed: "K11_M4", teamA: "Thắng Tứ kết 3", teamB: "Thắng Tứ kết 4" },
-  { sport: "Bóng đá Nam K11", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "K11_CK", teamAFeed: "K11_BK1", teamBFeed: "K11_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
-  { sport: "Bóng đá Nam K11", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "K11_H3", teamALoserFeed: "K11_BK1", teamBLoserFeed: "K11_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
+  // 2. BÓNG ĐÁ NAM K11
+  { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "BD11_M1", teamA: "11A1", teamB: "11A2" },
+  { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "BD11_M2", teamA: "11A8", teamB: "11A7" },
+  { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "BD11_M3", teamA: "11A4", teamB: "11A3" },
+  { sport: "Bóng đá Nam K11", round: "Vòng 1 (Tứ kết)", matchCode: "BD11_M4", teamA: "11A6", teamB: "11A5" },
+  { sport: "Bóng đá Nam K11", round: "Vòng 2 (Bán kết)", matchCode: "BD11_BK1", teamAFeed: "BD11_M1", teamBFeed: "BD11_M2", teamA: "Thắng Tứ kết 1", teamB: "Thắng Tứ kết 2" },
+  { sport: "Bóng đá Nam K11", round: "Vòng 2 (Bán kết)", matchCode: "BD11_BK2", teamAFeed: "BD11_M3", teamBFeed: "BD11_M4", teamA: "Thắng Tứ kết 3", teamB: "Thắng Tứ kết 4" },
+  { sport: "Bóng đá Nam K11", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD11_CK", teamAFeed: "BD11_BK1", teamBFeed: "BD11_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Bóng đá Nam K11", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD11_H3", teamALoserFeed: "BD11_BK1", teamBLoserFeed: "BD11_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
 
-  // BÓNG ĐÁ NAM K10 (8 ĐỘI - BỔ SUNG TRANH HẠNG 3)
-  { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "K10_M1", teamA: "10A5", teamB: "10A2" },
-  { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "K10_M2", teamA: "10A6", teamB: "10A4" },
-  { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "K10_M3", teamA: "10A8", teamB: "10A3" },
-  { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "K10_M4", teamA: "10A7", teamB: "10A1" },
-  { sport: "Bóng đá Nam K10", round: "Vòng 2 (Bán kết)", matchCode: "K10_BK1", teamAFeed: "K10_M1", teamBFeed: "K10_M2", teamA: "Thắng Tứ kết 1", teamB: "Thắng Tứ kết 2" },
-  { sport: "Bóng đá Nam K10", round: "Vòng 2 (Bán kết)", matchCode: "K10_BK2", teamAFeed: "K10_M3", teamBFeed: "K10_M4", teamA: "Thắng Tứ kết 3", teamB: "Thắng Tứ kết 4" },
-  { sport: "Bóng đá Nam K10", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "K10_CK", teamAFeed: "K10_BK1", teamBFeed: "K10_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
-  { sport: "Bóng đá Nam K10", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "K10_H3", teamALoserFeed: "K10_BK1", teamBLoserFeed: "K10_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
+  // 3. BÓNG ĐÁ NAM K10
+  { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "BD10_M1", teamA: "10A5", teamB: "10A2" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "BD10_M2", teamA: "10A6", teamB: "10A4" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "BD10_M3", teamA: "10A8", teamB: "10A3" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 1 (Tứ kết)", matchCode: "BD10_M4", teamA: "10A7", teamB: "10A1" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 2 (Bán kết)", matchCode: "BD10_BK1", teamAFeed: "BD10_M1", teamBFeed: "BD10_M2", teamA: "Thắng Tứ kết 1", teamB: "Thắng Tứ kết 2" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 2 (Bán kết)", matchCode: "BD10_BK2", teamAFeed: "BD10_M3", teamBFeed: "BD10_M4", teamA: "Thắng Tứ kết 3", teamB: "Thắng Tứ kết 4" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD10_CK", teamAFeed: "BD10_BK1", teamBFeed: "BD10_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Bóng đá Nam K10", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BD10_H3", teamALoserFeed: "BD10_BK1", teamBLoserFeed: "BD10_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
 
-  // CẦU LÔNG ĐÔI NAM
+  // 4. BÓNG CHUYỀN NỮ K12
+  { sport: "Bóng chuyền Nữ K12", round: "Vòng 1 (Tứ kết)", matchCode: "BC12_M1", teamA: "12A4", teamB: "12A5" },
+  { sport: "Bóng chuyền Nữ K12", round: "Vòng 1 (Tứ kết)", matchCode: "BC12_M2", teamA: "12A2", teamB: "12A8" },
+  { sport: "Bóng chuyền Nữ K12", round: "Vòng 1 (Tứ kết)", matchCode: "BC12_M3", teamA: "12A7", teamB: "12A3" },
+  { sport: "Bóng chuyền Nữ K12", round: "Vòng 2 (Bán kết)", matchCode: "BC12_BK1", teamAFeed: "BC12_M1", teamBFeed: "BC12_M2", teamA: "Thắng Trận 1", teamB: "Thắng Trận 2" },
+  { sport: "Bóng chuyền Nữ K12", round: "Vòng 2 (Bán kết)", matchCode: "BC12_BK2", teamAFeed: "BC12_M3", teamB: "12A1", teamA: "Thắng Trận 3" },
+  { sport: "Bóng chuyền Nữ K12", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BC12_CK", teamAFeed: "BC12_BK1", teamBFeed: "BC12_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Bóng chuyền Nữ K12", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BC12_H3", teamALoserFeed: "BC12_BK1", teamBLoserFeed: "BC12_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
+
+  // 5. BÓNG CHUYỀN NỮ K11
+  { sport: "Bóng chuyền Nữ K11", round: "Vòng 1 (Tứ kết)", matchCode: "BC11_M1", teamA: "11A8", teamB: "11A4" },
+  { sport: "Bóng chuyền Nữ K11", round: "Vòng 1 (Tứ kết)", matchCode: "BC11_M2", teamA: "11A5", teamB: "11A2" },
+  { sport: "Bóng chuyền Nữ K11", round: "Vòng 1 (Tứ kết)", matchCode: "BC11_M3", teamA: "11A3", teamB: "11A1" },
+  { sport: "Bóng chuyền Nữ K11", round: "Vòng 1 (Tứ kết)", matchCode: "BC11_M4", teamA: "11A7", teamB: "11A6" },
+  { sport: "Bóng chuyền Nữ K11", round: "Vòng 2 (Bán kết)", matchCode: "BC11_BK1", teamAFeed: "BC11_M1", teamBFeed: "BC11_M2", teamA: "Thắng Tứ kết 1", teamB: "Thắng Tứ kết 2" },
+  { sport: "Bóng chuyền Nữ K11", round: "Vòng 2 (Bán kết)", matchCode: "BC11_BK2", teamAFeed: "BC11_M3", teamBFeed: "BC11_M4", teamA: "Thắng Tứ kết 3", teamB: "Thắng Tứ kết 4" },
+  { sport: "Bóng chuyền Nữ K11", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BC11_CK", teamAFeed: "BC11_BK1", teamBFeed: "BC11_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Bóng chuyền Nữ K11", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BC11_H3", teamALoserFeed: "BC11_BK1", teamBLoserFeed: "BC11_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
+
+  // 6. BÓNG CHUYỀN NỮ K10
+  { sport: "Bóng chuyền Nữ K10", round: "Vòng 1", matchCode: "BC10_M1", teamA: "10A2", teamB: "10A7" },
+  { sport: "Bóng chuyền Nữ K10", round: "Vòng 2 (Bán kết)", matchCode: "BC10_BK1", teamAFeed: "BC10_M1", teamB: "10A1", teamA: "Thắng 10A2-10A7" },
+  { sport: "Bóng chuyền Nữ K10", round: "Vòng 2 (Bán kết)", matchCode: "BC10_BK2", teamA: "10A6", teamB: "10A4" },
+  { sport: "Bóng chuyền Nữ K10", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BC10_CK", teamAFeed: "BC10_BK1", teamBFeed: "BC10_BK2", teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" },
+  { sport: "Bóng chuyền Nữ K10", round: "Vòng 3 (Chung kết & Tranh Hạng 3)", matchCode: "BC10_H3", teamALoserFeed: "BC10_BK1", teamBLoserFeed: "BC10_BK2", teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" },
+
+  // 7. CẦU LÔNG ĐÔI NAM
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", matchCode: "CL_S1", teamA: "Hồ Quang Khang - La Phát Tài /10A1", teamB: "Nguyễn Tấn Thành - Cù Trương Phúc Minh /10A6" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", matchCode: "CL_S2", teamA: "Lê Hoàng Thịnh - Hà Văn Luân /10A5", teamB: "Nguyễn Thành Tân - Nguyễn Hoàng Thành /11A1" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 1 (Sơ loại)", matchCode: "CL_S3", teamA: "Hồ Vĩ Tường - Lê Văn Razalee /11A7", teamB: "Trần Đăng Khoa - Đào Hải Đạt /11A3" },
@@ -327,7 +353,24 @@ const rawExcel2025 = [
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", matchCode: "CL_V2_5", teamAFeed: "CL_S3", teamA: "Thắng Trận Sơ loại 3", teamB: "Nguyễn Duy An - Nguyễn Phạm Trí Khoa /11A5" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", matchCode: "CL_V2_6", teamA: "Võ Hữu Thành - Trần Thái Bảo /10A2", teamB: "Võ Trung Tín - Trương Hoàng Khang /11A6" },
   { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", matchCode: "CL_V2_7", teamA: "Nguyễn Quốc Dũng - Trần Thành Đạt /11A8", teamB: "Phan Thanh Hoàng - Nguyễn Lê Gia Lạc /12A2" },
-  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", matchCode: "CL_V2_8", teamA: "Cao Ngọc Huy - Lê Phước Thuận /10A7", teamB: "Phan Bảo Minh - Phạm Nguyễn Thành Thiện /12A1" }
+  { sport: "Cầu lông Đôi Nam", round: "Vòng 2 (1/8)", matchCode: "CL_V2_8", teamA: "Cao Ngọc Huy - Lê Phước Thuận /10A7", teamB: "Phan Bảo Minh - Phạm Nguyễn Thành Thiện /12A1" },
+
+  // 8. CẦU LÔNG ĐÔI NAM NỮ
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1 (Sơ loại)", matchCode: "CL_NN_S1", teamA: "Trịnh Thị Ngọc Quyên - Nguyễn Dương Thành Quân /10A8", teamB: "Huỳnh Trần Hạo Nam - Nguyễn Thị Ngọc Bích /11A2" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1 (Sơ loại)", matchCode: "CL_NN_S2", teamA: "Nguyễn Quốc Dũng - Trần Thị Kim Ngọc /11A8", teamB: "Lê Hoài Anh - Trương Quân Bão /11A7" },
+  { sport: "Cầu lông Đôi Nam Nữ", round: "Vòng 1 (Sơ loại)", matchCode: "CL_NN_S3", teamA: "Huỳnh Lê Anh Thơ - Nguyễn Phú Trọng /12A5", teamB: "Nguyễn Thành Tân - Ngô Thị Anh Thư /11A1" },
+
+  // 9. CẦU LÔNG ĐÔI NỮ
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", matchCode: "CL_NU_M1", teamA: "Ngô Thị Anh Thư - Nguyễn Ngọc Thùy / 11A1", teamB: "Trần Thị Bảo Châu - Phạm Xuân Nghi /10A7" },
+  { sport: "Cầu lông Đôi Nữ", round: "Vòng 1", matchCode: "CL_NU_M2", teamA: "Trần Hồ Khánh Băng - Trần Ngọc Như Quỳnh /12A1", teamB: "Trần Huyền Cơ - Phạm Minh Thư /10A4" },
+
+  // 10. ĐÁ CẦU ĐÔI NAM
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 1", matchCode: "DC_NAM_M1", teamA: "Nguyễn Hào Kiệt - Huỳnh Nhân / 11A7", teamB: "Nguyễn Quốc Bảo - Nguyễn Đăng Khoa / 12A1" },
+  { sport: "Đá cầu Đôi Nam", round: "Vòng 1", matchCode: "DC_NAM_M2", teamA: "Võ Thành Nhân - Nguyễn Văn Ngọc Hải / 11A4", teamB: "Lê Phước Nghĩa - Nguyên Hồ Lý Đạt Thành / 12A8" },
+
+  // 11. ĐÁ CẦU ĐÔI NAM NỮ
+  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 1", matchCode: "DC_NN_M1", teamA: "Võ Thành Nhân - Nguyễn Thị Tuyết Thùy / 11A4", teamB: "Nguyễn Thị Thùy Dương - Huỳnh Hoàng Phúc / 10A2" },
+  { sport: "Đá cầu Đôi Nam Nữ", round: "Vòng 1", matchCode: "DC_NN_M2", teamA: "Nguyễn Minh Hiệp - Nguyễn Thị Mỹ / 11A1", teamB: "Trần Đức Tiến - Nguyễn Ngọc Kim Ngân / 12A1" }
 ];
 
 const defaultMatches = rawExcel2025.map((m, idx) => ({
@@ -360,7 +403,6 @@ function saveData() {
   localStorage.setItem(STORAGE_VER + '_photos', JSON.stringify(photos));
 }
 
-// HÀM TÌM ĐỘI THẮNG CỦA 1 TRẬN ĐẤU
 function getWinnerOfMatch(matchCode) {
   if (!matchCode) return null;
   const m = matches.find(x => x.matchCode === matchCode);
@@ -370,7 +412,6 @@ function getWinnerOfMatch(matchCode) {
   return null;
 }
 
-// HÀM TÌM ĐỘI THUA CỦA 1 TRẬN ĐẤU (DÙNG CHO TRANH HẠNG 3)
 function getLoserOfMatch(matchCode) {
   if (!matchCode) return null;
   const m = matches.find(x => x.matchCode === matchCode);
@@ -519,7 +560,7 @@ function updateMatchScore(id) {
   
   saveData(); 
   renderAll();
-  alert("Đã lưu tỷ số thành công! Đội thắng/thua đã được cập nhật vào sơ đồ nhánh.");
+  alert("Đã lưu tỷ số! Tên đội thắng/thua đã được đẩy tự động vào sơ đồ nhánh.");
 }
 
 function deleteMatch(id) {
@@ -630,7 +671,7 @@ function renderAll() {
   document.getElementById('sportFilter').innerHTML = sportOpts;
   document.getElementById('bracketFilter').innerHTML = sportOpts;
   document.getElementById('adminSportFilter').innerHTML = sportOpts;
-  document.getElementById('mSportSelect').innerHTML = sports.length ? sports.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="Bóng đá">Bóng đá</option><option value="Cầu lông">Cầu lông</option>';
+  document.getElementById('mSportSelect').innerHTML = sports.length ? sports.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="Bóng đá Nam K12">Bóng đá Nam K12</option><option value="Cầu lông Đôi Nam">Cầu lông Đôi Nam</option>';
 
   renderSchedule();
   renderBracket();
@@ -689,7 +730,6 @@ function renderBracket() {
         let displayA = m.teamA;
         let displayB = m.teamB;
 
-        // Tự động đẩy đội thắng từ trận trước
         if (m.teamAFeed) {
           const winnerA = getWinnerOfMatch(m.teamAFeed);
           if (winnerA) displayA = winnerA;
@@ -699,7 +739,6 @@ function renderBracket() {
           if (winnerB) displayB = winnerB;
         }
 
-        // Tự động đẩy đội thua xuống trận Tranh Hạng 3
         if (m.teamALoserFeed) {
           const loserA = getLoserOfMatch(m.teamALoserFeed);
           if (loserA) displayA = loserA;
@@ -737,7 +776,7 @@ function renderBracket() {
       <div class="sport-bracket-block">
         <div class="sport-title">
           <span>🏆 Môn: ${sportName}</span>
-          <small style="font-size:11px;color:#667085">Sơ đồ thi đấu có Tranh Hạng 3</small>
+          <small style="font-size:11px;color:#667085">Sơ đồ nhánh đầy đủ 11 môn thi</small>
         </div>
         <div class="bracket-wrap">
           <div class="bracket">
