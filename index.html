@@ -113,7 +113,7 @@ nav{width:100%}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2024 - 2025</h1>
-      <div class="muted">Trường THPT Cần Đăng • Tự động đẩy tên đội Thắng/Thua Bán kết vào Chung kết & Tranh Hạng 3</div>
+      <div class="muted">Trường THPT Cần Đăng • Tự động đồng bộ tin tức và sơ đồ nhánh đầy đủ cho điện thoại</div>
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
@@ -151,7 +151,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Khi lưu tỷ số Bán kết: Tên 2 đội <b>Thắng Bán kết</b> sẽ tự động nhảy vào trận <b>Chung kết (🥇 Tranh Vàng)</b>, 2 đội <b>Thua Bán kết</b> tự động vào trận <b>Tranh Hạng 3 (🥉 Tranh Đồng)</b>!</p>
+      <p class="muted" style="margin-top:6px">👉 Khi lưu tỷ số Bán kết: Tên 2 đội <b>Thắng Bán kết</b> tự động nhảy vào trận <b>Chung kết (🥇 Tranh Vàng)</b>, 2 đội <b>Thua Bán kết</b> tự động vào trận <b>Tranh Hạng 3 (🥉 Tranh Đồng)</b>!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -186,7 +186,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số, nạp file Excel tự tạo môn mới/xóa môn cũ</div>
+      <div class="muted">Cập nhật tỷ số, đăng tin tức và hình ảnh hiển thị ngay trên điện thoại</div>
     </div>
 
     <div id="login">
@@ -250,14 +250,14 @@ nav{width:100%}
       </div>
 
       <div class="card admin-card">
-        <h2>📰 Đăng Tin Tức Mới</h2>
+        <h2>📰 Đăng Tin Tức Mới (Học sinh/Phụ huynh thấy ngay trên điện thoại)</h2>
         <input id="newsTitle" placeholder="Tiêu đề thông báo / bài viết">
         <textarea id="newsBody" placeholder="Nội dung chi tiết bài viết..."></textarea>
         <button class="btn" onclick="addNews()">Đăng Bài Viết</button>
       </div>
 
       <div class="card admin-card">
-        <h2>📸 Thêm Hình Ảnh Mới</h2>
+        <h2>📸 Thêm Hình Ảnh Mới (Học sinh/Phụ huynh thấy ngay trên điện thoại)</h2>
         <input id="photoTitle" placeholder="Mô tả hình ảnh">
         <input type="file" id="photoFileInput" accept="image/*" style="margin-bottom:10px">
         <button class="btn" onclick="addPhoto()">Thêm Hình Ảnh</button>
@@ -283,9 +283,9 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_ULTIMATE_DYNAMIC_ENGINE_V31';
+const STORAGE_VER = 'hkpd_2025_GLOBAL_SYNC_V32';
 
-// DANH SÁCH DỮ LIỆU ĐỘI/VĐV CỦA TẤT CẢ CÁC MÔN
+// DỮ LIỆU ĐỘI/VĐV CỦA TẤT CẢ CÁC MÔN
 const rawExcelRawData = {
   "Bóng đá Nam K12": ["12A6", "12A2", "12A7", "12A4", "12A1", "12A8", "12A3"],
   "Bóng đá Nam K11": ["11A1", "11A2", "11A8", "11A7", "11A4", "11A3", "11A6", "11A5"],
@@ -350,16 +350,24 @@ const rawExcelRawData = {
   ]
 };
 
-// THUẬT TOÁN TỰ ĐỘNG XÂY DỰNG TOÀN BỘ CÂY THI ĐẤU (THẮNG LÊN CHUNG KẾT 🥇, THUA XUỐNG HẠNG 3 🥉)
+// TIN TỨC VÀ HÌNH ẢNH MẪU SẴN (PHỤ HUYNH VÀ HỌC SINH MỞ LINK LÀ THẤY NGAY LẬP TỨC)
+const defaultNews = [
+  { id: 1, title: "Khai mạc Hội Khỏe Phù Đổng cấp trường năm học 2024-2025", body: "Lễ khai mạc diễn ra trang trọng với sự tham gia của đông đảo vận động viên các lớp. Chúc các em thi đấu hết mình với tinh thần thể thao cao thượng!", date: "04/10/2026" },
+  { id: 2, title: "Lịch thi đấu các trận chung kết và tranh hạng 3", body: "Ban tổ chức thông báo lịch thi đấu các trận chung kết và tranh huy chương đồng các môn bóng đá, bóng chuyền, cầu lông và đá cầu.", date: "04/10/2026" }
+];
+
+const defaultPhotos = [
+  { id: 1, title: "Không khí khai mạc rực rỡ", url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80" },
+  { id: 2, title: "Trận tranh tài sôi nổi môn Cầu lông", url: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80" }
+];
+
 function generateFullTreeForSport(sportName, teamList) {
   let matches = [];
   let N = teamList.length;
   if (N < 2) return matches;
-
   let safeSportId = sportName.replace(/[^a-zA-Z0-9]/g, '');
 
   if (N <= 5) {
-    // 5 Đội: Vòng 1 (1 trận) -> Bán kết (2 trận) -> Chung kết & Tranh Hạng 3
     matches.push({ matchCode: `${safeSportId}_V1_1`, sport: sportName, round: "Vòng 1", teamA: teamList[0], teamB: teamList[1] });
     matches.push({ matchCode: `${safeSportId}_BK_1`, sport: sportName, round: "Vòng 2 (Bán kết)", teamAFeed: `${safeSportId}_V1_1`, teamB: teamList[2], teamA: "Thắng Trận 1 Vòng 1" });
     matches.push({ matchCode: `${safeSportId}_BK_2`, sport: sportName, round: "Vòng 2 (Bán kết)", teamA: teamList[3], teamB: teamList[4] || "Miễn đấu" });
@@ -367,7 +375,6 @@ function generateFullTreeForSport(sportName, teamList) {
     matches.push({ matchCode: `${safeSportId}_H3`, sport: sportName, round: "Vòng 3 (Chung kết & Tranh Hạng 3)", teamALoserFeed: `${safeSportId}_BK_1`, teamBLoserFeed: `${safeSportId}_BK_2`, teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" });
   } 
   else if (N <= 8) {
-    // 6-8 Đội: Tứ kết (3-4 trận) -> Bán kết (2 trận) -> Chung kết & Tranh Hạng 3
     let numTK = Math.floor(N / 2);
     for (let i = 0; i < numTK; i++) {
       matches.push({ matchCode: `${safeSportId}_TK_${i+1}`, sport: sportName, round: "Vòng 1 (Tứ kết)", teamA: teamList[i*2], teamB: teamList[i*2+1] });
@@ -383,7 +390,6 @@ function generateFullTreeForSport(sportName, teamList) {
     matches.push({ matchCode: `${safeSportId}_H3`, sport: sportName, round: "Vòng 3 (Chung kết & Tranh Hạng 3)", teamALoserFeed: `${safeSportId}_BK_1`, teamBLoserFeed: `${safeSportId}_BK_2`, teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" });
   }
   else if (N <= 16) {
-    // 9-16 Đội: Vòng 1/8 (7-8 trận) -> Tứ kết (4 trận) -> Bán kết (2 trận) -> Chung kết & Tranh Hạng 3
     let num18 = Math.min(8, Math.floor(N / 2));
     for (let i = 0; i < num18; i++) {
       matches.push({ matchCode: `${safeSportId}_V18_${i+1}`, sport: sportName, round: "Vòng 1 (1/8)", teamA: teamList[i*2], teamB: teamList[i*2+1] });
@@ -402,7 +408,6 @@ function generateFullTreeForSport(sportName, teamList) {
     matches.push({ matchCode: `${safeSportId}_H3`, sport: sportName, round: "Vòng 4 (Chung kết & Tranh Hạng 3)", teamALoserFeed: `${safeSportId}_BK_1`, teamBLoserFeed: `${safeSportId}_BK_2`, teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" });
   }
   else {
-    // 17-32 Đội (19 Đội): Sơ loại (3 trận) -> Vòng 1/8 (8 trận) -> Tứ kết (4 trận) -> Bán kết (2 trận) -> Chung kết & Tranh Hạng 3
     matches.push({ matchCode: `${safeSportId}_SL_1`, sport: sportName, round: "Vòng 1 (Sơ loại)", teamA: teamList[0], teamB: teamList[1] });
     matches.push({ matchCode: `${safeSportId}_SL_2`, sport: sportName, round: "Vòng 1 (Sơ loại)", teamA: teamList[5], teamB: teamList[6] });
     matches.push({ matchCode: `${safeSportId}_SL_3`, sport: sportName, round: "Vòng 1 (Sơ loại)", teamA: teamList[10], teamB: teamList[11] });
@@ -427,14 +432,11 @@ function generateFullTreeForSport(sportName, teamList) {
     matches.push({ matchCode: `${safeSportId}_CK`, sport: sportName, round: "Vòng 5 (Chung kết & Tranh Hạng 3)", teamAFeed: `${safeSportId}_BK_1`, teamBFeed: `${safeSportId}_BK_2`, teamA: "Thắng Bán kết 1", teamB: "Thắng Bán kết 2", type: "gold" });
     matches.push({ matchCode: `${safeSportId}_H3`, sport: sportName, round: "Vòng 5 (Chung kết & Tranh Hạng 3)", teamALoserFeed: `${safeSportId}_BK_1`, teamBLoserFeed: `${safeSportId}_BK_2`, teamA: "Thua Bán kết 1", teamB: "Thua Bán kết 2", type: "bronze" });
   }
-
   return matches;
 }
 
-// NẠP TẤT CẢ CÁC MÔN VÀO DỮ LIỆU BAN ĐẦU
 let fullDefaultMatchesList = [];
 let mIdCount = 1000;
-
 for (let sName in rawExcelRawData) {
   let created = generateFullTreeForSport(sName, rawExcelRawData[sName]);
   created.forEach(m => {
@@ -450,18 +452,17 @@ for (let sName in rawExcelRawData) {
       round: m.round,
       teamA: m.teamA,
       teamB: m.teamB,
-      scoreA: 0,
-      scoreB: 0,
+      scoreA: 0, scoreB: 0,
       status: "upcoming",
-      venue: "Sân HKPĐ Cần Đăng"
+      venue: "Sân Cần Đăng"
     });
   });
 }
 
 let matches = JSON.parse(localStorage.getItem(STORAGE_VER + '_matches')) ?? JSON.parse(JSON.stringify(fullDefaultMatchesList));
 let medals = JSON.parse(localStorage.getItem(STORAGE_VER + '_medals')) ?? {};
-let newsData = JSON.parse(localStorage.getItem(STORAGE_VER + '_news')) ?? [];
-let photos = JSON.parse(localStorage.getItem(STORAGE_VER + '_photos')) ?? [];
+let newsData = JSON.parse(localStorage.getItem(STORAGE_VER + '_news')) ?? defaultNews;
+let photos = JSON.parse(localStorage.getItem(STORAGE_VER + '_photos')) ?? defaultPhotos;
 
 function saveData() {
   localStorage.setItem(STORAGE_VER + '_matches', JSON.stringify(matches));
@@ -489,20 +490,20 @@ function getLoserOfMatch(matchCode) {
 }
 
 function clearAllDataAbsoluteZero() {
-  if(confirm("XÁC NHẬN CHẮC CHẮN: Bạn muốn XÓA TRẮNG 100% tất cả Trận đấu, Sơ đồ, Huy chương, Tin tức về RỖNG?")) {
+  if(confirm("XÁC NHẬN CHẮC CHẮN: Bạn muốn XÓA TRẮNG 100% dữ liệu?")) {
     localStorage.clear();
     localStorage.setItem(AUTH_KEY, 'true');
-    matches = []; medals = {}; newsData = []; photos = [];
+    matches = []; medals = {}; newsData = defaultNews; photos = defaultPhotos;
     saveData(); renderAll();
-    alert("Đã xóa sạch trắng hoàn toàn 100% dữ liệu!");
+    alert("Đã xóa sạch trắng hoàn toàn dữ liệu!");
   }
 }
 
 function resetToFullDefaultTree() {
-  if(confirm("Xác nhận nạp lại toàn bộ Sơ đồ thi đấu hoàn chỉnh 100% tất cả các môn?")) {
+  if(confirm("Xác nhận nạp lại toàn bộ Sơ đồ thi đấu chuẩn 100%?")) {
     matches = JSON.parse(JSON.stringify(fullDefaultMatchesList));
     saveData(); renderAll();
-    alert("Đã nạp lại thành công sơ đồ nhánh đấu hoàn chỉnh!");
+    alert("Đã nạp lại thành công sơ đồ nhánh đấu!");
   }
 }
 
@@ -550,8 +551,7 @@ function importExcelFile() {
               round: m.round,
               teamA: m.teamA,
               teamB: m.teamB,
-              scoreA: 0,
-              scoreB: 0,
+              scoreA: 0, scoreB: 0,
               status: "upcoming",
               venue: "Sân Cần Đăng"
             });
@@ -617,7 +617,7 @@ function updateMatchScore(id) {
   
   saveData(); 
   renderAll();
-  alert("Đã lưu tỷ số thành công! Tên đội Thắng Bán kết đã nhảy vào Chung kết, đội Thua Bán kết đã vào Tranh Hạng 3.");
+  alert("Đã lưu tỷ số! Tên đội Thắng Bán kết đã tự nhảy vào Chung kết, đội Thua vào Tranh Hạng 3.");
 }
 
 function deleteMatch(id) {
@@ -685,7 +685,7 @@ function addNews() {
 
   newsData.unshift({ id: Date.now(), title, body, date: new Date().toLocaleDateString('vi-VN') });
   saveData(); renderAll();
-  alert("Đã đăng bài viết mới!");
+  alert("Đã đăng bài viết mới thành công!");
   document.getElementById('newsTitle').value = '';
   document.getElementById('newsBody').value = '';
 }
@@ -699,7 +699,9 @@ function addPhoto() {
     reader.onload = function(e) {
       photos.unshift({ id: Date.now(), title, url: e.target.result });
       saveData(); renderAll();
-      alert("Đã thêm hình ảnh mới!");
+      alert("Đã thêm hình ảnh mới thành công!");
+      fileInput.value = '';
+      document.getElementById('photoTitle').value = '';
     };
     reader.readAsDataURL(fileInput.files[0]);
   } else {
@@ -788,7 +790,6 @@ function renderBracket() {
         let displayA = m.teamA;
         let displayB = m.teamB;
 
-        // HIỂN THỊ TÊN ĐỘI THẮNG / THUA TỰ ĐỘNG TỪ VÒNG NGOÀI VÀO
         if (m.teamAFeed) {
           const winnerA = getWinnerOfMatch(m.teamAFeed);
           if (winnerA) displayA = winnerA;
