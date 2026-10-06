@@ -36,8 +36,7 @@ h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:
 .badge{font-size:10px;padding:3px 7px;border-radius:99px;background:#eaf2ff;color:#0757bd;font-weight:700;display:inline-block}
 .live{background:#ffe4e4;color:#c00000}
 .news{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.news-card{cursor:pointer;transition:transform 0.15s;border:1px solid var(--border)}
-.news-card:active{transform:scale(0.98)}
+.news-card{border:1px solid var(--border);display:flex;flex-direction:column;justify-content:space-between}
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .gallery-item{cursor:pointer;overflow:hidden;border-radius:12px;background:#fff;border:1px solid var(--border);padding:6px;box-shadow:0 2px 4px rgba(0,0,0,0.04)}
 .gallery img{width:100%;height:150px;object-fit:cover;border-radius:8px;display:block}
@@ -115,7 +114,7 @@ nav{width:100%}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2024 - 2025</h1>
-      <div class="muted">Trường THPT Cần Đăng • Tự động trích xuất lớp và tổng hợp huy chương</div>
+      <div class="muted">Trường THPT Cần Đăng • Cổng thông tin chính thức</div>
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
@@ -188,7 +187,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số, quản lý huy chương chuẩn xác theo tên lớp</div>
+      <div class="muted">Cập nhật tỷ số, quản lý huy chương, bài viết và hình ảnh</div>
     </div>
 
     <div id="login">
@@ -292,7 +291,7 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_MEDAL_EXTRACTION_CLEAN_V36';
+const STORAGE_VER = 'hkpd_2025_NEWS_READ_MORE_V37';
 
 const rawExcelRawData = {
   "Bóng đá Nam K12": ["12A6", "12A2", "12A7", "12A4", "12A1", "12A8", "12A3"],
@@ -359,8 +358,8 @@ const rawExcelRawData = {
 };
 
 const defaultNews = [
-  { id: 1, title: "Khai mạc Hội Khỏe Phù Đổng cấp trường năm học 2024-2025", body: "Lễ khai mạc diễn ra trang trọng với sự tham gia của đông đảo vận động viên các lớp.", date: "04/10/2026" },
-  { id: 2, title: "Lịch thi đấu các trận chung kết và tranh hạng 3", body: "Ban tổ chức thông báo lịch thi đấu các trận chung kết và tranh huy chương đồng.", date: "04/10/2026" }
+  { id: 1, title: "Khai mạc Hội Khỏe Phù Đổng cấp trường năm học 2024-2025", body: "Lễ khai mạc diễn ra trang trọng với sự tham gia của đông đảo vận động viên các lớp. Chúc các em thi đấu hết mình với tinh thần thể thao cao thượng, trung thực và đoàn kết!", date: "04/10/2026" },
+  { id: 2, title: "Lịch thi đấu các trận chung kết và tranh hạng 3", body: "Ban tổ chức thông báo lịch thi đấu các trận chung kết và tranh huy chương đồng các môn bóng đá, bóng chuyền, cầu lông và đá cầu. Đề nghị các đội có mặt trước 15 phút.", date: "04/10/2026" }
 ];
 
 const defaultPhotos = [
@@ -533,12 +532,9 @@ function autoPropagateTeams() {
   });
 }
 
-// HÀM TÁCH LỚP CHUẨN XÁC, LOẠI BỎ SỐ ĐỘI LẺ / RÁC
 function parseClass(str) {
   if (!str) return null;
   let cleanStr = str.toString().trim();
-  
-  // Nếu là dạng chuỗi số đơn thuần thuần túy (VD: "2") thì loại bỏ ngay
   if (/^\d+$/.test(cleanStr)) return null;
 
   if (cleanStr.includes('/')) {
@@ -548,7 +544,6 @@ function parseClass(str) {
     return cls;
   }
   
-  // Tìm mẫu tên lớp chuẩn như 10A1, 11A6, 12A8,... ở cuối chuỗi
   let match = cleanStr.match(/(10|11|12)[a-zA-Z]\d+/i);
   if (match) return match[0].toUpperCase();
 
@@ -1060,10 +1055,15 @@ function renderMedia() {
     document.getElementById('homeNews').innerHTML = '<p class="muted">Chưa có bài viết tin tức nào.</p>';
   } else {
     const newsHTML = newsData.map(n => `
-      <div class="card news-card" onclick="openNewsModal(${n.id})">
-        <h3 style="margin:0 0 6px;color:#0869d7;font-size:16px">${n.title}</h3>
-        <div class="muted" style="font-size:11px;margin-bottom:6px">🕒 ${n.date}</div>
-        <div style="font-size:13px;line-height:1.4">${n.body.length > 90 ? n.body.substring(0, 90) + '...' : n.body}</div>
+      <div class="card news-card">
+        <div>
+          <h3 style="margin:0 0 6px;color:#0869d7;font-size:16px">${n.title}</h3>
+          <div class="muted" style="font-size:11px;margin-bottom:6px">🕒 ${n.date}</div>
+          <div style="font-size:13px;line-height:1.4">${n.body.length > 90 ? n.body.substring(0, 90) + '...' : n.body}</div>
+        </div>
+        <div style="margin-top:12px;text-align:right">
+          <button class="btn" style="padding:6px 12px;font-size:12px" onclick="openNewsModal(${n.id})">Xem chi tiết ➔</button>
+        </div>
       </div>
     `).join('');
     document.getElementById('newsList').innerHTML = newsHTML;
