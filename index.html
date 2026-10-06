@@ -71,6 +71,8 @@ textarea{min-height:90px;resize:vertical}
 .slot .score{font-weight:800;color:var(--primary);font-size:13px;background:#eef2ff;padding:2px 6px;border-radius:4px}
 .winner-highlight{color:#198754!important;font-weight:bold!important}
 
+.admin-row{background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:1000;display:flex;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(3px)}
 .modal-content{background:#fff;border-radius:14px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;padding:18px;position:relative}
 .modal-close{position:absolute;top:10px;right:12px;font-size:22px;border:0;background:none;cursor:pointer;color:#888;font-weight:bold}
@@ -113,7 +115,7 @@ nav{width:100%}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2024 - 2025</h1>
-      <div class="muted">Trường THPT Cần Đăng • Tự động cập nhật tên đội vòng chung kết & tổng sắp huy chương</div>
+      <div class="muted">Trường THPT Cần Đăng • Tự động hiển thị tên đội thực tế ở mục quản trị</div>
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
@@ -147,11 +149,11 @@ nav{width:100%}
 
   <!-- SƠ ĐỒ NHÁNH VÒNG ĐẤU -->
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Tự động cập nhật đội Chung kết & Tranh Hạng 3)</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Đầy đủ tất cả các vòng & Chung kết)</h1></div>
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Tên đội thắng/thua Bán kết sẽ tự động cập nhật ngay vào Chung kết (🥇) và Tranh Hạng 3 (🥉)!</p>
+      <p class="muted" style="margin-top:6px">👉 Đội thắng Bán kết tự động lên Chung kết (🥇), đội thua xuống Tranh Hạng 3 (🥉)!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -186,7 +188,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số, quản lý bài viết, hình ảnh và huy chương các lớp</div>
+      <div class="muted">Cập nhật tỷ số, xem tên đội thực tế, quản lý bài viết và huy chương</div>
     </div>
 
     <div id="login">
@@ -287,7 +289,7 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_AUTO_SYNC_FINALS_MEDALS_V33';
+const STORAGE_VER = 'hkpd_2025_ADMIN_RESOLVED_TEAM_NAMES_V34';
 
 const rawExcelRawData = {
   "Bóng đá Nam K12": ["12A6", "12A2", "12A7", "12A4", "12A1", "12A8", "12A3"],
@@ -491,7 +493,22 @@ function getLoserOfMatch(matchCode) {
   return null;
 }
 
-// TỰ ĐỘNG CẬP NHẬT TÊN ĐỘI VÀO TRẬN VÒNG TRONG NGAY KHI LƯU TỶ SỐ
+function getResolvedTeamName(m, isTeamA) {
+  let raw = isTeamA ? m.teamA : m.teamB;
+  let feed = isTeamA ? m.teamAFeed : m.teamBFeed;
+  let loserFeed = isTeamA ? m.teamALoserFeed : m.teamBLoserFeed;
+
+  if (feed) {
+    let w = getWinnerOfMatch(feed);
+    if (w) return w;
+  }
+  if (loserFeed) {
+    let l = getLoserOfMatch(loserFeed);
+    if (l) return l;
+  }
+  return raw;
+}
+
 function autoPropagateTeams() {
   matches.forEach(m => {
     if (m.teamAFeed) {
@@ -523,12 +540,13 @@ function parseClass(str) {
   return parts[parts.length - 1].toUpperCase();
 }
 
-// TỰ ĐỘNG CỘNG HUY CHƯƠNG KHI TRẬN CHUNG KẾT HOẶC TRANH HẠNG 3 KẾT THÚC
 function checkAndAutoAddMedals(m) {
   if (m.status !== 'done') return;
   if (m.type === 'gold' || m.round.includes("Chung kết")) {
-    let winner = m.scoreA > m.scoreB ? m.teamA : (m.scoreB > m.scoreA ? m.teamB : null);
-    let loser = m.scoreA > m.scoreB ? m.teamB : (m.scoreB > m.scoreA ? m.teamA : null);
+    let teamAName = getResolvedTeamName(m, true);
+    let teamBName = getResolvedTeamName(m, false);
+    let winner = m.scoreA > m.scoreB ? teamAName : (m.scoreB > m.scoreA ? teamBName : null);
+    let loser = m.scoreA > m.scoreB ? teamBName : (m.scoreB > m.scoreA ? teamAName : null);
     if (winner) {
       let clsW = parseClass(winner);
       if (!medals[clsW]) medals[clsW] = {gold: 0, silver: 0, bronze: 0};
@@ -540,7 +558,9 @@ function checkAndAutoAddMedals(m) {
       medals[clsL].silver += 1;
     }
   } else if (m.type === 'bronze' || m.round.includes("Hạng 3")) {
-    let winner = m.scoreA > m.scoreB ? m.teamA : (m.scoreB > m.scoreA ? m.teamB : null);
+    let teamAName = getResolvedTeamName(m, true);
+    let teamBName = getResolvedTeamName(m, false);
+    let winner = m.scoreA > m.scoreB ? teamAName : (m.scoreB > m.scoreA ? teamBName : null);
     if (winner) {
       let clsW = parseClass(winner);
       if (!medals[clsW]) medals[clsW] = {gold: 0, silver: 0, bronze: 0};
@@ -569,7 +589,7 @@ function resetToFullDefaultTree() {
 
 function importExcelFile() {
   const fileInput = document.getElementById('excelFileInput');
-  if(!fileInput.files.length) return alert("Vui chọn file Excel (.xlsx hoặc .xls)!");
+  if(!fileInput.files.length) return alert("Vui lòng chọn file Excel (.xlsx hoặc .xls)!");
 
   const file = fileInput.files[0];
   const reader = new FileReader();
@@ -839,14 +859,16 @@ function renderAll() {
 
 function matchHTML(m) {
   const isLive = m.status === 'live';
+  let tA = getResolvedTeamName(m, true);
+  let tB = getResolvedTeamName(m, false);
   return `
     <div class="match">
-      <div class="team">${m.teamA}</div>
+      <div class="team">${tA}</div>
       <div>
         <div class="score">${m.scoreA} - ${m.scoreB}</div>
         <div class="meta"><span class="badge ${isLive ? 'live' : ''}">${isLive ? '🔴 ĐANG ĐẤU' : (m.status==='done'?'KẾT THÚC':'SẮP ĐẤU')}</span></div>
       </div>
-      <div class="team">${m.teamB}</div>
+      <div class="team">${tB}</div>
     </div>
   `;
 }
@@ -884,25 +906,8 @@ function renderBracket() {
       let rHtml = `<div class="round"><div class="round-title">${rName}</div>`;
       
       rMatches.forEach((m, idx) => {
-        let displayA = m.teamA;
-        let displayB = m.teamB;
-
-        if (m.teamAFeed) {
-          const winnerA = getWinnerOfMatch(m.teamAFeed);
-          if (winnerA) displayA = winnerA;
-        }
-        if (m.teamBFeed) {
-          const winnerB = getWinnerOfMatch(m.teamBFeed);
-          if (winnerB) displayB = winnerB;
-        }
-        if (m.teamALoserFeed) {
-          const loserA = getLoserOfMatch(m.teamALoserFeed);
-          if (loserA) displayA = loserA;
-        }
-        if (m.teamBLoserFeed) {
-          const loserB = getLoserOfMatch(m.teamBLoserFeed);
-          if (loserB) displayB = loserB;
-        }
+        let displayA = getResolvedTeamName(m, true);
+        let displayB = getResolvedTeamName(m, false);
 
         const isGold = m.type === 'gold' || (rName.includes("Chung kết") && !m.type);
         const isBronze = m.type === 'bronze';
@@ -1024,37 +1029,41 @@ function closeModal() {
 function renderAdminMatches() {
   const sp = document.getElementById('adminSportFilter').value;
   const st = document.getElementById('adminStatusFilter').value;
-  const list = matches.filter(m => (!sp || m.sport === sp) && (!st || m.status === st));
+  let list = matches.filter(m => (!sp || m.sport === sp) && (!st || m.status === st));
 
   if(!list.length) {
     document.getElementById('adminMatches').innerHTML = '<p class="muted">Chưa có trận đấu nào trong danh sách.</p>';
     return;
   }
 
-  document.getElementById('adminMatches').innerHTML = list.map(m => `
-    <div class="admin-row" id="row_${m.id}">
-      <div style="font-weight:bold;color:#0869d7;display:flex;justify-content:space-between">
-        <span>${m.sport} (${m.round})</span>
-      </div>
-      <div class="formgrid" style="margin:8px 0">
-        <div>${m.teamA}<input type="number" id="sA_${m.id}" value="${m.scoreA}"></div>
-        <div>${m.teamB}<input type="number" id="sB_${m.id}" value="${m.scoreB}"></div>
-      </div>
-      <div class="formgrid">
-        <div>Trạng thái:
-          <select id="st_${m.id}">
-            <option value="upcoming" ${m.status==='upcoming'?'selected':''}>Sắp đấu</option>
-            <option value="live" ${m.status==='live'?'selected':''}>Đang đấu</option>
-            <option value="done" ${m.status==='done'?'selected':''}>Đã kết thúc</option>
-          </select>
+  document.getElementById('adminMatches').innerHTML = list.map(m => {
+    let teamAName = getResolvedTeamName(m, true);
+    let teamBName = getResolvedTeamName(m, false);
+    return `
+      <div class="admin-row" id="row_${m.id}">
+        <div style="font-weight:bold;color:#0869d7;display:flex;justify-content:space-between">
+          <span>${m.sport} (${m.round})</span>
         </div>
-        <div style="display:flex;gap:5px;align-items:flex-end">
-          <button class="btn ok" style="flex:1" onclick="updateMatchScore(${m.id})">💾 Lưu Tỷ Số & Đẩy Tên Đội</button>
-          <button class="danger" onclick="deleteMatch(${m.id})">🗑 Xóa</button>
+        <div class="formgrid" style="margin:8px 0">
+          <div><b>${teamAName}</b><input type="number" id="sA_${m.id}" value="${m.scoreA}"></div>
+          <div><b>${teamBName}</b><input type="number" id="sB_${m.id}" value="${m.scoreB}"></div>
+        </div>
+        <div class="formgrid">
+          <div>Trạng thái:
+            <select id="st_${m.id}">
+              <option value="upcoming" ${m.status==='upcoming'?'selected':''}>Sắp đấu</option>
+              <option value="live" ${m.status==='live'?'selected':''}>Đang đấu</option>
+              <option value="done" ${m.status==='done'?'selected':''}>Đã kết thúc</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:5px;align-items:flex-end">
+            <button class="btn ok" style="flex:1" onclick="updateMatchScore(${m.id})">💾 Lưu Tỷ Số & Đẩy Tên</button>
+            <button class="danger" onclick="deleteMatch(${m.id})">🗑 Xóa</button>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 window.onload = function() {
