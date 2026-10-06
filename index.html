@@ -48,7 +48,7 @@ h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:
 .hidden{display:none!important}
 .btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn:hover{opacity:0.9}
-.danger{background:var(--danger);color:#fff;border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}
+.danger{background:var(--danger);color:#fff;border:0;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px}
 .warn{background:#ffc107;color:#000;border:0;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer}
 .ok{background:var(--success);color:#fff;border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}
 .formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
@@ -113,7 +113,7 @@ nav{width:100%}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2024 - 2025</h1>
-      <div class="muted">Trường THPT Cần Đăng • Tự động đồng bộ tin tức và sơ đồ nhánh đầy đủ cho điện thoại</div>
+      <div class="muted">Trường THPT Cần Đăng • Tự động cập nhật tên đội vòng chung kết & tổng sắp huy chương</div>
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
@@ -147,11 +147,11 @@ nav{width:100%}
 
   <!-- SƠ ĐỒ NHÁNH VÒNG ĐẤU -->
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Đầy đủ tất cả các môn & tự liên kết Bán kết vào Chung kết)</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu (Tự động cập nhật đội Chung kết & Tranh Hạng 3)</h1></div>
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Khi lưu tỷ số Bán kết: Tên 2 đội <b>Thắng Bán kết</b> tự động nhảy vào trận <b>Chung kết (🥇 Tranh Vàng)</b>, 2 đội <b>Thua Bán kết</b> tự động vào trận <b>Tranh Hạng 3 (🥉 Tranh Đồng)</b>!</p>
+      <p class="muted" style="margin-top:6px">👉 Tên đội thắng/thua Bán kết sẽ tự động cập nhật ngay vào Chung kết (🥇) và Tranh Hạng 3 (🥉)!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -186,7 +186,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số, đăng tin tức và hình ảnh hiển thị ngay trên điện thoại</div>
+      <div class="muted">Cập nhật tỷ số, quản lý bài viết, hình ảnh và huy chương các lớp</div>
     </div>
 
     <div id="login">
@@ -239,7 +239,7 @@ nav{width:100%}
       </div>
 
       <div class="card admin-card">
-        <h2>🏅 Cập Nhật Huy Chương Lớp</h2>
+        <h2>🏅 Cập Nhật Huy Chương Lớp (Thủ công dự phòng)</h2>
         <div class="formgrid">
           <input id="medTeam" placeholder="Tên Lớp (VD: 12A6, 11A1...)">
           <input id="gold" type="number" placeholder="Số Vàng" value="0">
@@ -250,21 +250,25 @@ nav{width:100%}
       </div>
 
       <div class="card admin-card">
-        <h2>📰 Đăng Tin Tức Mới (Học sinh/Phụ huynh thấy ngay trên điện thoại)</h2>
+        <h2>📰 Đăng & Quản Lý Tin Tức</h2>
         <input id="newsTitle" placeholder="Tiêu đề thông báo / bài viết">
         <textarea id="newsBody" placeholder="Nội dung chi tiết bài viết..."></textarea>
-        <button class="btn" onclick="addNews()">Đăng Bài Viết</button>
+        <button class="btn" onclick="addNews()" style="margin-bottom:14px">Đăng Bài Viết Mới</button>
+        <h4 style="margin:10px 0 6px;color:var(--primary)">Danh sách bài đăng hiện tại:</h4>
+        <div id="adminNewsList"></div>
       </div>
 
       <div class="card admin-card">
-        <h2>📸 Thêm Hình Ảnh Mới (Học sinh/Phụ huynh thấy ngay trên điện thoại)</h2>
+        <h2>📸 Đăng & Quản Lý Hình Ảnh</h2>
         <input id="photoTitle" placeholder="Mô tả hình ảnh">
         <input type="file" id="photoFileInput" accept="image/*" style="margin-bottom:10px">
-        <button class="btn" onclick="addPhoto()">Thêm Hình Ảnh</button>
+        <button class="btn" onclick="addPhoto()" style="margin-bottom:14px">Thêm Hình Ảnh Mới</button>
+        <h4 style="margin:10px 0 6px;color:var(--primary)">Danh sách hình ảnh hiện tại:</h4>
+        <div id="adminPhotoList"></div>
       </div>
 
       <div class="card">
-        <button class="danger" style="width:100%" onclick="logout()">Thoát Tài Khoản Quản Trị</button>
+        <button class="danger" style="width:100%;padding:12px;font-size:14px" onclick="logout()">Thoát Tài Khoản Quản Trị</button>
       </div>
     </div>
   </section>
@@ -283,9 +287,8 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_GLOBAL_SYNC_V32';
+const STORAGE_VER = 'hkpd_2025_AUTO_SYNC_FINALS_MEDALS_V33';
 
-// DỮ LIỆU ĐỘI/VĐV CỦA TẤT CẢ CÁC MÔN
 const rawExcelRawData = {
   "Bóng đá Nam K12": ["12A6", "12A2", "12A7", "12A4", "12A1", "12A8", "12A3"],
   "Bóng đá Nam K11": ["11A1", "11A2", "11A8", "11A7", "11A4", "11A3", "11A6", "11A5"],
@@ -350,15 +353,14 @@ const rawExcelRawData = {
   ]
 };
 
-// TIN TỨC VÀ HÌNH ẢNH MẪU SẴN (PHỤ HUYNH VÀ HỌC SINH MỞ LINK LÀ THẤY NGAY LẬP TỨC)
 const defaultNews = [
-  { id: 1, title: "Khai mạc Hội Khỏe Phù Đổng cấp trường năm học 2024-2025", body: "Lễ khai mạc diễn ra trang trọng với sự tham gia của đông đảo vận động viên các lớp. Chúc các em thi đấu hết mình với tinh thần thể thao cao thượng!", date: "04/10/2026" },
-  { id: 2, title: "Lịch thi đấu các trận chung kết và tranh hạng 3", body: "Ban tổ chức thông báo lịch thi đấu các trận chung kết và tranh huy chương đồng các môn bóng đá, bóng chuyền, cầu lông và đá cầu.", date: "04/10/2026" }
+  { id: 1, title: "Khai mạc Hội Khỏe Phù Đổng cấp trường năm học 2024-2025", body: "Lễ khai mạc diễn ra trang trọng với sự tham gia của đông đảo vận động viên các lớp.", date: "04/10/2026" },
+  { id: 2, title: "Lịch thi đấu các trận chung kết và tranh hạng 3", body: "Ban tổ chức thông báo lịch thi đấu các trận chung kết và tranh huy chương đồng.", date: "04/10/2026" }
 ];
 
 const defaultPhotos = [
   { id: 1, title: "Không khí khai mạc rực rỡ", url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80" },
-  { id: 2, title: "Trận tranh tài sôi nổi môn Cầu lông", url: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80" }
+  { id: 2, title: "Trận tranh tài sôi nổi", url: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80" }
 ];
 
 function generateFullTreeForSport(sportName, teamList) {
@@ -489,6 +491,64 @@ function getLoserOfMatch(matchCode) {
   return null;
 }
 
+// TỰ ĐỘNG CẬP NHẬT TÊN ĐỘI VÀO TRẬN VÒNG TRONG NGAY KHI LƯU TỶ SỐ
+function autoPropagateTeams() {
+  matches.forEach(m => {
+    if (m.teamAFeed) {
+      let w = getWinnerOfMatch(m.teamAFeed);
+      if (w) m.teamA = w;
+    }
+    if (m.teamBFeed) {
+      let w = getWinnerOfMatch(m.teamBFeed);
+      if (w) m.teamB = w;
+    }
+    if (m.teamALoserFeed) {
+      let l = getLoserOfMatch(m.teamALoserFeed);
+      if (l) m.teamA = l;
+    }
+    if (m.teamBLoserFeed) {
+      let l = getLoserOfMatch(m.teamBLoserFeed);
+      if (l) m.teamB = l;
+    }
+  });
+}
+
+function parseClass(str) {
+  if (!str) return 'KHÁC';
+  if (str.includes('/')) {
+    const p = str.split('/');
+    return p[p.length - 1].trim().toUpperCase();
+  }
+  const parts = str.trim().split(/\s+/);
+  return parts[parts.length - 1].toUpperCase();
+}
+
+// TỰ ĐỘNG CỘNG HUY CHƯƠNG KHI TRẬN CHUNG KẾT HOẶC TRANH HẠNG 3 KẾT THÚC
+function checkAndAutoAddMedals(m) {
+  if (m.status !== 'done') return;
+  if (m.type === 'gold' || m.round.includes("Chung kết")) {
+    let winner = m.scoreA > m.scoreB ? m.teamA : (m.scoreB > m.scoreA ? m.teamB : null);
+    let loser = m.scoreA > m.scoreB ? m.teamB : (m.scoreB > m.scoreA ? m.teamA : null);
+    if (winner) {
+      let clsW = parseClass(winner);
+      if (!medals[clsW]) medals[clsW] = {gold: 0, silver: 0, bronze: 0};
+      medals[clsW].gold += 1;
+    }
+    if (loser) {
+      let clsL = parseClass(loser);
+      if (!medals[clsL]) medals[clsL] = {gold: 0, silver: 0, bronze: 0};
+      medals[clsL].silver += 1;
+    }
+  } else if (m.type === 'bronze' || m.round.includes("Hạng 3")) {
+    let winner = m.scoreA > m.scoreB ? m.teamA : (m.scoreB > m.scoreA ? m.teamB : null);
+    if (winner) {
+      let clsW = parseClass(winner);
+      if (!medals[clsW]) medals[clsW] = {gold: 0, silver: 0, bronze: 0};
+      medals[clsW].bronze += 1;
+    }
+  }
+}
+
 function clearAllDataAbsoluteZero() {
   if(confirm("XÁC NHẬN CHẮC CHẮN: Bạn muốn XÓA TRẮNG 100% dữ liệu?")) {
     localStorage.clear();
@@ -509,7 +569,7 @@ function resetToFullDefaultTree() {
 
 function importExcelFile() {
   const fileInput = document.getElementById('excelFileInput');
-  if(!fileInput.files.length) return alert("Vui lòng chọn 1 file Excel (.xlsx hoặc .xls)!");
+  if(!fileInput.files.length) return alert("Vui chọn file Excel (.xlsx hoặc .xls)!");
 
   const file = fileInput.files[0];
   const reader = new FileReader();
@@ -562,7 +622,7 @@ function importExcelFile() {
       if(importedMatches.length > 0) {
         matches = importedMatches;
         saveData(); renderAll();
-        alert(`Đã nhập và tự động tạo nhánh thi đấu hoàn chỉnh cho ${workbook.SheetNames.length} môn từ File Excel!`);
+        alert(`Đã nhập thành công cho ${workbook.SheetNames.length} môn từ File Excel!`);
       }
     } catch(err) {
       alert("Lỗi đọc File Excel: " + err.message);
@@ -602,6 +662,7 @@ function checkAuth() {
     document.getElementById('login').classList.add('hidden');
     document.getElementById('adminPanel').classList.remove('hidden');
     renderAdminMatches();
+    renderAdminMediaList();
   } else {
     document.getElementById('login').classList.remove('hidden');
     document.getElementById('adminPanel').classList.add('hidden');
@@ -615,9 +676,14 @@ function updateMatchScore(id) {
   m.scoreB = parseInt(document.getElementById(`sB_${id}`).value) || 0;
   m.status = document.getElementById(`st_${id}`).value;
   
+  if (m.status === 'done') {
+    checkAndAutoAddMedals(m);
+  }
+
+  autoPropagateTeams();
   saveData(); 
   renderAll();
-  alert("Đã lưu tỷ số! Tên đội Thắng Bán kết đã tự nhảy vào Chung kết, đội Thua vào Tranh Hạng 3.");
+  alert("Đã lưu tỷ số! Tên đội vòng chung kết và bảng huy chương đã được cập nhật tự động.");
 }
 
 function deleteMatch(id) {
@@ -643,20 +709,11 @@ function addMatch() {
     venue: document.getElementById('mVenue').value || 'Sân Cần Đăng'
   });
 
+  autoPropagateTeams();
   saveData(); renderAll();
   alert(`Đã tạo trận đấu mới cho môn "${sport}"!`);
   document.getElementById('mA').value = '';
   document.getElementById('mB').value = '';
-}
-
-function parseClass(str) {
-  if (!str) return 'KHÁC';
-  if (str.includes('/')) {
-    const p = str.split('/');
-    return p[p.length - 1].trim().toUpperCase();
-  }
-  const parts = str.trim().split(/\s+/);
-  return parts[parts.length - 1].toUpperCase();
 }
 
 function saveMedal() {
@@ -685,9 +742,18 @@ function addNews() {
 
   newsData.unshift({ id: Date.now(), title, body, date: new Date().toLocaleDateString('vi-VN') });
   saveData(); renderAll();
-  alert("Đã đăng bài viết mới thành công!");
+  alert("Đã đăng bài viết mới!");
   document.getElementById('newsTitle').value = '';
   document.getElementById('newsBody').value = '';
+  renderAdminMediaList();
+}
+
+function deleteNews(id) {
+  if(confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+    newsData = newsData.filter(n => n.id !== id);
+    saveData(); renderAll();
+    renderAdminMediaList();
+  }
 }
 
 function addPhoto() {
@@ -699,9 +765,10 @@ function addPhoto() {
     reader.onload = function(e) {
       photos.unshift({ id: Date.now(), title, url: e.target.result });
       saveData(); renderAll();
-      alert("Đã thêm hình ảnh mới thành công!");
+      alert("Đã thêm hình ảnh mới!");
       fileInput.value = '';
       document.getElementById('photoTitle').value = '';
+      renderAdminMediaList();
     };
     reader.readAsDataURL(fileInput.files[0]);
   } else {
@@ -709,7 +776,38 @@ function addPhoto() {
   }
 }
 
+function deletePhoto(id) {
+  if(confirm("Bạn có chắc chắn muốn xóa hình ảnh này?")) {
+    photos = photos.filter(p => p.id !== id);
+    saveData(); renderAll();
+    renderAdminMediaList();
+  }
+}
+
+function renderAdminMediaList() {
+  const nList = document.getElementById('adminNewsList');
+  if(nList) {
+    nList.innerHTML = newsData.length ? newsData.map(n => `
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;padding:8px 10px;border-radius:6px;margin-bottom:6px;border:1px solid #e2e8f0">
+        <span style="font-size:13px;font-weight:600">${n.title}</span>
+        <button class="danger" onclick="deleteNews(${n.id})">Xóa</button>
+      </div>
+    `).join('') : '<p class="muted" style="font-size:12px">Chưa có bài viết nào.</p>';
+  }
+
+  const pList = document.getElementById('adminPhotoList');
+  if(pList) {
+    pList.innerHTML = photos.length ? photos.map(p => `
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;padding:8px 10px;border-radius:6px;margin-bottom:6px;border:1px solid #e2e8f0">
+        <span style="font-size:13px;font-weight:600">${p.title}</span>
+        <button class="danger" onclick="deletePhoto(${p.id})">Xóa</button>
+      </div>
+    `).join('') : '<p class="muted" style="font-size:12px">Chưa có hình ảnh nào.</p>';
+  }
+}
+
 function renderAll() {
+  autoPropagateTeams();
   checkAuth();
 
   document.getElementById('sDone').innerText = matches.filter(m => m.status === 'done').length;
@@ -779,7 +877,6 @@ function renderBracket() {
     if (!sportMatches.length) return;
 
     const rNames = [...new Set(sportMatches.map(m => m.round))];
-
     let bracketColsHtml = '';
 
     rNames.forEach(rName => {
@@ -798,7 +895,6 @@ function renderBracket() {
           const winnerB = getWinnerOfMatch(m.teamBFeed);
           if (winnerB) displayB = winnerB;
         }
-
         if (m.teamALoserFeed) {
           const loserA = getLoserOfMatch(m.teamALoserFeed);
           if (loserA) displayA = loserA;
