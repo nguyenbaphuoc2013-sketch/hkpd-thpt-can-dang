@@ -48,7 +48,7 @@ h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:
 .hidden{display:none!important}
 .btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn:hover{opacity:0.9}
-.danger{background:var(--danger);color:#fff;border:0;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px}
+.danger{background:var(--danger);color:#fff;border:0;border-radius:8px;padding:6px 10px;font-weight:700;cursor:pointer;font-size:11px}
 .warn{background:#ffc107;color:#000;border:0;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer}
 .ok{background:var(--success);color:#fff;border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}
 .formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
@@ -115,7 +115,7 @@ nav{width:100%}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2024 - 2025</h1>
-      <div class="muted">Trường THPT Cần Đăng • Quản lý huy chương linh hoạt</div>
+      <div class="muted">Trường THPT Cần Đăng • Tự động trích xuất lớp và tổng hợp huy chương</div>
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
@@ -188,7 +188,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số, quản lý huy chương, bài viết và hình ảnh</div>
+      <div class="muted">Cập nhật tỷ số, quản lý huy chương chuẩn xác theo tên lớp</div>
     </div>
 
     <div id="login">
@@ -213,8 +213,8 @@ nav{width:100%}
         <h3 style="margin-top:0;color:#c53030">🧹 Dọn Dẹp & Xóa Sạch Hoàn Toàn Dữ Liệu</h3>
         <p class="muted" style="margin-bottom:10px">Bấm nút này sẽ <b>XÓA SẠCH TRẮNG 100%</b> toàn bộ Trận đấu, Sơ đồ, Huy chương, Tin tức và Hình ảnh.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="danger" onclick="clearAllDataAbsoluteZero()">🗑 XÓA SẠCH TRẮNG HOÀN TOÀN DỮ LIỆU</button>
-          <button class="warn" onclick="resetToFullDefaultTree()">🔄 Nạp lại Toàn Bộ Sơ Đồ Thi Đấu Chuẩn 100%</button>
+          <button class="danger" onclick="clearAllDataAbsoluteZero()" style="padding:10px 15px;font-size:12px">🗑 XÓA SẠCH TRẮNG HOÀN TOÀN</button>
+          <button class="warn" onclick="resetToFullDefaultTree()">🔄 Nạp lại Toàn Bộ Sơ Đồ Thi Đấu Chuẩn</button>
         </div>
       </div>
 
@@ -241,16 +241,17 @@ nav{width:100%}
       </div>
 
       <div class="card admin-card">
-        <h2>🏅 Quản Lý & Cập Nhật Huy Chương Lớp</h2>
+        <h2>🏅 Cập Nhật Huy Chương Lớp (Thủ công dự phòng)</h2>
         <div class="formgrid">
-          <input id="medTeam" placeholder="Tên Lớp (VD: 12A6, 11A1...)">
+          <input id="medTeam" placeholder="Tên Lớp hoặc Cặp VĐV (VD: 12A6 hoặc Nguyễn A - 12A1)">
           <input id="gold" type="number" placeholder="Số Vàng" value="0">
           <input id="silver" type="number" placeholder="Số Bạc" value="0">
           <input id="bronze" type="number" placeholder="Số Đồng" value="0">
         </div>
-        <button class="btn" onclick="saveMedal()" style="margin-bottom:14px">Cập Nhật / Thêm Huy Chương</button>
-        <h4 style="margin:10px 0 6px;color:var(--primary)">Danh sách huy chương các lớp (Bấm Xóa nếu nhầm lẫn):</h4>
-        <div id="adminMedalList"></div>
+        <button class="btn" onclick="saveMedal()" style="margin-bottom:14px">Cập Nhật Huy Chương Lớp</button>
+        
+        <h4 style="margin:10px 0 6px;color:var(--primary)">Bảng quản lý huy chương (Có thể bấm Xóa để sửa sai):</h4>
+        <div class="table-wrap" id="adminMedalTable"></div>
       </div>
 
       <div class="card admin-card">
@@ -291,7 +292,7 @@ nav{width:100%}
 
 <script>
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_ADMIN_MEDAL_DELETE_V35';
+const STORAGE_VER = 'hkpd_2025_MEDAL_EXTRACTION_CLEAN_V36';
 
 const rawExcelRawData = {
   "Bóng đá Nam K12": ["12A6", "12A2", "12A7", "12A4", "12A1", "12A8", "12A3"],
@@ -532,14 +533,29 @@ function autoPropagateTeams() {
   });
 }
 
+// HÀM TÁCH LỚP CHUẨN XÁC, LOẠI BỎ SỐ ĐỘI LẺ / RÁC
 function parseClass(str) {
-  if (!str) return 'KHÁC';
-  if (str.includes('/')) {
-    const p = str.split('/');
-    return p[p.length - 1].trim().toUpperCase();
+  if (!str) return null;
+  let cleanStr = str.toString().trim();
+  
+  // Nếu là dạng chuỗi số đơn thuần thuần túy (VD: "2") thì loại bỏ ngay
+  if (/^\d+$/.test(cleanStr)) return null;
+
+  if (cleanStr.includes('/')) {
+    const p = cleanStr.split('/');
+    let cls = p[p.length - 1].trim().toUpperCase();
+    if (/^\d+$/.test(cls)) return null;
+    return cls;
   }
-  const parts = str.trim().split(/\s+/);
-  return parts[parts.length - 1].toUpperCase();
+  
+  // Tìm mẫu tên lớp chuẩn như 10A1, 11A6, 12A8,... ở cuối chuỗi
+  let match = cleanStr.match(/(10|11|12)[a-zA-Z]\d+/i);
+  if (match) return match[0].toUpperCase();
+
+  const parts = cleanStr.split(/\s+/);
+  let lastPart = parts[parts.length - 1].toUpperCase();
+  if (/^\d+$/.test(lastPart)) return null;
+  return lastPart;
 }
 
 function checkAndAutoAddMedals(m) {
@@ -551,13 +567,17 @@ function checkAndAutoAddMedals(m) {
     let loser = m.scoreA > m.scoreB ? teamBName : (m.scoreB > m.scoreA ? teamAName : null);
     if (winner) {
       let clsW = parseClass(winner);
-      if (!medals[clsW]) medals[clsW] = {gold: 0, silver: 0, bronze: 0};
-      medals[clsW].gold += 1;
+      if (clsW) {
+        if (!medals[clsW]) medals[clsW] = {gold: 0, silver: 0, bronze: 0};
+        medals[clsW].gold += 1;
+      }
     }
     if (loser) {
       let clsL = parseClass(loser);
-      if (!medals[clsL]) medals[clsL] = {gold: 0, silver: 0, bronze: 0};
-      medals[clsL].silver += 1;
+      if (clsL) {
+        if (!medals[clsL]) medals[clsL] = {gold: 0, silver: 0, bronze: 0};
+        medals[clsL].silver += 1;
+      }
     }
   } else if (m.type === 'bronze' || m.round.includes("Hạng 3")) {
     let teamAName = getResolvedTeamName(m, true);
@@ -565,8 +585,10 @@ function checkAndAutoAddMedals(m) {
     let winner = m.scoreA > m.scoreB ? teamAName : (m.scoreB > m.scoreA ? teamBName : null);
     if (winner) {
       let clsW = parseClass(winner);
-      if (!medals[clsW]) medals[clsW] = {gold: 0, silver: 0, bronze: 0};
-      medals[clsW].bronze += 1;
+      if (clsW) {
+        if (!medals[clsW]) medals[clsW] = {gold: 0, silver: 0, bronze: 0};
+        medals[clsW].bronze += 1;
+      }
     }
   }
 }
@@ -685,7 +707,7 @@ function checkAuth() {
     document.getElementById('adminPanel').classList.remove('hidden');
     renderAdminMatches();
     renderAdminMediaList();
-    renderAdminMedalList();
+    renderAdminMedalTable();
   } else {
     document.getElementById('login').classList.remove('hidden');
     document.getElementById('adminPanel').classList.add('hidden');
@@ -742,7 +764,7 @@ function addMatch() {
 function saveMedal() {
   const raw = document.getElementById('medTeam').value.trim();
   const cls = parseClass(raw);
-  if(!cls) return alert("Vui lòng nhập tên lớp!");
+  if(!cls) return alert("Không tìm thấy tên lớp hợp lệ! Vui lòng nhập đúng định dạng lớp (VD: 12A6 hoặc tên VĐV kèm /12A6).");
 
   const g = parseInt(document.getElementById('gold').value) || 0;
   const s = parseInt(document.getElementById('silver').value) || 0;
@@ -756,31 +778,49 @@ function saveMedal() {
   saveData(); renderAll();
   alert(`Đã cập nhật huy chương cho lớp ${cls}`);
   document.getElementById('medTeam').value = '';
-  renderAdminMedalList();
+  document.getElementById('gold').value = '0';
+  document.getElementById('silver').value = '0';
+  document.getElementById('bronze').value = '0';
+  renderAdminMedalTable();
 }
 
 function deleteMedalClass(cls) {
   if(confirm(`Bạn có chắc chắn muốn xóa toàn bộ huy chương của lớp ${cls}?`)) {
     delete medals[cls];
     saveData(); renderAll();
-    renderAdminMedalList();
+    renderAdminMedalTable();
   }
 }
 
-function renderAdminMedalList() {
-  const mList = document.getElementById('adminMedalList');
-  if(!mList) return;
-  let keys = Object.keys(medals);
-  if(!keys.length) {
-    mList.innerHTML = '<p class="muted" style="font-size:12px">Chưa có dữ liệu huy chương lớp nào.</p>';
+function renderAdminMedalTable() {
+  const tDiv = document.getElementById('adminMedalTable');
+  if(!tDiv) return;
+
+  let list = [];
+  for(let cls in medals) {
+    const m = medals[cls];
+    list.push({ cls, gold: m.gold, silver: m.silver, bronze: m.bronze, total: m.gold+m.silver+m.bronze });
+  }
+  list.sort((a,b) => b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze);
+
+  if(!list.length) {
+    tDiv.innerHTML = '<p class="muted" style="font-size:12px;padding:10px">Chưa có dữ liệu huy chương lớp nào.</p>';
     return;
   }
-  mList.innerHTML = keys.map(cls => `
-    <div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;padding:8px 10px;border-radius:6px;margin-bottom:6px;border:1px solid #e2e8f0">
-      <span style="font-size:13px;font-weight:600">Lớp ${cls} (🥇${medals[cls].gold} - 🥈${medals[cls].silver} - 🥉${medals[cls].bronze})</span>
-      <button class="danger" onclick="deleteMedalClass('${cls}')">Xóa</button>
-    </div>
-  `).join('');
+
+  let html = `<table class="medal"><thead><tr><th>Hạng</th><th>Lớp</th><th>🥇 Vàng</th><th>🥈 Bạc</th><th>🥉 Đồng</th><th>Thao tác</th></tr></thead><tbody>`;
+  list.forEach((item, idx) => {
+    html += `<tr>
+      <td><b>${idx+1}</b></td>
+      <td><b>${item.cls}</b></td>
+      <td>${item.gold}</td>
+      <td>${item.silver}</td>
+      <td>${item.bronze}</td>
+      <td><button class="danger" onclick="deleteMedalClass('${item.cls}')">Xóa</button></td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  tDiv.innerHTML = html;
 }
 
 function addNews() {
