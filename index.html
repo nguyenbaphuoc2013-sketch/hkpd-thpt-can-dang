@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hội Khỏe Phù Đổng - THPT Cần Đăng</title>
-    <!-- Tailwind CSS -->
+    <title>Hội Khỏe Phù Đổng - THPT Cần Đăng 2024-2025</title>
+    <!-- Tailwind CSS cho giao diện chuyên nghiệp -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -14,136 +14,161 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- THANH TRẠNG THÁI ĐỒNG BỘ ĐÁM MÂY -->
+    <!-- THANH TRẠNG THÁI ĐỒNG BỘ ĐÁM MÂY TỰ ĐỘNG -->
     <div class="bg-emerald-50 border-b border-emerald-200 px-4 py-2 text-xs text-emerald-800 flex justify-between items-center">
         <div>
             <i class="fa-solid fa-cloud-circle-check mr-1"></i> <strong>Hệ thống đám mây:</strong> 
-            <span id="syncStatus" class="font-semibold text-emerald-600">Đã kết nối tự động (JSONBin)</span>
+            <span class="font-semibold text-emerald-600">Đã kết nối tự động (JSONBin - THPT Cần Đăng)</span>
         </div>
-        <div class="text-xs text-emerald-700 font-medium">
-            <i class="fa-solid fa-circle-check mr-1"></i> Sẵn sàng đồng bộ trực tiếp
+        <div class="text-xs text-emerald-700 font-medium hidden md:block">
+            <i class="fa-solid fa-sync fa-spin mr-1"></i> Đồng bộ thời gian thực giữa máy giáo viên và điện thoại học sinh
         </div>
     </div>
 
     <!-- HEADER CHÍNH -->
-    <header class="bg-blue-700 text-white shadow-md">
+    <header class="bg-blue-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
             <div class="flex items-center space-x-3 mb-3 md:mb-0">
-                <div class="bg-white text-blue-700 p-2.5 rounded-xl font-bold text-xl shadow">
+                <div class="bg-white text-blue-700 p-3 rounded-xl font-bold text-xl shadow-md">
                     <i class="fa-solid fa-medal"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold uppercase tracking-wide">HKPĐ THPT Cần Đăng 2024-2025</h1>
-                    <p class="text-xs text-blue-200">Cổng thông tin Thể thao học đường - Tự động đồng bộ thời gian thực</p>
+                    <h1 class="text-xl md:text-2xl font-bold uppercase tracking-wide">HKPĐ THPT Cần Đăng 2024-2025</h1>
+                    <p class="text-xs text-blue-200">Cổng thông tin Thể thao học đường & Quản lý kết quả trực tuyến</p>
                 </div>
             </div>
             <!-- MENU ĐIỀU HƯỚNG -->
             <nav class="flex flex-wrap gap-2 text-sm font-medium">
-                <button onclick="switchTab('home')" class="tab-btn px-3 py-2 rounded-lg bg-blue-800 text-white transition hover:bg-blue-600"><i class="fa-solid fa-house mr-1"></i> Trang chủ</button>
-                <button onclick="switchTab('schedule')" class="tab-btn px-3 py-2 rounded-lg hover:bg-blue-600 transition"><i class="fa-solid fa-calendar-days mr-1"></i> Lịch thi đấu</button>
-                <button onclick="switchTab('medals')" class="tab-btn px-3 py-2 rounded-lg hover:bg-blue-600 transition"><i class="fa-solid fa-trophy mr-1"></i> Bảng Huy Chương</button>
-                <button onclick="switchTab('gallery')" class="tab-btn px-3 py-2 rounded-lg hover:bg-blue-600 transition"><i class="fa-solid fa-images mr-1"></i> Hình ảnh</button>
-                <button onclick="switchTab('admin')" class="tab-btn px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 transition"><i class="fa-solid fa-gear mr-1"></i> Quản trị</button>
+                <button onclick="switchTab('home')" class="tab-btn px-3.5 py-2 rounded-lg bg-blue-800 text-white transition shadow-sm hover:bg-blue-600"><i class="fa-solid fa-house mr-1.5"></i> Trang chủ</button>
+                <button onclick="switchTab('schedule')" class="tab-btn px-3.5 py-2 rounded-lg hover:bg-blue-600 transition"><i class="fa-solid fa-calendar-days mr-1.5"></i> Lịch thi đấu</button>
+                <button onclick="switchTab('medals')" class="tab-btn px-3.5 py-2 rounded-lg hover:bg-blue-600 transition"><i class="fa-solid fa-trophy mr-1.5"></i> Bảng Huy Chương</button>
+                <button onclick="switchTab('gallery')" class="tab-btn px-3.5 py-2 rounded-lg hover:bg-blue-600 transition"><i class="fa-solid fa-images mr-1.5"></i> Hình ảnh</button>
+                <button onclick="switchTab('admin')" class="tab-btn px-3.5 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 transition shadow-sm"><i class="fa-solid fa-gear mr-1.5"></i> Quản trị</button>
             </nav>
         </div>
     </header>
 
     <!-- NỘI DUNG CHÍNH -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
 
         <!-- TAB TRANG CHỦ & TIN TỨC -->
         <section id="tab-home" class="tab-content space-y-6">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-center">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 md:p-8 text-white shadow-lg flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
-                    <span class="bg-blue-500 text-xs px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider">Thông báo chính thức</span>
-                    <h2 class="text-2xl md:text-3xl font-bold mt-2">Chào mừng đến với Hội Khỏe Phù Đổng</h2>
-                    <p class="text-blue-100 text-sm mt-1 max-w-xl">Cập nhật liên tục kết quả thi đấu, lịch thi đấu các môn thể thao và bảng tổng sắp huy chương toàn trường.</p>
+                    <span class="bg-blue-500 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider shadow-sm">Thông báo chính thức</span>
+                    <h2 class="text-2xl md:text-4xl font-bold mt-3">Hội Khỏe Phù Đổng Trường THPT Cần Đăng</h2>
+                    <p class="text-blue-100 text-sm mt-2 max-w-2xl leading-relaxed">Nơi cập nhật lịch thi đấu, tỷ số trực tiếp các môn thể thao, bảng tổng sắp huy chương và những khoảnh khắc tuyệt vời của phong trào thể dục thể thao nhà trường.</p>
                 </div>
-                <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 text-center">
+                <div class="bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/20 text-center min-w-[180px]">
                     <div class="text-xs text-blue-200 uppercase font-semibold">Trạng thái giải đấu</div>
-                    <div class="text-lg font-bold text-emerald-300 mt-1"><i class="fa-solid fa-circle-dot animate-pulse mr-1"></i> Đang diễn ra</div>
+                    <div class="text-base md:text-lg font-bold text-emerald-300 mt-1"><i class="fa-solid fa-circle-dot animate-pulse mr-1"></i> Đang diễn ra</div>
                 </div>
             </div>
 
             <!-- Danh sách Tin tức -->
             <div>
-                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center"><i class="fa-solid fa-newspaper text-blue-600 mr-2"></i> Bản tin & Sự kiện</h3>
+                <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><i class="fa-solid fa-newspaper text-blue-600 mr-2"></i> Bản tin & Sự kiện nổi bật</h3>
                 <div id="newsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
         </section>
 
-        <!-- TAB LỊCH THI ĐẤU -->
+        <!-- TAB LỊCH THI ĐẤU & TỶ SỐ -->
         <section id="tab-schedule" class="tab-content hidden space-y-6">
-            <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-calendar-alt text-blue-600 mr-2"></i> Lịch thi đấu & Tỷ số trực tiếp</h2>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-calendar-alt text-blue-600 mr-2"></i> Lịch thi đấu & Tỷ số trực tiếp các môn</h2>
+                <span class="text-xs text-slate-500 bg-white px-3 py-1.5 rounded-lg border shadow-sm">Tự động cập nhật từ hệ thống đám mây</span>
+            </div>
             <div id="scheduleContainer" class="space-y-4"></div>
         </section>
 
         <!-- TAB BẢNG HUY CHƯƠNG -->
         <section id="tab-medals" class="tab-content hidden space-y-6">
-            <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-medal text-amber-500 mr-2"></i> Bảng Tổng Sắp Huy Chương</h2>
-            <div class="bg-white rounded-xl shadow overflow-x-auto">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i> Bảng Tổng Sắp Huy Chương Theo Lớp</h2>
+            </div>
+            <div class="bg-white rounded-xl shadow-md overflow-x-auto border border-slate-100">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-100 text-slate-700 text-xs uppercase font-semibold border-b">
-                            <th class="p-3 text-center w-16">Hạng</th>
-                            <th class="p-3">Lớp</th>
-                            <th class="p-3 text-center text-yellow-600"><i class="fa-solid fa-medal"></i> Vàng</th>
-                            <th class="p-3 text-center text-slate-400"><i class="fa-solid fa-medal"></i> Bạc</th>
-                            <th class="p-3 text-center text-amber-700"><i class="fa-solid fa-medal"></i> Đồng</th>
-                            <th class="p-3 text-center font-bold">Tổng</th>
+                            <th class="p-3.5 text-center w-16">Hạng</th>
+                            <th class="p-3.5">Lớp</th>
+                            <th class="p-3.5 text-center text-yellow-600 font-bold"><i class="fa-solid fa-medal mr-1"></i> Vàng</th>
+                            <th class="p-3.5 text-center text-slate-500 font-bold"><i class="fa-solid fa-medal mr-1"></i> Bạc</th>
+                            <th class="p-3.5 text-center text-amber-700 font-bold"><i class="fa-solid fa-medal mr-1"></i> Đồng</th>
+                            <th class="p-3.5 text-center font-bold text-slate-800">Tổng cộng</th>
                         </tr>
                     </thead>
                     <tbody id="medalsTableBody" class="divide-y text-sm"></tbody>
                 </table>
             </div>
-        </section>
 
-        <!-- TAB HÌNH ẢNH -->
-        <section id="tab-gallery" class="tab-content hidden space-y-6">
-            <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-images text-blue-600 mr-2"></i> Thư viện Hình ảnh Hoạt động</h2>
-            <div id="galleryContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
-        </section>
-
-        <!-- TAB QUẢN TRỊ -->
-        <section id="tab-admin" class="tab-content hidden space-y-6">
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
-                <div>
-                    <h2 class="text-lg font-bold text-amber-900"><i class="fa-solid fa-user-shield mr-2"></i> Khu vực Quản trị Viên</h2>
-                    <p class="text-xs text-amber-700">Mọi thay đổi sẽ tự động đẩy lên đám mây JSONBin để điện thoại học sinh cập nhật tức thi.</p>
+            <!-- Danh sách chi tiết huy chương cá nhân/đồng đội -->
+            <div class="bg-white rounded-xl shadow-md p-5 border border-slate-100 space-y-4 mt-6">
+                <h3 class="font-bold text-slate-800 text-base border-b pb-2"><i class="fa-solid fa-list-check text-blue-600 mr-2"></i> Chi tiết thành tích cá nhân và tập thể đạt được</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border">
+                        <thead>
+                            <tr class="bg-slate-50 border-b text-xs font-semibold text-slate-600">
+                                <th class="p-3">Học sinh / Đội tuyển</th>
+                                <th class="p-3">Lớp (Tự trích xuất)</th>
+                                <th class="p-3">Loại huy chương</th>
+                                <th class="p-3">Môn thi đấu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="medalsDetailList" class="divide-y"></tbody>
+                    </table>
                 </div>
-                <button onclick="syncDataToCloud(true)" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold shadow">
-                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Đồng bộ ngay lập tức
+            </div>
+        </section>
+
+        <!-- TAB THƯ VIỆN HÌNH ẢNH -->
+        <section id="tab-gallery" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-images text-blue-600 mr-2"></i> Thư viện Hình ảnh Hoạt động Hội Khỏe Phù Đổng</h2>
+            </div>
+            <div id="galleryContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </section>
+
+        <!-- TAB QUẢN TRỊ (ADMIN) -->
+        <section id="tab-admin" class="tab-content hidden space-y-6">
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+                <div>
+                    <h2 class="text-lg font-bold text-amber-900"><i class="fa-solid fa-user-shield mr-2"></i> Khu vực Quản trị Viên (Admin)</h2>
+                    <p class="text-xs text-amber-700 mt-0.5">Mọi thao tác chỉnh sửa tỷ số, thêm huy chương hoặc đăng tin tức sẽ tự động lưu và đồng bộ lên đám mây ngay lập tức.</p>
+                </div>
+                <button onclick="syncDataToCloud(true)" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold shadow transition whitespace-nowrap">
+                    <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Đồng bộ ngay lập tức
                 </button>
             </div>
 
-            <!-- Quản lý Tỷ số -->
-            <div class="bg-white rounded-xl shadow p-5 space-y-4">
-                <h3 class="font-bold text-slate-800 border-b pb-2"><i class="fa-solid fa-pen-to-square text-blue-600 mr-2"></i> Quản lý Kết quả Trận đấu</h3>
+            <!-- 1. Quản lý Tỷ số Trận đấu -->
+            <div class="bg-white rounded-xl shadow-md p-5 space-y-4 border border-slate-100">
+                <h3 class="font-bold text-slate-800 border-b pb-2 text-base"><i class="fa-solid fa-pen-to-square text-blue-600 mr-2"></i> Quản lý & Cập nhật Kết quả Trận đấu</h3>
                 <div id="adminMatchesList" class="space-y-3"></div>
             </div>
 
-            <!-- Quản lý Huy chương -->
-            <div class="bg-white rounded-xl shadow p-5 space-y-4">
-                <h3 class="font-bold text-slate-800 border-b pb-2"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i> Thêm / Quản lý Huy chương</h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <input type="text" id="mStudentName" placeholder="Tên học sinh / Đội (VD: Nguyễn Văn A - 12A1)" class="border rounded px-3 py-2 text-sm">
-                    <select id="mType" class="border rounded px-3 py-2 text-sm">
+            <!-- 2. Quản lý Huy chương -->
+            <div class="bg-white rounded-xl shadow-md p-5 space-y-4 border border-slate-100">
+                <h3 class="font-bold text-slate-800 border-b pb-2 text-base"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i> Thêm & Quản lý Huy chương (Tự trích xuất mã lớp)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border">
+                    <input type="text" id="mStudentName" placeholder="Tên học sinh / Đội (VD: Nguyễn Văn A - 12A1)" class="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                    <select id="mType" class="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                         <option value="Vàng">Huy chương Vàng</option>
                         <option value="Bạc">Huy chương Bạc</option>
                         <option value="Đồng">Huy chương Đồng</option>
                     </select>
-                    <input type="text" id="mSport" placeholder="Môn thi đấu (VD: Cầu lông)" class="border rounded px-3 py-2 text-sm">
-                    <button onclick="addMedalRecord()" class="bg-blue-600 hover:bg-blue-700 text-white rounded px-4 py-2 text-sm font-semibold">Thêm Huy Chương</button>
+                    <input type="text" id="mSport" placeholder="Môn thi đấu (VD: Cầu lông đơn nam)" class="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="addMedalRecord()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold shadow transition"><i class="fa-solid fa-plus mr-1"></i> Thêm Huy Chương</button>
                 </div>
-                <div class="overflow-x-auto mt-4">
+                <div class="overflow-x-auto mt-2">
                     <table class="w-full text-left text-xs border">
                         <thead>
                             <tr class="bg-slate-100 border-b">
-                                <th class="p-2">Học sinh / Đội</th>
-                                <th class="p-2">Lớp</th>
-                                <th class="p-2">Loại</th>
-                                <th class="p-2">Môn</th>
-                                <th class="p-2 text-center">Thao tác</th>
+                                <th class="p-2.5">Học sinh / Đội</th>
+                                <th class="p-2.5">Lớp (Tự nhận diện)</th>
+                                <th class="p-2.5">Loại</th>
+                                <th class="p-2.5">Môn thi đấu</th>
+                                <th class="p-2.5 text-center">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody id="adminMedalsList" class="divide-y"></tbody>
@@ -151,70 +176,83 @@
                 </div>
             </div>
 
-            <!-- Quản lý Tin tức -->
-            <div class="bg-white rounded-xl shadow p-5 space-y-4">
-                <h3 class="font-bold text-slate-800 border-b pb-2"><i class="fa-solid fa-newspaper text-blue-600 mr-2"></i> Đăng Tin tức Mới</h3>
-                <div class="space-y-3">
-                    <input type="text" id="newsTitle" placeholder="Tiêu đề bài viết..." class="w-full border rounded px-3 py-2 text-sm">
-                    <textarea id="newsContent" placeholder="Nội dung chi tiết bài viết..." rows="3" class="w-full border rounded px-3 py-2 text-sm"></textarea>
-                    <input type="text" id="newsImage" placeholder="Đường dẫn hình ảnh (URL hình ảnh)..." class="w-full border rounded px-3 py-2 text-sm">
-                    <button onclick="addNewArticle()" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded px-4 py-2 text-sm font-semibold">Đăng Bài Viết</button>
+            <!-- 3. Quản lý Tin tức -->
+            <div class="bg-white rounded-xl shadow-md p-5 space-y-4 border border-slate-100">
+                <h3 class="font-bold text-slate-800 border-b pb-2 text-base"><i class="fa-solid fa-newspaper text-emerald-600 mr-2"></i> Đăng Bài Viết & Tin Tức Mới</h3>
+                <div class="space-y-3 bg-slate-50 p-4 rounded-xl border">
+                    <input type="text" id="newsTitle" placeholder="Tiêu đề bài viết..." class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                    <textarea id="newsContent" placeholder="Nội dung chi tiết bài viết..." rows="3" class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                    <input type="text" id="newsImage" placeholder="Đường dẫn hình ảnh minh họa (URL ảnh)..." class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                    <button onclick="addNewArticle()" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-5 py-2 text-sm font-semibold shadow transition"><i class="fa-solid fa-paper-plane mr-1"></i> Đăng Bài Viết</button>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- MODAL READ MORE -->
+    <!-- MODAL "READ MORE" XEM CHI TIẾT TIN TỨC -->
     <div id="newsModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 id="modalNewsTitle" class="text-xl font-bold text-slate-900"></h3>
-            <p id="modalNewsDate" class="text-xs text-slate-400"></p>
-            <img id="modalNewsImg" src="" class="w-full h-48 object-cover rounded-lg hidden" alt="Ảnh tin tức">
-            <div id="modalNewsBody" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line"></div>
-            <div class="flex justify-end pt-2">
-                <button onclick="closeNewsModal()" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-semibold rounded hover:bg-slate-300">Đóng</button>
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start">
+                <h3 id="modalNewsTitle" class="text-xl font-bold text-slate-900 leading-snug"></h3>
+                <button onclick="closeNewsModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <p id="modalNewsDate" class="text-xs text-blue-600 font-semibold"></p>
+            <img id="modalNewsImg" src="" class="w-full h-52 object-cover rounded-xl shadow hidden" alt="Ảnh tin tức">
+            <div id="modalNewsBody" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line pt-2"></div>
+            <div class="flex justify-end pt-4 border-t">
+                <button onclick="closeNewsModal()" class="px-5 py-2 bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-300 transition">Đóng</button>
             </div>
         </div>
     </div>
 
-    <footer class="bg-slate-800 text-slate-400 text-center py-4 text-xs mt-auto">
-        <p>&copy; 2026 Trường THPT Cần Đăng - Hệ thống Quản lý Hội Khỏe Phù Đổng</p>
+    <!-- FOOTER -->
+    <footer class="bg-slate-800 text-slate-400 text-center py-5 text-xs mt-auto space-y-1">
+        <p class="font-medium text-slate-300">Trường THPT Cần Đăng - Huyện Châu Phú, Tỉnh An Giang</p>
+        <p>&copy; 2026 Hệ thống Quản lý Hội Khỏe Phù Đổng - Thiết kế chuyên nghiệp</p>
     </footer>
 
-    <!-- JAVASCRIPT TÍCH HỢP JSONBIN SẴN SÀNG -->
+    <!-- JAVASCRIPT LOGIC TÍCH HỢP SẴN MÃ BIN ID VÀ API KEY -->
     <script>
         const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
-        let binId = "6ac5df89ffd5d1605354f559"; // Đã điền sẵn mã Bin ID của thầy
+        const BIN_ID = "6ac5df89ffd5d1605354f559"; // Đã cố định mã Bin ID chuẩn của thầy
 
+        // Dữ liệu mặc định đầy đủ các mục
         let db = {
             matches: [
-                { id: 1, sport: "Bóng đá nam", team1: "12A1", team2: "12A2", score1: "2", score2: "1", status: "Đã kết thúc" },
+                { id: 1, sport: "Bóng đá nam khối 12", team1: "12A1", team2: "12A2", score1: "2", score2: "1", status: "Đã kết thúc" },
                 { id: 2, sport: "Cầu lông đơn nam", team1: "Nguyễn Văn A (11A1)", team2: "Trần Văn B (11A3)", score1: "21", score2: "18", status: "Đã kết thúc" },
-                { id: 3, sport: "Bóng chuyền", team1: "10A1", team2: "10A2", score1: "0", score2: "0", status: "Sắp diễn ra" }
+                { id: 3, sport: "Bóng chuyền nam", team1: "10A1", team2: "10A2", score1: "0", score2: "0", status: "Sắp diễn ra" },
+                { id: 4, sport: "Điền kinh 100m nữ", team1: "Lê Thị C (12A3)", team2: "Phạm Thị D (10B1)", score1: "13.5s", score2: "14.2s", status: "Đã kết thúc" }
             ],
             medals: [
-                { id: 1, name: "Nguyễn Văn A - 12A1", classCode: "12A1", type: "Vàng", sport: "Cầu lông" },
-                { id: 2, name: "Tập thể lớp 11A2", classCode: "11A2", type: "Bạc", sport: "Bóng đá" },
-                { id: 3, name: "Trần Thị B - 10A1", classCode: "10A1", type: "Đồng", sport: "Điền kinh" }
+                { id: 1, name: "Nguyễn Văn A - 12A1", classCode: "12A1", type: "Vàng", sport: "Cầu lông đơn nam" },
+                { id: 2, name: "Tập thể bóng đá nam 11A2", classCode: "11A2", type: "Bạc", sport: "Bóng đá nam" },
+                { id: 3, name: "Trần Thị B - 10A1", classCode: "10A1", type: "Đồng", sport: "Điền kinh 100m" },
+                { id: 4, name: "Lê Hoàng Long - 12A3", classCode: "12A3", type: "Vàng", sport: "Cờ vua" }
             ],
             news: [
-                { id: 1, title: "Khai mạc Hội Khỏe Phù Đổng cấp trường năm học 2024-2025", date: "07/04/2026", content: "Sáng nay, trường THPT Cần Đăng đã long trọng tổ chức lễ khai mạc Hội Khỏe Phù Đổng với sự tham gia của đông đảo học sinh và các thầy cô giáo...", image: "https://images.unsplash.com/photo-1517649763962-0c623266cf10?auto=format&fit=crop&w=600&q=80" }
+                { id: 1, title: "Khai mạc Hội Khỏe Phù Đổng cấp trường năm học 2024-2025", date: "07/04/2026", content: "Sáng nay, trường THPT Cần Đăng đã long trọng tổ chức lễ khai mạc Hội Khỏe Phù Đổng với sự tham gia nhiệt tình của đông đảo học sinh và các thầy cô giáo trong toàn trường. Buổi lễ diễn ra trong không khí hào hứng, sôi nổi với nhiều tiết mục văn nghệ và diễu hành biểu dương lực lượng.", image: "https://images.unsplash.com/photo-1517649763962-0c623266cf10?auto=format&fit=crop&w=600&q=80" },
+                { id: 2, title: "Lịch thi đấu vòng chung kết môn Bóng đá nam và Bóng chuyền", date: "08/04/2026", content: "Ban tổ chức thông báo lịch thi đấu chính thức các trận chung kết môn Bóng đá nam và Bóng chuyền diễn ra vào cuối tuần này tại sân vận động trung tâm của trường. Kính mời quý thầy cô và các bạn học sinh đến xem và cổ vũ nhiệt tình.", image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80" }
             ],
             gallery: [
-                { id: 1, url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80", caption: "Trận chung kết bóng đá" },
-                { id: 2, url: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80", caption: "Thi đấu điền kinh" }
+                { id: 1, url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80", caption: "Trận chung kết bóng đá sôi nổi" },
+                { id: 2, url: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80", caption: "Vận động viên thi đấu điền kinh" },
+                { id: 3, url: "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=600&q=80", caption: "Không khí cổ vũ nhiệt tình từ khán giả" },
+                { id: 4, url: "https://images.unsplash.com/photo-1517649763962-0c623266cf10?auto=format&fit=crop&w=600&q=80", caption: "Lễ khai mạc trang trọng và rực rỡ" }
             ]
         };
 
+        // Khi tải trang xong sẽ tự động lấy dữ liệu từ đám mây JSONBin về
         window.onload = function() {
             fetchDataFromCloud();
         };
 
+        // Tải dữ liệu từ JSONBin
         async function fetchDataFromCloud() {
-            if(!binId) return;
+            if(!BIN_ID) return;
             try {
-                let res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+                let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
                     headers: { 'X-Master-Key': API_KEY }
                 });
                 if(res.ok) {
@@ -225,19 +263,17 @@
                     }
                 }
             } catch(e) {
-                console.log("Lỗi tải đám mây", e);
+                console.log("Dùng dữ liệu mặc định do chưa có kết nối mạng", e);
                 renderAll();
             }
         }
 
+        // Đẩy dữ liệu lên đám mây JSONBin tự động
         async function syncDataToCloud(showAlert = false) {
             renderAll();
-            if(!binId) {
-                if(showAlert) alert('Chưa cấu hình Bin ID!');
-                return;
-            }
+            if(!BIN_ID) return;
             try {
-                let res = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+                let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -246,13 +282,14 @@
                     body: JSON.stringify(db)
                 });
                 if(res.ok && showAlert) {
-                    alert('Đồng bộ lên đám mây thành công! Mọi điện thoại học sinh mở link sẽ thấy ngay lập tức.');
+                    alert('Đồng bộ dữ liệu lên đám mây thành công! Mọi học sinh mở link sẽ thấy ngay lập tức.');
                 }
             } catch(e) {
-                if(showAlert) alert('Lỗi đồng bộ: ' + e.message);
+                if(showAlert) alert('Lỗi đồng bộ đám mây: ' + e.message);
             }
         }
 
+        // Chuyển tab giao diện mượt mà
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('bg-blue-800', 'bg-amber-500'));
@@ -260,6 +297,7 @@
             event.currentTarget.classList.add(tabId === 'admin' ? 'bg-amber-500' : 'bg-blue-800');
         }
 
+        // Trích xuất mã lớp thông minh từ tên học sinh (VD: "Nguyễn Văn A - 12A1" -> "12A1")
         function extractClassCode(str) {
             if(!str) return "Khác";
             let match = str.match(/(?:10|11|12)[A-Za-z0-9]+/i);
@@ -270,6 +308,7 @@
             return "Khác";
         }
 
+        // Render toàn bộ các thành phần giao diện
         function renderAll() {
             renderNews();
             renderSchedule();
@@ -278,19 +317,20 @@
             renderAdminPanel();
         }
 
+        // 1. Render Tin tức & Sự kiện
         function renderNews() {
             document.getElementById('newsContainer').innerHTML = db.news.map(item => `
-                <div class="bg-white rounded-xl shadow overflow-hidden flex flex-col justify-between border border-slate-100">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col justify-between border border-slate-100 hover:shadow-lg transition">
                     <div>
-                        ${item.image ? `<img src="${item.image}" class="w-full h-48 object-cover" alt="Ảnh">` : ''}
+                        ${item.image ? `<img src="${item.image}" class="w-full h-48 object-cover" alt="Ảnh tin tức">` : ''}
                         <div class="p-5">
-                            <span class="text-xs text-blue-600 font-semibold">${item.date}</span>
+                            <span class="text-xs text-blue-600 font-semibold"><i class="fa-regular fa-calendar mr-1"></i>${item.date}</span>
                             <h4 class="font-bold text-slate-800 text-lg mt-1 line-clamp-2">${item.title}</h4>
-                            <p class="text-sm text-slate-600 mt-2 line-clamp-3">${item.content}</p>
+                            <p class="text-sm text-slate-600 mt-2 line-clamp-3 leading-relaxed">${item.content}</p>
                         </div>
                     </div>
                     <div class="p-5 pt-0">
-                        <button onclick="openNewsModal(${item.id})" class="text-blue-600 font-semibold text-sm hover:underline flex items-center">Xem thêm <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></button>
+                        <button onclick="openNewsModal(${item.id})" class="text-blue-600 font-semibold text-sm hover:underline flex items-center">Xem thêm chi tiết <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -309,21 +349,25 @@
 
         function closeNewsModal() { document.getElementById('newsModal').classList.add('hidden'); }
 
+        // 2. Render Lịch thi đấu & Tỷ số
         function renderSchedule() {
             document.getElementById('scheduleContainer').innerHTML = db.matches.map(m => `
-                <div class="bg-white rounded-xl shadow p-4 flex flex-col md:flex-row justify-between items-center border border-slate-100">
-                    <div class="mb-2 md:mb-0 text-center md:text-left">
-                        <span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-semibold">${m.sport}</span>
-                        <div class="text-base font-bold text-slate-800 mt-2">${m.team1} <span class="text-slate-400 font-normal mx-2">vs</span> ${m.team2}</div>
+                <div class="bg-white rounded-xl shadow-md p-4 md:p-5 flex flex-col md:flex-row justify-between items-center border border-slate-100 gap-4">
+                    <div class="text-center md:text-left">
+                        <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold"><i class="fa-solid fa-medal mr-1"></i>${m.sport}</span>
+                        <div class="text-base md:text-lg font-bold text-slate-800 mt-2">${m.team1} <span class="text-slate-400 font-normal mx-2">vs</span> ${m.team2}</div>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <div class="bg-slate-100 px-4 py-2 rounded-lg text-center font-mono font-bold text-lg text-blue-700">${m.score1} - ${m.score2}</div>
-                        <span class="text-xs px-2.5 py-1 rounded font-semibold ${m.status === 'Đã kết thúc' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${m.status}</span>
+                        <div class="bg-slate-100 px-5 py-2 rounded-xl text-center font-mono font-bold text-xl text-blue-700 shadow-inner">
+                            ${m.score1} - ${m.score2}
+                        </div>
+                        <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${m.status === 'Đã kết thúc' ? 'bg-emerald-100 text-emerald-800' : m.status === 'Đang diễn ra' ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-slate-100 text-slate-600'}">${m.status}</span>
                     </div>
                 </div>
             `).join('');
         }
 
+        // 3. Render Bảng Huy Chương & Chi tiết
         function renderMedalsTable() {
             let stats = {};
             db.medals.forEach(m => {
@@ -334,65 +378,81 @@
                 if(m.type === 'Đồng') stats[cls].bronze++;
             });
 
-            let sortedClasses = Object.keys(stats).sort((a, b) => stats[b].gold - stats[a].gold || stats[b].silver - stats[a].silver);
+            let sortedClasses = Object.keys(stats).sort((a, b) => stats[b].gold - stats[a].gold || stats[b].silver - stats[a].silver || stats[b].bronze - stats[a].bronze);
             let tbody = document.getElementById('medalsTableBody');
+            
             if(sortedClasses.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Chưa có dữ liệu.</td></tr>`;
-                return;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Chưa có dữ liệu huy chương.</td></tr>`;
+            } else {
+                tbody.innerHTML = sortedClasses.map((cls, idx) => `
+                    <tr class="border-b hover:bg-slate-50 transition">
+                        <td class="p-3.5 text-center font-bold text-slate-600">${idx + 1}</td>
+                        <td class="p-3.5 font-bold text-blue-700 text-base">${cls}</td>
+                        <td class="p-3.5 text-center font-bold text-yellow-600">${stats[cls].gold}</td>
+                        <td class="p-3.5 text-center font-bold text-slate-500">${stats[cls].silver}</td>
+                        <td class="p-3.5 text-center font-bold text-amber-700">${stats[cls].bronze}</td>
+                        <td class="p-3.5 text-center font-extrabold text-slate-800 text-base">${stats[cls].gold + stats[cls].silver + stats[cls].bronze}</td>
+                    </tr>
+                `).join('');
             }
 
-            tbody.innerHTML = sortedClasses.map((cls, idx) => `
+            // Bảng chi tiết từng huy chương
+            let detailTbody = document.getElementById('medalsDetailList');
+            detailTbody.innerHTML = db.medals.map(m => `
                 <tr class="border-b hover:bg-slate-50">
-                    <td class="p-3 text-center font-bold text-slate-600">${idx + 1}</td>
-                    <td class="p-3 font-semibold text-blue-700">${cls}</td>
-                    <td class="p-3 text-center font-bold text-yellow-600">${stats[cls].gold}</td>
-                    <td class="p-3 text-center font-bold text-slate-400">${stats[cls].silver}</td>
-                    <td class="p-3 text-center font-bold text-amber-700">${stats[cls].bronze}</td>
-                    <td class="p-3 text-center font-extrabold text-slate-800">${stats[cls].gold + stats[cls].silver + stats[cls].bronze}</td>
+                    <td class="p-3 font-semibold text-slate-800">${m.name}</td>
+                    <td class="p-3 text-blue-600 font-semibold">${extractClassCode(m.name)}</td>
+                    <td class="p-3"><span class="px-2.5 py-0.5 rounded text-xs font-semibold ${m.type==='Vàng'?'bg-yellow-100 text-yellow-800':m.type==='Bạc'?'bg-slate-200 text-slate-700':'bg-amber-100 text-amber-900'}">${m.type}</span></td>
+                    <td class="p-3 text-slate-600">${m.sport}</td>
                 </tr>
             `).join('');
         }
 
+        // 4. Render Thư viện Hình ảnh
         function renderGallery() {
             document.getElementById('galleryContainer').innerHTML = db.gallery.map(img => `
-                <div class="bg-white rounded-xl shadow overflow-hidden border border-slate-100">
-                    <img src="${img.url}" class="w-full h-36 object-cover" alt="Ảnh">
-                    <div class="p-2 text-xs font-medium text-slate-700 text-center truncate">${img.caption}</div>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-slate-100 hover:shadow-lg transition">
+                    <img src="${img.url}" class="w-full h-44 object-cover" alt="Ảnh hoạt động">
+                    <div class="p-3 text-xs font-medium text-slate-700 text-center bg-slate-50 truncate">${img.caption}</div>
                 </div>
             `).join('');
         }
 
+        // 5. Render Bảng Quản trị (Admin Panel)
         function renderAdminPanel() {
+            // Sửa tỷ số trận đấu
             document.getElementById('adminMatchesList').innerHTML = db.matches.map(m => `
-                <div class="flex flex-col md:flex-row justify-between items-center bg-slate-50 p-3 rounded-lg border gap-2">
-                    <div class="text-sm font-semibold text-slate-700">${m.sport}: ${m.team1} vs ${m.team2}</div>
-                    <div class="flex items-center space-x-2">
-                        <input type="text" id="score1_${m.id}" value="${m.score1}" class="w-12 border text-center rounded py-1 text-sm">
-                        <span>-</span>
-                        <input type="text" id="score2_${m.id}" value="${m.score2}" class="w-12 border text-center rounded py-1 text-sm">
-                        <select id="status_${m.id}" class="border rounded py-1 text-xs">
+                <div class="flex flex-col md:flex-row justify-between items-center bg-slate-50 p-3.5 rounded-xl border gap-3">
+                    <div class="text-sm font-semibold text-slate-700 w-full md:w-auto">${m.sport}: <strong>${m.team1} vs ${m.team2}</strong></div>
+                    <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
+                        <input type="text" id="score1_${m.id}" value="${m.score1}" class="w-14 border text-center rounded-lg py-1.5 text-sm font-bold">
+                        <span class="text-slate-400">-</span>
+                        <input type="text" id="score2_${m.id}" value="${m.score2}" class="w-14 border text-center rounded-lg py-1.5 text-sm font-bold">
+                        <select id="status_${m.id}" class="border rounded-lg py-1.5 px-2 text-xs bg-white">
                             <option value="Sắp diễn ra" ${m.status==='Sắp diễn ra'?'selected':''}>Sắp diễn ra</option>
                             <option value="Đang diễn ra" ${m.status==='Đang diễn ra'?'selected':''}>Đang diễn ra</option>
                             <option value="Đã kết thúc" ${m.status==='Đã kết thúc'?'selected':''}>Đã kết thúc</option>
                         </select>
-                        <button onclick="updateMatch(${m.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">Lưu</button>
+                        <button onclick="updateMatch(${m.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold shadow">Lưu</button>
                     </div>
                 </div>
             `).join('');
 
+            // Quản lý danh sách huy chương
             document.getElementById('adminMedalsList').innerHTML = db.medals.map(m => `
-                <tr>
-                    <td class="p-2 font-medium">${m.name}</td>
-                    <td class="p-2 text-blue-600 font-semibold">${extractClassCode(m.name)}</td>
-                    <td class="p-2">${m.type}</td>
-                    <td class="p-2">${m.sport}</td>
-                    <td class="p-2 text-center">
-                        <button onclick="deleteMedal(${m.id})" class="text-red-600 hover:text-red-800"><i class="fa-solid fa-trash"></i></button>
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="p-2.5 font-medium">${m.name}</td>
+                    <td class="p-2.5 text-blue-600 font-semibold">${extractClassCode(m.name)}</td>
+                    <td class="p-2.5 font-semibold text-slate-700">${m.type}</td>
+                    <td class="p-2.5 text-slate-600">${m.sport}</td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="deleteMedal(${m.id})" class="text-red-600 hover:text-red-800 p-1.5"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
         }
 
+        // Thao tác Admin: Cập nhật trận đấu
         function updateMatch(id) {
             let m = db.matches.find(item => item.id === id);
             if(m) {
@@ -400,35 +460,38 @@
                 m.score2 = document.getElementById(`score2_${id}`).value;
                 m.status = document.getElementById(`status_${id}`).value;
                 syncDataToCloud(false);
-                alert('Đã cập nhật trận đấu!');
+                alert('Đã cập nhật tỷ số trận đấu thành công!');
             }
         }
 
+        // Thao tác Admin: Thêm huy chương
         function addMedalRecord() {
             let name = document.getElementById('mStudentName').value.trim();
             let type = document.getElementById('mType').value;
             let sport = document.getElementById('mSport').value.trim();
-            if(!name || !sport) { alert('Vui lòng nhập đủ thông tin!'); return; }
+            if(!name || !sport) { alert('Vui lòng nhập đầy đủ tên và môn thi đấu!'); return; }
             let newId = db.medals.length > 0 ? Math.max(...db.medals.map(m => m.id)) + 1 : 1;
             db.medals.push({ id: newId, name, classCode: extractClassCode(name), type, sport });
             document.getElementById('mStudentName').value = '';
             document.getElementById('mSport').value = '';
             syncDataToCloud(false);
-            alert('Đã thêm huy chương!');
+            alert('Đã thêm huy chương thành công!');
         }
 
+        // Thao tác Admin: Xóa huy chương
         function deleteMedal(id) {
-            if(confirm('Xóa huy chương này?')) {
+            if(confirm('Thầy có chắc chắn muốn xóa huy chương này không?')) {
                 db.medals = db.medals.filter(m => m.id !== id);
                 syncDataToCloud(false);
             }
         }
 
+        // Thao tác Admin: Đăng tin tức mới
         function addNewArticle() {
             let title = document.getElementById('newsTitle').value.trim();
             let content = document.getElementById('newsContent').value.trim();
             let image = document.getElementById('newsImage').value.trim();
-            if(!title || !content) { alert('Vui lòng nhập tiêu đề và nội dung!'); return; }
+            if(!title || !content) { alert('Vui lòng nhập tiêu đề và nội dung bài viết!'); return; }
             let today = new Date().toLocaleDateString('vi-VN');
             let newId = db.news.length > 0 ? Math.max(...db.news.map(n => n.id)) + 1 : 1;
             db.news.unshift({ id: newId, title, date: today, content, image });
@@ -436,7 +499,7 @@
             document.getElementById('newsContent').value = '';
             document.getElementById('newsImage').value = '';
             syncDataToCloud(false);
-            alert('Đã đăng bài viết!');
+            alert('Đã đăng bài viết mới thành công!');
         }
     </script>
 </body>
