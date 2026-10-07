@@ -151,9 +151,10 @@ nav{width:100%}
     </div>
   </section>
 
+  <!-- LIVESTREAM -->
   <section id="live" class="page hidden">
-    <div class="hero"><h1>🔴 Trực tiếp các trận đấu</h1></div>
-    <div id="liveList"></div>
+    <div class="hero"><h1>🔴 Trực tiếp các trận đấu & Livestream</h1></div>
+    <div id="liveViewContent"></div>
   </section>
 
   <section id="photos" class="page hidden">
@@ -176,7 +177,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số, quản lý huy chương, bài viết và hình ảnh (Tự động đồng bộ đám mây)</div>
+      <div class="muted">Cập nhật tỷ số, quản lý huy chương, cấu hình Link Live Facebook/TikTok và đồng bộ đám mây</div>
     </div>
 
     <div id="login">
@@ -190,6 +191,17 @@ nav{width:100%}
     </div>
 
     <div id="adminPanel" class="hidden">
+      <!-- CẤU HÌNH LINK LIVE FACEBOOK / TIKTOK -->
+      <div class="card admin-card" style="background:#f0fdf4;border-color:#bbf7d0">
+        <h3 style="margin-top:0;color:#166534">🎥 Cấu Hình Đường Link Livestream (Facebook & TikTok)</h3>
+        <p class="muted" style="margin-bottom:10px">Dán đường dẫn (URL) phát trực tiếp để học sinh bấm vào xem trực tiếp trên tab Live.</p>
+        <div class="formgrid">
+          <div>Link Facebook Live / Video:<input id="liveFbInput" placeholder="https://facebook.com/..."></div>
+          <div>Link TikTok Live / Video:<input id="liveTtInput" placeholder="https://tiktok.com/@..."></div>
+        </div>
+        <button class="btn ok" onclick="saveLiveLinks()">💾 Lưu Cấu Hình Link Live</button>
+      </div>
+
       <div class="card admin-card" style="background:#f0f7ff">
         <h3 style="margin-top:0;color:#0869d7">📂 Nạp File Excel (Thêm môn mới hoặc bớt môn cũ tự động)</h3>
         <p class="muted" style="margin-bottom:10px">Chọn file Excel lịch thi đấu (định dạng <code>.xlsx</code> hoặc <code>.xls</code>).</p>
@@ -207,7 +219,7 @@ nav{width:100%}
       </div>
 
       <div class="card admin-card">
-        <h2>📝 Cập Nhật Tỷ Số & Trạng Thái Trận Đấu</h2>
+        <h2>📝 Cập Nhật Tỷ Số & Trạng Thái Trận Đấu (Hiển thị tên đội cụ thể)</h2>
         <div class="formgrid">
           <div>Lọc theo Môn:<select id="adminSportFilter" onchange="renderAdminMatches()"><option value="">Tất cả các môn</option></select></div>
           <div>Lọc Trạng Thái:<select id="adminStatusFilter" onchange="renderAdminMatches()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
@@ -220,8 +232,8 @@ nav{width:100%}
         <div class="formgrid">
           <div>Môn thi đấu:<input id="mSportInput" placeholder="Tên môn thi đấu mới"></div>
           <div>Vòng đấu:<input id="mRoundInput" placeholder="VD: Vòng 1, Tứ kết, Bán kết, Chung kết"></div>
-          <div>VĐV / Đội A:<input id="mA" placeholder="Tên VĐV hoặc Lớp A"></div>
-          <div>VĐV / Đội B:<input id="mB" placeholder="Tên VĐV hoặc Lớp B"></div>
+          <div>Đội A:<input id="mA" placeholder="Tên VĐV hoặc Lớp A"></div>
+          <div>Đội B:<input id="mB" placeholder="Tên VĐV hoặc Lớp B"></div>
           <div>Địa điểm sân:<input id="mVenue" placeholder="Sân Cần Đăng"></div>
           <div>Trạng thái:<select id="mStatus"><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
         </div>
@@ -284,7 +296,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559"; // Cố định mã Bin ID chuẩn của thầy
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_NEWS_READ_MORE_V38';
+const STORAGE_VER = 'hkpd_2025_NEWS_READ_MORE_V39';
 
 const rawExcelRawData = {
   "Bóng đá Nam K12": ["12A6", "12A2", "12A7", "12A4", "12A1", "12A8", "12A3"],
@@ -359,6 +371,8 @@ const defaultPhotos = [
   { id: 1, title: "Không khí khai mạc rực rỡ", url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80" },
   { id: 2, title: "Trận tranh tài sôi nổi", url: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80" }
 ];
+
+let liveConfig = { facebook: "", tiktok: "" };
 
 function generateFullTreeForSport(sportName, teamList) {
   let matches = [];
@@ -462,8 +476,8 @@ let matches = JSON.parse(localStorage.getItem(STORAGE_VER + '_matches')) ?? JSON
 let medals = JSON.parse(localStorage.getItem(STORAGE_VER + '_medals')) ?? {};
 let newsData = JSON.parse(localStorage.getItem(STORAGE_VER + '_news')) ?? defaultNews;
 let photos = JSON.parse(localStorage.getItem(STORAGE_VER + '_photos')) ?? defaultPhotos;
+let savedLiveLinks = JSON.parse(localStorage.getItem(STORAGE_VER + '_livelinks')) ?? liveConfig;
 
-// TẢI DỮ LIỆU TỪ JSONBIN KHI MỞ TRANG
 window.onload = function() {
   fetchDataFromCloud();
 };
@@ -481,6 +495,7 @@ async function fetchDataFromCloud() {
         if(data.record.medals) medals = data.record.medals;
         if(data.record.newsData) newsData = data.record.newsData;
         if(data.record.photos) photos = data.record.photos;
+        if(data.record.liveConfig) savedLiveLinks = data.record.liveConfig;
       }
     }
   } catch(e) {
@@ -493,7 +508,7 @@ async function syncDataToCloud(showAlert = false) {
   saveData();
   if(!BIN_ID) return;
   try {
-    let payload = { matches, medals, newsData, photos };
+    let payload = { matches, medals, newsData, photos, liveConfig: savedLiveLinks };
     let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
       method: 'PUT',
       headers: {
@@ -503,7 +518,7 @@ async function syncDataToCloud(showAlert = false) {
       body: JSON.stringify(payload)
     });
     if(res.ok && showAlert) {
-      alert('Đồng bộ dữ liệu lên đám mây thành công! Mọi học sinh mở link Vercel sẽ thấy ngay lập tức.');
+      alert('Đồng bộ dữ liệu lên đám mây thành công!');
     }
   } catch(e) {
     if(showAlert) alert('Lỗi đồng bộ: ' + e.message);
@@ -515,6 +530,7 @@ function saveData() {
   localStorage.setItem(STORAGE_VER + '_medals', JSON.stringify(medals));
   localStorage.setItem(STORAGE_VER + '_news', JSON.stringify(newsData));
   localStorage.setItem(STORAGE_VER + '_photos', JSON.stringify(photos));
+  localStorage.setItem(STORAGE_VER + '_livelinks', JSON.stringify(savedLiveLinks));
 }
 
 function getWinnerOfMatch(matchCode) {
@@ -542,7 +558,11 @@ function getLoserOfMatch(matchCode) {
 function getTeamAName(m) {
   if (m.teamAFeed) {
     let w = getWinnerOfMatch(m.teamAFeed);
-    return w ? w : m.teamA;
+    return w ? `Thắng: ${w}` : m.teamA;
+  }
+  if (m.teamALoserFeed) {
+    let l = getLoserOfMatch(m.teamALoserFeed);
+    return l ? `Thua: ${l}` : m.teamA;
   }
   return m.teamA || "Chưa xác định";
 }
@@ -550,15 +570,11 @@ function getTeamAName(m) {
 function getTeamBName(m) {
   if (m.teamBFeed) {
     let w = getWinnerOfMatch(m.teamBFeed);
-    return w ? w : m.teamB;
+    return w ? `Thắng: ${w}` : m.teamB;
   }
   if (m.teamBLoserFeed) {
     let l = getLoserOfMatch(m.teamBLoserFeed);
-    return l ? l : m.teamB;
-  }
-  if (m.teamALoserFeed) {
-    let l = getLoserOfMatch(m.teamALoserFeed);
-    return l ? l : m.teamB;
+    return l ? `Thua: ${l}` : m.teamB;
   }
   return m.teamB || "Chưa xác định";
 }
@@ -710,13 +726,28 @@ function renderBracket() {
 }
 
 function renderLive() {
-  let liveMatches = matches.filter(m => m.status === 'live');
-  document.getElementById('liveList').innerHTML = liveMatches.length ? liveMatches.map(m => `
-    <div class="card">
-      <h2>🔴 ${m.sport} • ${m.round}</h2>
-      ${matchHTML(m)}
+  let html = `
+    <div class="card" style="text-align:center;padding:25px">
+      <h2 style="justify-content:center;color:var(--danger)">🔴 Kênh Phát Sóng Trực Tiếp HKPĐ</h2>
+      <p class="muted">Theo dõi trực tiếp các trận đấu hấp dẫn qua các nền tảng mạng xã hội của trường:</p>
+      <div style="display:flex;justify-content:center;gap:15px;margin-top:20px;flex-wrap:wrap">
+        ${savedLiveLinks.facebook ? `<a href="${savedLiveLinks.facebook}" target="_blank" class="btn" style="background:#1877f2;padding:12px 20px;font-size:15px"><i class="fa-brands fa-facebook"></i> Xem Livestream trên Facebook</a>` : '<p class="muted">Chưa cấu hình Link Facebook Live.</p>'}
+        ${savedLiveLinks.tiktok ? `<a href="${savedLiveLinks.tiktok}" target="_blank" class="btn" style="background:#000000;padding:12px 20px;font-size:15px"><i class="fa-brands fa-tiktok"></i> Xem Livestream trên TikTok</a>` : ''}
+      </div>
     </div>
-  `).join('') : '<p class="muted">Hiện tại không có trận đấu trực tiếp nào.</p>';
+  `;
+  
+  let liveMatches = matches.filter(m => m.status === 'live');
+  if(liveMatches.length > 0) {
+    html += `<h2 style="margin-top:20px">Trận đấu đang diễn ra</h2>`;
+    html += liveMatches.map(m => `
+      <div class="card">
+        <h2>🔴 ${m.sport} • ${m.round}</h2>
+        ${matchHTML(m)}
+      </div>
+    `).join('');
+  }
+  document.getElementById('liveViewContent').innerHTML = html;
 }
 
 function renderPhotos() {
@@ -821,6 +852,8 @@ function checkLoginState() {
   if(logged) {
     document.getElementById('login').classList.add('hidden');
     document.getElementById('adminPanel').classList.remove('hidden');
+    document.getElementById('liveFbInput').value = savedLiveLinks.facebook || '';
+    document.getElementById('liveTtInput').value = savedLiveLinks.tiktok || '';
     renderAdminMatches();
     renderAdminMedalTable();
     renderAdminNews();
@@ -829,6 +862,13 @@ function checkLoginState() {
     document.getElementById('login').classList.remove('hidden');
     document.getElementById('adminPanel').classList.add('hidden');
   }
+}
+
+function saveLiveLinks() {
+  savedLiveLinks.facebook = document.getElementById('liveFbInput').value.trim();
+  savedLiveLinks.tiktok = document.getElementById('liveTtInput').value.trim();
+  syncDataToCloud(true);
+  alert('Đã lưu cấu hình đường link Live thành công!');
 }
 
 function renderAdminMatches() {
@@ -842,10 +882,10 @@ function renderAdminMatches() {
     return `
       <div class="admin-row">
         <div style="font-weight:bold;margin-bottom:6px">${m.sport} • ${m.round}</div>
-        <div style="font-size:13px;margin-bottom:8px">Đội A: <b>${tA}</b> vs Đội B: <b>${tB}</b></div>
+        <div style="font-size:13px;margin-bottom:8px;color:#073b8f">Đội A: <b>${tA}</b> vs Đội B: <b>${tB}</b></div>
         <div class="formgrid">
-          <div>Điểm A:<input type="number" id="scA_${m.id}" value="${m.scoreA}"></div>
-          <div>Điểm B:<input type="number" id="scB_${m.id}" value="${m.scoreB}"></div>
+          <div>Điểm đội A:<input type="number" id="scA_${m.id}" value="${m.scoreA}"></div>
+          <div>Điểm đội B:<input type="number" id="scB_${m.id}" value="${m.scoreB}"></div>
         </div>
         <div>Trạng thái:
           <select id="st_${m.id}">
