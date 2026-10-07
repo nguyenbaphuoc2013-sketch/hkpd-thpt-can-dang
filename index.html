@@ -151,7 +151,6 @@ nav{width:100%}
     </div>
   </section>
 
-  <!-- LIVESTREAM -->
   <section id="live" class="page hidden">
     <div class="hero"><h1>🔴 Trực tiếp các trận đấu & Livestream</h1></div>
     <div id="liveViewContent"></div>
@@ -177,7 +176,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số, quản lý huy chương, cấu hình Link Live Facebook/TikTok và đồng bộ đám mây</div>
+      <div class="muted">Cập nhật tỷ số với tên đội trực quan, quản lý huy chương và cấu hình Link Live Facebook/TikTok</div>
     </div>
 
     <div id="login">
@@ -191,7 +190,6 @@ nav{width:100%}
     </div>
 
     <div id="adminPanel" class="hidden">
-      <!-- CẤU HÌNH LINK LIVE FACEBOOK / TIKTOK -->
       <div class="card admin-card" style="background:#f0fdf4;border-color:#bbf7d0">
         <h3 style="margin-top:0;color:#166534">🎥 Cấu Hình Đường Link Livestream (Facebook & TikTok)</h3>
         <p class="muted" style="margin-bottom:10px">Dán đường dẫn (URL) phát trực tiếp để học sinh bấm vào xem trực tiếp trên tab Live.</p>
@@ -219,7 +217,7 @@ nav{width:100%}
       </div>
 
       <div class="card admin-card">
-        <h2>📝 Cập Nhật Tỷ Số & Trạng Thái Trận Đấu (Hiển thị tên đội cụ thể)</h2>
+        <h2>📝 Cập Nhật Tỷ Số & Trạng Thái Trận Đấu</h2>
         <div class="formgrid">
           <div>Lọc theo Môn:<select id="adminSportFilter" onchange="renderAdminMatches()"><option value="">Tất cả các môn</option></select></div>
           <div>Lọc Trạng Thái:<select id="adminStatusFilter" onchange="renderAdminMatches()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
@@ -296,7 +294,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559"; // Cố định mã Bin ID chuẩn của thầy
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2025_NEWS_READ_MORE_V39';
+const STORAGE_VER = 'hkpd_2025_NEWS_READ_MORE_V40';
 
 const rawExcelRawData = {
   "Bóng đá Nam K12": ["12A6", "12A2", "12A7", "12A4", "12A1", "12A8", "12A3"],
@@ -884,8 +882,8 @@ function renderAdminMatches() {
         <div style="font-weight:bold;margin-bottom:6px">${m.sport} • ${m.round}</div>
         <div style="font-size:13px;margin-bottom:8px;color:#073b8f">Đội A: <b>${tA}</b> vs Đội B: <b>${tB}</b></div>
         <div class="formgrid">
-          <div>Điểm đội A:<input type="number" id="scA_${m.id}" value="${m.scoreA}"></div>
-          <div>Điểm đội B:<input type="number" id="scB_${m.id}" value="${m.scoreB}"></div>
+          <div>Điểm ${tA}:<input type="number" id="scA_${m.id}" value="${m.scoreA}"></div>
+          <div>Điểm ${tB}:<input type="number" id="scB_${m.id}" value="${m.scoreB}"></div>
         </div>
         <div>Trạng thái:
           <select id="st_${m.id}">
