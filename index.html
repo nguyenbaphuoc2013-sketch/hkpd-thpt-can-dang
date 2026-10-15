@@ -139,11 +139,11 @@ nav{width:100%}
   </section>
 
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu chuẩn sơ đồ cây</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu chuẩn Excel</h1></div>
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Đội thắng Vòng 1 sẽ tự động nối tiếp lên Vòng 2 / Bán kết / Chung kết đúng theo sơ đồ thiết kế!</p>
+      <p class="muted" style="margin-top:6px">👉 Các cặp đấu Vòng 1 ghép nối chính xác từng cặp 2 đội liên tiếp theo đúng sơ đồ trên file Excel!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -189,7 +189,7 @@ nav{width:100%}
     <div id="adminPanel" class="hidden">
       <div class="card admin-card" style="background:#f0f7ff;border-color:#bfdbfe">
         <h3 style="margin-top:0;color:#0869d7">📂 Tải File Excel Đọc Sơ Đồ Cây Thi Đấu</h3>
-        <p class="muted" style="margin-bottom:10px">Hệ thống sẽ đọc các cặp dòng liền kề làm Vòng 1 và tự động dựng cây kết nối lên các vòng tiếp theo.</p>
+        <p class="muted" style="margin-bottom:10px">Hệ thống sẽ đọc các cặp dòng liền nhau làm Vòng 1 và tự động dựng cây kết nối lên các vòng tiếp theo.</p>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
         <button class="btn ok" onclick="importExcelFile()">📥 Đọc File Excel & Dựng Sơ Đồ Cây</button>
       </div>
@@ -268,7 +268,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V65';
+const STORAGE_VER = 'hkpd_2026_V70';
 
 let matches = [];
 let medals = {};
@@ -331,14 +331,14 @@ function saveData() {
   localStorage.setItem(STORAGE_VER + '_livelinks', JSON.stringify(savedLiveLinks));
 }
 
-// THUẬT TOÁN TẠO CÂY ĐẤU LOẠI TRỰC TIẾP CHUẨN XÁC THEO CẶP ĐẤU
+// THUẬT TOÁN DỰNG CÂY ĐẤU: CẶP 1 & 2 THI ĐẤU VÒNG 1, THẮNG ĐẤU VỚI NHAU Ở VÒNG 2
 function generateTournamentTree(sportName, pairsList) {
   let matchesList = [];
   let safeSportId = sportName.replace(/[^a-zA-Z0-9]/g, '');
   let N = pairsList.length;
   if(N === 0) return matchesList;
 
-  // 1. Tạo Vòng 1 từ các cặp liền kề trong file Excel
+  // 1. Tạo Vòng 1 từ các cặp liền kề trong Excel (Mỗi cặp 2 dòng là 1 trận Vòng 1)
   let currentRoundCodes = [];
   pairsList.forEach((pair, idx) => {
     let mCode = `${safeSportId}_R1_${idx+1}`;
@@ -352,7 +352,7 @@ function generateTournamentTree(sportName, pairsList) {
     });
   });
 
-  // 2. Tự động dựng tiếp các vòng đấu nối tiếp (Vòng 2 / Bán kết / Chung kết)
+  // 2. Tiếp tục tự động dựng cây nối tiếp lên các vòng sau
   let roundLevel = 2;
   while(currentRoundCodes.length > 1) {
     let nextRoundCodes = [];
@@ -367,17 +367,15 @@ function generateTournamentTree(sportName, pairsList) {
           round: rName,
           teamAFeed: currentRoundCodes[i],
           teamBFeed: currentRoundCodes[i+1],
-          teamA: `Thắng Trận ${currentRoundCodes[i]}`,
-          teamB: `Thắng Trận ${currentRoundCodes[i+1]}`
+          teamA: `Thắng Trận ${i+1}`,
+          teamB: `Thắng Trận ${i+2}`
         });
         nextRoundCodes.push(nextCode);
       } else {
-        // Đội lẻ được đặc cách đi tiếp vòng sau
         nextRoundCodes.push(currentRoundCodes[i]);
       }
     }
 
-    // Nếu đến vòng cuối cùng và có 2 nhánh, tạo thêm trận Tranh Hạng 3 (🥉)
     if(nextRoundCodes.length === 2 && currentRoundCodes.length === 2) {
       matchesList.push({
         matchCode: `${safeSportId}_H3`,
@@ -385,8 +383,8 @@ function generateTournamentTree(sportName, pairsList) {
         round: "Chung Kết & Tranh Hạng 3",
         teamALoserFeed: currentRoundCodes[0],
         teamBLoserFeed: currentRoundCodes[1],
-        teamA: `Thua ${currentRoundCodes[0]}`,
-        teamB: `Thua ${currentRoundCodes[1]}`,
+        teamA: `Thua Bán Kết 1`,
+        teamB: `Thua Bán Kết 2`,
         type: "bronze"
       });
     }
@@ -839,7 +837,7 @@ function updateMatch(id) {
   renderAdminMatches();
 }
 
-// HÀM ĐỌC EXCEL ĐÚNG CHUẨN CÂY CẶP ĐẤU
+// HÀM ĐỌC EXCEL BÁM SÁT 100% CẶP ĐẤU LIỀN KỀ TỪNG ĐÔI MỘT TRÊN EXCEL
 function importExcelFile() {
   let fileInput = document.getElementById('excelFileInput');
   if(!fileInput.files || !fileInput.files[0]) { alert('Vui lòng chọn file Excel!'); return; }
@@ -870,6 +868,7 @@ function importExcelFile() {
           });
         });
 
+        // Ghép cặp từng đôi một chính xác từ trên xuống dưới theo ý đồ của thầy
         if(validTeams.length >= 2) {
           let pairs = [];
           for(let i=0; i<validTeams.length; i+=2) {
@@ -883,7 +882,7 @@ function importExcelFile() {
 
       if(Object.keys(newExcelPairs).length > 0) {
         let newMatchesList = [];
-        let mIdCount = 7000;
+        let mIdCount = 8000;
         for(let sName in newExcelPairs) {
           let created = generateTournamentTree(sName, newExcelPairs[sName]);
           created.forEach(m => {
@@ -908,7 +907,7 @@ function importExcelFile() {
         matches = newMatchesList;
         syncDataToCloud(true);
         initApp();
-        alert('Đã đọc và thiết lập sơ đồ cây thi đấu thành công!');
+        alert('Đã cập nhật sơ đồ cây thi đấu theo đúng các cặp đấu trong Excel!');
       } else {
         alert('Không tìm thấy dữ liệu đội hợp lệ trong file Excel.');
       }
