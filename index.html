@@ -188,10 +188,10 @@ nav{width:100%}
     </div>
 
     <div id="adminPanel" class="hidden">
-      <!-- NẠP FILE EXCEL DỄ DÀNG VÀ TỰ ĐỘNG THAY THẾ -->
+      <!-- NẠP FILE EXCEL ĐÃ NÂNG CẤP ĐỌC LINH HOẠT MỌI SHEET -->
       <div class="card admin-card" style="background:#f0f7ff;border-color:#bfdbfe">
         <h3 style="margin-top:0;color:#0869d7">📂 Nạp File Excel Lịch Thi Đấu Mới</h3>
-        <p class="muted" style="margin-bottom:10px">Khi nạp file Excel mới, hệ thống sẽ <b>tự động xóa toàn bộ danh sách môn cũ</b> và tạo lại lịch thi đấu chính xác theo file Excel mới.</p>
+        <p class="muted" style="margin-bottom:10px">Hệ thống sẽ tự động quét toàn bộ các sheet và tên môn trong file Excel để tạo lịch thi đấu tự động.</p>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
         <button class="btn ok" onclick="importExcelFile()">📥 Cập Nhật Lịch Đấu Từ File Excel Này Ngay</button>
       </div>
@@ -284,7 +284,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V43';
+const STORAGE_VER = 'hkpd_2026_V44';
 
 let matches = [];
 let medals = {};
@@ -981,6 +981,7 @@ function deletePhoto(id) {
   renderAdminPhotos();
 }
 
+// CƠ CHẾ QUÉT LINH HOẠT TẤT CẢ CÁC SHEET VÀ Ô TRONG FILE EXCEL
 function importExcelFile() {
   let fileInput = document.getElementById('excelFileInput');
   if(!fileInput.files || !fileInput.files[0]) { alert('Vui lòng chọn file Excel!'); return; }
@@ -989,26 +990,47 @@ function importExcelFile() {
     try {
       let data = new Uint8Array(e.target.result);
       let workbook = XLSX.read(data, {type: 'array'});
-      let firstSheetName = workbook.SheetNames[0];
-      let worksheet = workbook.Sheets[firstSheetName];
-      let json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
       
       let newExcelData = {};
-      let currentSport = "";
-      json.forEach(row => {
-        if(row[0] && typeof row[0] === 'string' && row[0].trim() !== "") {
-          if(row[0].includes("Môn") || (row[0].length < 30 && !row[0].includes("-"))) {
-            currentSport = row[0].replace("Môn:", "").trim();
-            if(!newExcelData[currentSport]) newExcelData[currentSport] = [];
-          } else if(currentSport) {
-            newExcelData[currentSport].push(row[0].trim());
-          }
+
+      workbook.SheetNames.forEach(sheetName => {
+        let worksheet = workbook.Sheets[sheetName];
+        let json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+        
+        let detectedSport = sheetName; // Mặc định lấy tên sheet làm tên môn
+        let teams = [];
+
+        json.forEach(row => {
+          row.forEach(cell => {
+            if (cell && typeof cell === 'string') {
+              let text = cell.trim();
+              // Tìm tên môn dựa trên từ khóa MÔN hoặc BÓNG / CẦU LÔNG / ĐÁ CẦU trong nội dung ô
+              if (text.toUpperCase().includes("MÔN") || text.toUpperCase().includes("BÓNG") || text.toUpperCase().includes("CẦU LÔNG") || text.toUpperCase().includes("ĐÁ CẦU")) {
+                if (text.length < 50) detectedSport = text.replace(/^MÔN\s*/i, "").trim();
+              }
+            }
+          });
+
+          // Quét tìm các lớp / đội (chứa định dạng 10A, 11A, 12A hoặc tên đội)
+          row.forEach(cell => {
+            if (cell && typeof cell === 'string') {
+              let text = cell.trim();
+              // Nếu ô chứa tên đội/lớp (có chứa A1->A9 hoặc dấu gạch nối giữa các VĐV) và khác tiêu đề
+              if ((text.match(/(?:10|11|12)[A-Z0-9]+/i) || text.includes("-")) && !text.toUpperCase().includes("BẢNG THI ĐẤU") && !text.toUpperCase().includes("NĂM HỌC") && !text.toUpperCase().includes("MÔN")) {
+                if (!teams.includes(text)) teams.push(text);
+              }
+            }
+          });
+        });
+
+        if(teams.length >= 2) {
+          newExcelData[sheetName] = teams;
         }
       });
 
       if(Object.keys(newExcelData).length > 0) {
         let newMatchesList = [];
-        let mIdCount = 2000;
+        let mIdCount = 3000;
         for(let sName in newExcelData) {
           let created = generateFullTreeForSport(sName, newExcelData[sName]);
           created.forEach(m => {
@@ -1020,7 +1042,7 @@ function importExcelFile() {
               teamALoserFeed: m.teamALoserFeed || null,
               teamBLoserFeed: m.teamBLoserFeed || null,
               type: m.type || null,
-              sport: m.sport,
+              sport: sName,
               round: m.round,
               teamA: m.teamA,
               teamB: m.teamB,
@@ -1035,7 +1057,7 @@ function importExcelFile() {
         initApp();
         alert('Đã cập nhật lịch thi đấu mới từ file Excel thành công!');
       } else {
-        alert('Không đọc được dữ liệu môn thi đấu trong file Excel.');
+        alert('Không tìm thấy danh sách đội/lớp hợp lệ trong file Excel. Thầy kiểm tra lại các cột chứa tên lớp (VD: 10A1, 11A2, 12A6...)');
       }
     } catch(err) {
       alert('Lỗi khi đọc file Excel: ' + err.message);
