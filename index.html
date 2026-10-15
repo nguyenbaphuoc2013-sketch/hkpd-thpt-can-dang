@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
 <title>HKPĐ THPT Cần Đăng 2026-2027</title>
+<!-- Sử dụng CDN chính thức, siêu ổn định không bị chặn trên Vercel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--primary:#073b8f;--accent:#0877e8;--bg:#f4f7fb;--card:#ffffff;--text:#172033;--border:#e4eaf2;--success:#198754;--danger:#dc3545}
 *{box-sizing:border-box}
@@ -172,7 +174,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật lịch thi đấu, tỷ số trận đấu và quản lý huy chương trực tuyến</div>
+      <div class="muted">Tải file Excel lên để tự động cập nhật lịch thi đấu, tỷ số và sơ đồ nhánh</div>
     </div>
 
     <div id="login">
@@ -186,13 +188,12 @@ nav{width:100%}
     </div>
 
     <div id="adminPanel" class="hidden">
-      <!-- CẬP NHẬT LỊCH THI ĐẤU SIÊU NHANH VÀ CHẮC CHẮN -->
+      <!-- TỰ ĐỘNG ĐỌC FILE EXCEL CỦA THẦY -->
       <div class="card admin-card" style="background:#f0f7ff;border-color:#bfdbfe">
-        <h3 style="margin-top:0;color:#0869d7">⚡ Thêm Nhanh Môn & Danh Sách Đội Thi Đấu</h3>
-        <p class="muted" style="margin-bottom:8px">Thầy chỉ cần nhập tên môn và danh sách các lớp (mỗi lớp 1 dòng) rồi bấm tạo là xong ngay!</p>
-        <div>Tên Môn Thi Đấu:<input id="quickSportName" placeholder="VD: Bón Đá Nam Khối 12 hoặc Cầu Lông Đôi Nam"></div>
-        <div>Danh sách các lớp (mỗi lớp / đội một dòng):<textarea id="quickTeamList" placeholder="12A6&#10;12A2&#10;12A7&#10;12A4&#10;12A1&#10;12A8&#10;12A3"></textarea></div>
-        <button class="btn ok" onclick="addQuickSport()" style="margin-top:6px">🚀 Tạo Môn & Tự Động Tạo Sơ Đồ Nhánh</button>
+        <h3 style="margin-top:0;color:#0869d7">📂 Tự Động Đọc & Cập Nhật File Excel Mới Nhất</h3>
+        <p class="muted" style="margin-bottom:10px">Hệ thống quét toàn bộ các sheet và cột trong file Excel của thầy để tự động sinh lịch đấu và sơ đồ nhánh.</p>
+        <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
+        <button class="btn ok" onclick="importExcelFile()">📥 Đọc File Excel & Cập Nhật Lịch Đấu Ngay</button>
       </div>
 
       <div class="card admin-card" style="background:#f0fdf4;border-color:#bbf7d0">
@@ -269,7 +270,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V50';
+const STORAGE_VER = 'hkpd_2026_V55';
 
 let matches = [];
 let medals = {};
@@ -820,48 +821,78 @@ function updateMatch(id) {
   renderAdminMatches();
 }
 
-// THÊM NHANH MÔN THI ĐẤU DỰA TRÊN COPY-PASTE DANH SÁCH LỚP CỰC KỲ AN TOÀN
-function addQuickSport() {
-  let sportName = document.getElementById('quickSportName').value.trim();
-  let rawText = document.getElementById('quickTeamList').value.trim();
-  if(!sportName || !rawText) {
-    alert('Vui lòng nhập tên môn và danh sách các lớp/đội!');
-    return;
-  }
-  let teamList = rawText.split('\n').map(t => t.trim()).filter(t => t !== '');
-  if(teamList.length < 2) {
-    alert('Danh sách phải có ít nhất 2 đội/lớp để tạo sơ đồ thi đấu!');
-    return;
-  }
+// HÀM ĐỌC FILE EXCEL TỰ ĐỘNG THÔNG MINH (Quét toàn bộ sheet và mọi cột)
+function importExcelFile() {
+  let fileInput = document.getElementById('excelFileInput');
+  if(!fileInput.files || !fileInput.files[0]) { alert('Vui lòng chọn file Excel!'); return; }
+  let reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      let data = new Uint8Array(e.target.result);
+      let workbook = XLSX.read(data, {type: 'array'});
+      
+      let newExcelData = {};
 
-  // Xóa các trận cũ cùng tên môn nếu có, sau đó thêm mới
-  matches = matches.filter(m => m.sport !== sportName);
-  let created = generateFullTreeForSport(sportName, teamList);
-  let mIdCount = Date.now();
-  created.forEach(m => {
-    matches.push({
-      id: mIdCount++,
-      matchCode: m.matchCode,
-      teamAFeed: m.teamAFeed || null,
-      teamBFeed: m.teamBFeed || null,
-      teamALoserFeed: m.teamALoserFeed || null,
-      teamBLoserFeed: m.teamBLoserFeed || null,
-      type: m.type || null,
-      sport: sportName,
-      round: m.round,
-      teamA: m.teamA,
-      teamB: m.teamB,
-      scoreA: 0, scoreB: 0,
-      status: "upcoming",
-      venue: "Sân Cần Đăng"
-    });
-  });
+      workbook.SheetNames.forEach(sheetName => {
+        let worksheet = workbook.Sheets[sheetName];
+        let json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+        
+        let teams = [];
 
-  syncDataToCloud(true);
-  initApp();
-  document.getElementById('quickSportName').value = '';
-  document.getElementById('quickTeamList').value = '';
-  alert('Đã tạo thành công môn thi đấu và sơ đồ nhánh tự động!');
+        json.forEach(row => {
+          row.forEach(cell => {
+            if (cell !== null && cell !== undefined) {
+              let text = String(cell).trim();
+              if ((text.match(/(?:10|11|12)[A-Z0-9]+/i) || text.includes("-")) && !text.toUpperCase().includes("BẢNG THI ĐẤU") && !text.toUpperCase().includes("NĂM HỌC") && !text.toUpperCase().includes("MÔN")) {
+                if (!teams.includes(text)) {
+                  teams.push(text);
+                }
+              }
+            }
+          });
+        });
+
+        if(teams.length >= 2) {
+          newExcelData[sheetName] = teams;
+        }
+      });
+
+      if(Object.keys(newExcelData).length > 0) {
+        let newMatchesList = [];
+        let mIdCount = 5000;
+        for(let sName in newExcelData) {
+          let created = generateFullTreeForSport(sName, newExcelData[sName]);
+          created.forEach(m => {
+            newMatchesList.push({
+              id: mIdCount++,
+              matchCode: m.matchCode,
+              teamAFeed: m.teamAFeed || null,
+              teamBFeed: m.teamBFeed || null,
+              teamALoserFeed: m.teamALoserFeed || null,
+              teamBLoserFeed: m.teamBLoserFeed || null,
+              type: m.type || null,
+              sport: sName,
+              round: m.round,
+              teamA: m.teamA,
+              teamB: m.teamB,
+              scoreA: 0, scoreB: 0,
+              status: "upcoming",
+              venue: "Sân Cần Đăng"
+            });
+          });
+        }
+        matches = newMatchesList;
+        syncDataToCloud(true);
+        initApp();
+        alert('Đã cập nhật lịch thi đấu mới từ file Excel thành công!');
+      } else {
+        alert('Không tìm thấy danh sách đội/lớp hợp lệ trong file Excel.');
+      }
+    } catch(err) {
+      alert('Lỗi khi đọc file Excel: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(fileInput.files[0]);
 }
 
 function saveMedal() {
@@ -913,7 +944,7 @@ function addNews() {
   syncDataToCloud(true);
   initApp();
   renderAdminNews();
-  alert('Đã đăng bài viết!');
+  alert('Đăng bài viết thành công!');
 }
 
 function renderAdminNews() {
@@ -935,13 +966,13 @@ function deleteNews(id) {
 function addPhoto() {
   let title = document.getElementById('photoTitle').value.trim() || 'Ảnh hoạt động';
   let url = document.getElementById('photoUrlInput').value.trim();
-  if(!url) { alert('Vui lòng dán liên kết (URL) hình ảnh!'); return; }
+  if(!url) { alert('Vui lòng dán liên kết hình ảnh!'); return; }
   photos.unshift({ id: Date.now(), title, url });
   syncDataToCloud(true);
   renderPhotos();
   renderAdminPhotos();
   document.getElementById('photoUrlInput').value = '';
-  alert('Đã thêm hình ảnh!');
+  alert('Thêm hình ảnh thành công!');
 }
 
 function renderAdminPhotos() {
