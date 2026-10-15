@@ -191,7 +191,7 @@ nav{width:100%}
       <!-- NẠP FILE EXCEL DỄ DÀNG VÀ TỰ ĐỘNG THAY THẾ -->
       <div class="card admin-card" style="background:#f0f7ff;border-color:#bfdbfe">
         <h3 style="margin-top:0;color:#0869d7">📂 Nạp File Excel Lịch Thi Đấu Mới</h3>
-        <p class="muted" style="margin-bottom:10px">Khi nạp file Excel mới, hệ thống sẽ <b>tự động xóa toàn bộ danh sách môn cũ</b> và tạo lại lịch thi đấu chính xác theo file Excel mới dán vào.</p>
+        <p class="muted" style="margin-bottom:10px">Khi nạp file Excel mới, hệ thống sẽ <b>tự động xóa toàn bộ danh sách môn cũ</b> và tạo lại lịch thi đấu chính xác theo file Excel mới.</p>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
         <button class="btn ok" onclick="importExcelFile()">📥 Cập Nhật Lịch Đấu Từ File Excel Này Ngay</button>
       </div>
@@ -981,7 +981,6 @@ function deletePhoto(id) {
   renderAdminPhotos();
 }
 
-// XỬ LÝ NẠP FILE EXCEL VÀ XÓA SẠCH MÔN CŨ
 function importExcelFile() {
   let fileInput = document.getElementById('excelFileInput');
   if(!fileInput.files || !fileInput.files[0]) { alert('Vui lòng chọn file Excel!'); return; }
@@ -1031,7 +1030,6 @@ function importExcelFile() {
             });
           });
         }
-        // Xóa hoàn toàn danh sách trận cũ
         matches = newMatchesList;
         syncDataToCloud(true);
         initApp();
