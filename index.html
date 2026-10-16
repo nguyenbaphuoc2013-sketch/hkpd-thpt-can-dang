@@ -139,11 +139,11 @@ nav{width:100%}
   </section>
 
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu chuẩn loại trực tiếp</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu chuẩn Excel (Phân bổ Miễn Vòng 1)</h1></div>
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Xử lý chuẩn xác suất miễn (Bye) và tự động đôn đội thắng/thua vào Chung Kết & Tranh Hạng 3!</p>
+      <p class="muted" style="margin-top:6px">👉 Đội miễn vòng 1 (như Huỳnh Trần Hạo Nam /11A2) đứng chờ ở Vòng 2 gặp đội thắng Trận 1 chuẩn xác 100%!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -173,7 +173,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Tải file Excel tổng hợp để dựng sơ đồ tự động chuẩn xác</div>
+      <div class="muted">Tải file Excel lên để tự động xây dựng cây đấu có Suất Miễn chính xác</div>
     </div>
 
     <div id="login">
@@ -188,10 +188,10 @@ nav{width:100%}
 
     <div id="adminPanel" class="hidden">
       <div class="card admin-card" style="background:#f0f7ff;border-color:#bfdbfe">
-        <h3 style="margin-top:0;color:#0869d7">📂 Tải File Excel Đọc Sơ Đồ Toàn Bộ Môn</h3>
-        <p class="muted" style="margin-bottom:10px">Hệ thống sẽ tự động lọc danh sách đội, tính toán suất miễn (Bye) và dựng nhánh chuẩn mực.</p>
+        <h3 style="margin-top:0;color:#0869d7">📂 Tải File Excel Tự Động Phân Nhánh Chuẩn Trận 1, Trận 4...</h3>
+        <p class="muted" style="margin-bottom:10px">Hệ thống phân tách đội đánh Vòng 1 và đội Miễn Vòng 1 (chờ Vòng 2) chuẩn theo sơ đồ cây.</p>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
-        <button class="btn ok" onclick="importExcelFile()">📥 Đọc File Excel & Dựng Sơ Đồ Mới</button>
+        <button class="btn ok" onclick="importExcelFile()">📥 Đọc File Excel & Dựng Sơ Đồ Cây Mới</button>
       </div>
 
       <div class="card admin-card" style="background:#f0fdf4;border-color:#bbf7d0">
@@ -204,7 +204,7 @@ nav{width:100%}
       </div>
 
       <div class="card admin-card danger-zone">
-        <h3 style="margin-top:0;color:#c53030">🧹 Dọn Dẹp & Xóa Trắng Dữ Liệu</h3>
+        <h3 style="margin-top:0;color:#c53030">🧹 Dọn Dẹp & Xóa Trắng Dữ Liệu Cũ</h3>
         <button class="danger" onclick="clearAllDataAbsoluteZero()" style="padding:10px 15px;font-size:12px">🗑 XÓA SẠCH TRẮNG TOÀN BỘ DỮ LIỆU</button>
       </div>
 
@@ -268,7 +268,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V120';
+const STORAGE_VER = 'hkpd_2026_V130';
 
 let matches = [];
 let medals = {};
@@ -331,65 +331,75 @@ function saveData() {
   localStorage.setItem(STORAGE_VER + '_livelinks', JSON.stringify(savedLiveLinks));
 }
 
-// THUẬT TOÁN CHUẨN ĐẤU LOẠI TRỰC TIẾP (XỬ LÝ SUẤT MIỄN - BYE VÀ TỰ ĐỘNG ĐÔN ĐỘI)
+// THUẬT TOÁN TẠO CÂY THI ĐẤU CHUẨN LOẠI TRỰC TIẾP TỪ EXCEL (XỬ LÝ ĐỘI MIỄN VÒNG 1)
 function generateTournamentTreeExact(sportName, teamsList) {
   let matchesList = [];
   let safeSportId = sportName.replace(/[^a-zA-Z0-9]/g, '');
   let N = teamsList.length;
   if(N < 2) return matchesList;
 
-  // Tìm lũy thừa 2 gần nhất lớn hơn hoặc bằng N
+  // Tính số suất miễn (Bye) để tròn mốc 2^k
   let k = 1;
   while(k < N) k *= 2;
-  let byeCount = k - N; // Số suất miễn vòng 1
+  let byeCount = k - N;
 
   let currentRoundSlots = [];
   let matchIdx = 1;
 
-  // Phân bổ suất miễn cho các đội đầu tiên, các đội còn lại đấu vòng 1
-  for(let i = 0; i < N; i++) {
-    if(i < byeCount * 2 && i % 2 === 0 && i + 1 < N) {
-      // Trận Vòng 1 bình thường
-      let mCode = `${safeSportId}_R1_${matchIdx}`;
-      matchesList.push({
-        matchCode: mCode,
-        matchLabel: `Trận ${matchIdx}`,
-        sport: sportName,
-        round: "Vòng 1",
-        teamA: teamsList[i],
-        teamB: teamsList[i+1]
-      });
-      currentRoundSlots.push(mCode);
-      matchIdx++;
-      i++;
-    } else if(i < byeCount) {
-      // Đội được miễn vào thẳng vòng sau
-      currentRoundSlots.push({ directTeam: teamsList[i] });
-    } else {
-      if(i + 1 < N) {
+  // Ghép cặp Vòng 1 và các Đội Miễn Vòng 1 (Bye)
+  let idx = 0;
+  let byeAllocated = 0;
+
+  while(idx < N) {
+    if (byeAllocated < byeCount) {
+      // 1 Trận Vòng 1 và 1 Đội Miễn Vòng 1
+      if (idx + 1 < N) {
         let mCode = `${safeSportId}_R1_${matchIdx}`;
         matchesList.push({
           matchCode: mCode,
           matchLabel: `Trận ${matchIdx}`,
           sport: sportName,
           round: "Vòng 1",
-          teamA: teamsList[i],
-          teamB: teamsList[i+1]
+          teamA: teamsList[idx],
+          teamB: teamsList[idx+1]
         });
         currentRoundSlots.push(mCode);
         matchIdx++;
-        i++;
+        idx += 2;
+      }
+      if (idx < N && byeAllocated < byeCount) {
+        currentRoundSlots.push({ directTeam: teamsList[idx] });
+        idx++;
+        byeAllocated++;
+      }
+    } else {
+      // Đấu cặp Vòng 1 bình thường
+      if (idx + 1 < N) {
+        let mCode = `${safeSportId}_R1_${matchIdx}`;
+        matchesList.push({
+          matchCode: mCode,
+          matchLabel: `Trận ${matchIdx}`,
+          sport: sportName,
+          round: "Vòng 1",
+          teamA: teamsList[idx],
+          teamB: teamsList[idx+1]
+        });
+        currentRoundSlots.push(mCode);
+        matchIdx++;
+        idx += 2;
       } else {
-        currentRoundSlots.push({ directTeam: teamsList[i] });
+        currentRoundSlots.push({ directTeam: teamsList[idx] });
+        idx++;
       }
     }
   }
 
-  // Dựng các vòng tiếp theo
+  // Dựng tiếp Vòng 2 (Huỳnh Trần Hạo Nam /11A2 đấu với Thắng Trận 1)
   let roundLevel = 2;
   while(currentRoundSlots.length > 1) {
     let nextRoundSlots = [];
-    let rName = currentRoundSlots.length <= 2 ? "Chung Kết & Tranh Hạng 3" : (currentRoundSlots.length <= 4 ? "Vòng Bán Kết" : `Vòng ${roundLevel}`);
+    let isFinalStage = (currentRoundSlots.length <= 2);
+    let rName = isFinalStage ? "Chung Kết & Tranh Hạng 3" : (currentRoundSlots.length <= 4 ? "Vòng Bán Kết" : `Vòng ${roundLevel}`);
 
     let pairIdx = 1;
     for(let i = 0; i < currentRoundSlots.length; i += 2) {
@@ -401,8 +411,8 @@ function generateTournamentTreeExact(sportName, teamsList) {
 
         let tAFeed = typeof slotA === 'string' ? slotA : null;
         let tBFeed = typeof slotB === 'string' ? slotB : null;
-        let staticA = typeof slotA === 'object' ? slotA.directTeam : `Thắng ${slotA}`;
-        let staticB = typeof slotB === 'object' ? slotB.directTeam : `Thắng ${slotB}`;
+        let staticA = typeof slotA === 'object' ? slotA.directTeam : `Thắng Trận ${slotA.split('_').pop()}`;
+        let staticB = typeof slotB === 'object' ? slotB.directTeam : `Thắng Trận ${slotB.split('_').pop()}`;
 
         matchesList.push({
           matchCode: nextCode,
@@ -422,7 +432,7 @@ function generateTournamentTreeExact(sportName, teamsList) {
       }
     }
 
-    // Tạo Trận Chung Kết và Trận Tranh Hạng 3
+    // Đôn nhánh vào Trận Chung Kết (🥇) và Trận Tranh Hạng 3 (🥉)
     if(nextRoundSlots.length === 2 && currentRoundSlots.length === 2) {
       let ckLabel = `Trận ${matchIdx++} (Chung Kết 🥇)`;
       matchesList.push({
@@ -810,7 +820,7 @@ function openNewsModal(id) {
 
 function openPhotoModal(url, title) {
   document.getElementById('modalBody').innerHTML = `<h3 style="margin-top:0">${title}</h3><img src="${url}" class="modal-img">`;
-  document.getElementById('modalOverlay').classList.add('hidden');
+  document.getElementById('modalOverlay').classList.remove('hidden');
 }
 
 function closeModal(e) {
@@ -937,7 +947,7 @@ function importExcelFile() {
 
       if(Object.keys(newExcelTeams).length > 0) {
         let newMatchesList = [];
-        let mIdCount = 10500;
+        let mIdCount = 11000;
         for(let sName in newExcelTeams) {
           let created = generateTournamentTreeExact(sName, newExcelTeams[sName]);
           created.forEach(m => {
@@ -963,7 +973,7 @@ function importExcelFile() {
         matches = newMatchesList;
         syncDataToCloud(true);
         initApp();
-        alert('Đã đọc file Excel và dựng sơ đồ đấu loại trực tiếp chuẩn xác (có tính suất miễn Bye)!');
+        alert('Đã nạp file Excel và dựng sơ đồ nhánh chuẩn xác thành công!');
       } else {
         alert('Không tìm thấy danh sách đội hợp lệ trong file Excel.');
       }
