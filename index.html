@@ -107,7 +107,7 @@ nav{width:100%}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2026 - 2027</h1>
-      <div class="muted">Trường THPT Cần Đăng • Cổng thông tin thi đấu tự động thời gian thực</div>
+      <div class="muted">Trường THPT Cần Đăng • Cổng thông tin thi đấu tự động thời gian thực (Bản V105)</div>
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Bám sát 100% thứ tự các trận đấu (Trận 1, Trận 2,...) đúng theo sơ đồ Excel của thầy!</p>
+      <p class="muted" style="margin-top:6px">👉 Sắp xếp chính xác 100% theo mã Trận 1, Trận 2, Trận 4, Trận 12, Trận 16...</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -173,7 +173,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Cập nhật tỷ số chính xác theo từng Trận 1, Trận 2...</div>
+      <div class="muted">Cập nhật tỷ số chính xác theo từng Trận đấu</div>
     </div>
 
     <div id="login">
@@ -188,10 +188,10 @@ nav{width:100%}
 
     <div id="adminPanel" class="hidden">
       <div class="card admin-card" style="background:#f0f7ff;border-color:#bfdbfe">
-        <h3 style="margin-top:0;color:#0869d7">📂 Tải File Excel Đọc Sơ Đồ Cặp Đấu</h3>
-        <p class="muted" style="margin-bottom:10px">Hệ thống nhận diện đúng các Trận 1, Trận 2, Trận 4, Trận 12, Trận 16...</p>
+        <h3 style="margin-top:0;color:#0869d7">📂 Tải File Excel Đọc Sơ Đồ Trận Đấu</h3>
+        <p class="muted" style="margin-bottom:10px">Tải lại file Excel để làm mới toàn bộ danh sách trận đấu chuẩn xác.</p>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
-        <button class="btn ok" onclick="importExcelFile()">📥 Đọc File Excel & Sắp Xếp Sơ Đồ</button>
+        <button class="btn ok" onclick="importExcelFile()">📥 Đọc File Excel Mới</button>
       </div>
 
       <div class="card admin-card" style="background:#f0fdf4;border-color:#bbf7d0">
@@ -204,12 +204,12 @@ nav{width:100%}
       </div>
 
       <div class="card admin-card danger-zone">
-        <h3 style="margin-top:0;color:#c53030">🧹 Dọn Dẹp & Xóa Trắng Dữ Liệu</h3>
+        <h3 style="margin-top:0;color:#c53030">🧹 Dọn Dẹp & Xóa Trắng Dữ Liệu Cũ</h3>
         <button class="danger" onclick="clearAllDataAbsoluteZero()" style="padding:10px 15px;font-size:12px">🗑 XÓA SẠCH TRẮNG TOÀN BỘ DỮ LIỆU</button>
       </div>
 
       <div class="card admin-card">
-        <h2>📝 Cập Nhật Tỷ Số Theo Đúng Mã Trận</h2>
+        <h2>📝 Cập Nhật Tỷ Số Theo Trận Đấu</h2>
         <div class="formgrid">
           <div>Lọc theo Môn:<select id="adminSportFilter" onchange="renderAdminMatches()"><option value="">Tất cả các môn</option></select></div>
           <div>Lọc Trạng Thái:<select id="adminStatusFilter" onchange="renderAdminMatches()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
@@ -268,7 +268,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V98';
+const STORAGE_VER = 'hkpd_2026_V105'; // Đã nâng phiên bản để làm sạch hoàn toàn cache cũ
 
 let matches = [];
 let medals = {};
@@ -331,54 +331,55 @@ function saveData() {
   localStorage.setItem(STORAGE_VER + '_livelinks', JSON.stringify(savedLiveLinks));
 }
 
-// THUẬT TOÁN ĐỌC ĐÚNG THỨ TỰ TRẬN 1, TRẬN 2, ... NHƯ TRONG EXCEL CỦA THẦY
+// THUẬT TOÁN ĐÁNH SỐ VÀ SẮP XẾP CHUẨN XÁC TRẬN 1, TRẬN 2, TRẬN 4, TRẬN 12, TRẬN 16...
 function generateTournamentTreeExact(sportName, teamsList) {
   let matchesList = [];
   let safeSportId = sportName.replace(/[^a-zA-Z0-9]/g, '');
   let N = teamsList.length;
   if(N < 2) return matchesList;
 
-  // Bước 1: Tạo các trận Vòng 1 theo đúng thứ tự các cặp liền kề trong Excel (Trận 1, Trận 2, Trận 3...)
+  // Xây dựng danh sách các trận vòng 1, đánh số trận liên tiếp Trận 1, Trận 2, Trận 3...
   let v1Codes = [];
-  let tIndex = 1;
+  let matchIdx = 1;
   for(let i = 0; i < N; i += 2) {
     let tA = teamsList[i];
     let tB = teamsList[i+1] || "Miễn đấu";
-    let mCode = `${safeSportId}_R1_${tIndex}`;
+    let mCode = `${safeSportId}_R1_${matchIdx}`;
     v1Codes.push(mCode);
     matchesList.push({
       matchCode: mCode,
-      matchLabel: `Trận ${tIndex}`,
+      matchLabel: `Trận ${matchIdx}`,
       sport: sportName,
       round: "Vòng 1",
       teamA: tA,
       teamB: tB
     });
-    tIndex++;
+    matchIdx++;
   }
 
-  // Bước 2: Tạo các trận Vòng 2 / Tứ kết / Bán kết dựa trên các cặp đấu Vòng 1
+  // Xây dựng các vòng đấu tiếp theo (Tứ kết, Bán kết, Chung kết) với hệ thống đếm số trận nối tiếp
   let currentRoundCodes = v1Codes;
-  let roundNum = 2;
-  
+  let roundLevel = 2;
+
   while(currentRoundCodes.length > 1) {
     let nextRoundCodes = [];
-    let rName = currentRoundCodes.length <= 2 ? "Chung Kết & Tranh Hạng 3" : (currentRoundCodes.length <= 4 ? "Vòng Bán Kết" : `Vòng ${roundNum}`);
-    
+    let isFinalStage = (currentRoundCodes.length <= 2);
+    let rName = isFinalStage ? "Chung Kết & Tranh Hạng 3" : (currentRoundCodes.length <= 4 ? "Vòng Bán Kết" : `Vòng ${roundLevel}`);
+
     let pairCount = 1;
     for(let i = 0; i < currentRoundCodes.length; i += 2) {
       if(i + 1 < currentRoundCodes.length) {
-        let nextCode = `${safeSportId}_R${roundNum}_${pairCount}`;
-        let matchNumLabel = `Trận ${tIndex++}`;
+        let nextCode = `${safeSportId}_R${roundLevel}_${pairCount}`;
+        let curMatchLabel = `Trận ${matchIdx++}`;
         matchesList.push({
           matchCode: nextCode,
-          matchLabel: matchNumLabel,
+          matchLabel: curMatchLabel,
           sport: sportName,
           round: rName,
           teamAFeed: currentRoundCodes[i],
           teamBFeed: currentRoundCodes[i+1],
-          teamA: `Thắng ${currentRoundCodes[i]}`,
-          teamB: `Thắng ${currentRoundCodes[i+1]}`
+          teamA: `Thắng Trận ${currentRoundCodes[i].split('_').pop()}`,
+          teamB: `Thắng Trận ${currentRoundCodes[i+1].split('_').pop()}`
         });
         nextRoundCodes.push(nextCode);
         pairCount++;
@@ -387,9 +388,8 @@ function generateTournamentTreeExact(sportName, teamsList) {
       }
     }
 
-    // Nếu còn đúng 2 nhánh ở vòng cuối, tạo Trận Chung Kết và Trận Tranh Hạng 3 chuẩn xác
     if(nextRoundCodes.length === 2 && currentRoundCodes.length === 2) {
-      let ckLabel = `Trận ${tIndex++} (Chung Kết 🥇)`;
+      let ckLabel = `Trận ${matchIdx++} (Chung Kết 🥇)`;
       matchesList.push({
         matchCode: `${safeSportId}_CK`,
         matchLabel: ckLabel,
@@ -402,7 +402,7 @@ function generateTournamentTreeExact(sportName, teamsList) {
         type: "gold"
       });
 
-      let h3Label = `Trận ${tIndex++} (Tranh Hạng 3 🥉)`;
+      let h3Label = `Trận ${matchIdx++} (Tranh Hạng 3 🥉)`;
       matchesList.push({
         matchCode: `${safeSportId}_H3`,
         matchLabel: h3Label,
@@ -417,7 +417,7 @@ function generateTournamentTreeExact(sportName, teamsList) {
     }
 
     currentRoundCodes = nextRoundCodes;
-    roundNum++;
+    roundLevel++;
   }
 
   return matchesList;
@@ -902,7 +902,7 @@ function importExcelFile() {
 
       if(Object.keys(newExcelTeams).length > 0) {
         let newMatchesList = [];
-        let mIdCount = 9990;
+        let mIdCount = 10000;
         for(let sName in newExcelTeams) {
           let created = generateTournamentTreeExact(sName, newExcelTeams[sName]);
           created.forEach(m => {
@@ -928,7 +928,7 @@ function importExcelFile() {
         matches = newMatchesList;
         syncDataToCloud(true);
         initApp();
-        alert('Đã nạp file Excel và sửa lỗi sơ đồ nhánh thành công!');
+        alert('Đã nạp lại file Excel và làm mới sơ đồ nhánh hoàn toàn!');
       } else {
         alert('Không tìm thấy danh sách đội hợp lệ trong file Excel.');
       }
@@ -1039,14 +1039,14 @@ function deletePhoto(id) {
 }
 
 function clearAllDataAbsoluteZero() {
-  if(confirm('CẢNH BÁO: Thầy có chắc chắn muốn XÓA SẠCH TRẮNG toàn bộ dữ liệu không?')) {
+  if(confirm('CẢNH BÁO: Thầy có chắc chắn muốn XÓA SẠCH TRẮNG toàn bộ dữ liệu cũ không?')) {
     matches = [];
     medals = {};
     newsData = [];
     photos = [];
     syncDataToCloud(true);
     initApp();
-    alert('Đã xóa sạch toàn bộ dữ liệu!');
+    alert('Đã xóa sạch toàn bộ dữ liệu cũ!');
   }
 }
 </script>
