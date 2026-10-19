@@ -222,7 +222,7 @@ nav{width:100%}
 
       <div class="card admin-card">
         <h2>📝 Cập Nhật Tỷ Số & Đội Thắng Vòng Tiếp Theo</h2>
-        <p class="muted" style="margin-bottom:10px">💡 Khi trận trước có kết quả, tên đội thắng sẽ tự động hiển thị ra ngay bên dưới để thầy dễ dàng cập nhật tiếp các vòng sau!</p>
+        <p class="muted" style="margin-bottom:10px">💡 Thầy có thể chỉnh sửa trực tiếp tên đội ở ô Gốc nếu đội vào thẳng từ vòng 2!</p>
         <div class="formgrid">
           <div>Lọc theo Môn:<select id="adminSportFilter" onchange="renderAdminMatches()"><option value="">Tất cả các môn</option></select></div>
           <div>Lọc Trạng Thái:<select id="adminStatusFilter" onchange="renderAdminMatches()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
@@ -281,7 +281,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V290';
+const STORAGE_VER = 'hkpd_2026_V300';
 
 let matches = [];
 let medals = {};
@@ -380,7 +380,7 @@ function addNewManualMatch() {
   alert('Đã thêm trận đấu thủ công thành công!');
 }
 
-// THUẬT TOÁN ĐỌC ĐÚNG TUYỆT ĐỐI KHÔNG BỊ NHẦM LẪN VÒNG 1 VÀ VÒNG 2
+// THUẬT TOÁN ĐỌC TỐI ƯU: HỖ TRỢ CẢ ĐẶC CÁCH VÀO THẲNG VÒNG 2
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = sheetName.replace(/[^a-zA-Z0-9]/g, '');
@@ -408,10 +408,6 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   matchesDict.sort((a, b) => a.num - b.num);
   if (matchesDict.length === 0) return matchesList;
 
-  // Thu thập danh sách các trận ở Cột B (Vòng 1) để định danh chính xác
-  let v1Matches = new Set();
-  matchesDict.filter(m => m.col === 1).forEach(m => v1Matches.add(m.num));
-
   matchesDict.forEach(m => {
     let mNum = m.num;
     let mCol = m.col;
@@ -434,9 +430,8 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
       let tAFeed = null, tBFeed = null;
       let tA = "Chưa xác định", tB = "Chưa xác định";
 
-      // 1. Quét phía trên để tìm Nguồn A (có thể là Trận trước hoặc Đội miễn Vòng 1 ở Cột B)
+      // Quét tìm nguồn phía trên
       for (let rTop = mRow - 1; rTop >= 0; rTop--) {
-        // Kiểm tra xem ở cột trước (mCol - 1) có chứa nhãn Trận cũ không
         let cellPrev = jsonMatrix[rTop] ? jsonMatrix[rTop][mCol - 1] : null;
         if (cellPrev && String(cellPrev).includes("(Trận")) {
           let mPrev = String(cellPrev).match(/\(Trận\s*(\d+)\)/i);
@@ -447,37 +442,18 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
             break;
           }
         }
-        // Nếu ở Cột C (mCol === 2), kiểm tra nếu cột B có tên đội miễn vòng 1
-        if (mCol === 2) {
-          let cellB = jsonMatrix[rTop] ? jsonMatrix[rTop][1] : null;
-          if (cellB) {
-            let txt = String(cellB).trim();
-            if (txt && !txt.startsWith("(Trận") && !txt.toUpperCase().includes("BẢNG THI ĐẤU") && !txt.toUpperCase().includes("MÔN")) {
-              // Kiểm tra xem có phải là một trận đấu Vòng 1 nằm gần đó không
-              let matchedV1 = null;
-              for (let checkR of [rTop - 1, rTop + 1]) {
-                let vCheck = jsonMatrix[checkR] ? jsonMatrix[checkR][1] : null;
-                if (vCheck && String(vCheck).includes("(Trận")) {
-                  let mV1 = String(vCheck).match(/\(Trận\s*(\d+)\)/i);
-                  if (mV1) {
-                    matchedV1 = parseInt(mV1[1]);
-                    break;
-                  }
-                }
-              }
-              if (matchedV1 !== null) {
-                tAFeed = `${safeSportId}_M${matchedV1}`;
-                tA = `Thắng Trận ${matchedV1}`;
-              } else {
-                tA = txt;
-              }
-              break;
-            }
+        // Nếu ở Vòng 2 mà có tên đội trực tiếp (đặc cách)
+        let cellThisCol = jsonMatrix[rTop] ? jsonMatrix[rTop][mCol] : null;
+        if (cellThisCol) {
+          let txt = String(cellThisCol).trim();
+          if (txt && !txt.startsWith("(Trận") && !txt.toUpperCase().includes("BẢNG") && !txt.toUpperCase().includes("MÔN")) {
+            tA = txt;
+            break;
           }
         }
       }
 
-      // 2. Quét phía dưới để tìm Nguồn B
+      // Quét tìm nguồn phía dưới
       for (let rBot = mRow + 1; rBot < jsonMatrix.length; rBot++) {
         let cellPrev = jsonMatrix[rBot] ? jsonMatrix[rBot][mCol - 1] : null;
         if (cellPrev && String(cellPrev).includes("(Trận")) {
@@ -489,30 +465,12 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
             break;
           }
         }
-        if (mCol === 2) {
-          let cellB = jsonMatrix[rBot] ? jsonMatrix[rBot][1] : null;
-          if (cellB) {
-            let txt = String(cellB).trim();
-            if (txt && !txt.startsWith("(Trận") && !txt.toUpperCase().includes("BẢNG THI ĐẤU") && !txt.toUpperCase().includes("MÔN")) {
-              let matchedV1 = null;
-              for (let checkR of [rBot - 1, rBot + 1]) {
-                let vCheck = jsonMatrix[checkR] ? jsonMatrix[checkR][1] : null;
-                if (vCheck && String(vCheck).includes("(Trận")) {
-                  let mV1 = String(vCheck).match(/\(Trận\s*(\d+)\)/i);
-                  if (mV1) {
-                    matchedV1 = parseInt(mV1[1]);
-                    break;
-                  }
-                }
-              }
-              if (matchedV1 !== null) {
-                tBFeed = `${safeSportId}_M${matchedV1}`;
-                tB = `Thắng Trận ${matchedV1}`;
-              } else {
-                tB = txt;
-              }
-              break;
-            }
+        let cellThisCol = jsonMatrix[rBot] ? jsonMatrix[rBot][mCol] : null;
+        if (cellThisCol) {
+          let txt = String(cellThisCol).trim();
+          if (txt && !txt.startsWith("(Trận") && !txt.toUpperCase().includes("BẢNG") && !txt.toUpperCase().includes("MÔN")) {
+            tB = txt;
+            break;
           }
         }
       }
@@ -1025,7 +983,7 @@ function importExcelFile() {
       let workbook = XLSX.read(data, {type: 'array'});
       
       let newMatchesList = [];
-      let mIdCount = 80000;
+      let mIdCount = 90000;
 
       workbook.SheetNames.forEach(sheetName => {
         let worksheet = workbook.Sheets[sheetName];
@@ -1057,7 +1015,7 @@ function importExcelFile() {
         matches = newMatchesList;
         syncDataToCloud(true);
         initApp();
-        alert(`Đã nạp thành công từ file Excel với thuật toán ghép nhánh Vòng 2 hoàn toàn chính xác!`);
+        alert(`Đã nạp file Excel thành công với hỗ trợ đội đặc cách vòng 2!`);
       } else {
         alert('Không tìm thấy danh sách trận hợp lệ trong file Excel.');
       }
