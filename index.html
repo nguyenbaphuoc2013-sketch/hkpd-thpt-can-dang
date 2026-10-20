@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Đọc tự động chuẩn xác tuyệt đối theo sơ đồ của từng môn!</p>
+      <p class="muted" style="margin-top:6px">👉 Đọc tự động chuẩn xác theo sơ đồ cây nhiều vòng của từng môn!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -281,7 +281,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V340';
+const STORAGE_VER = 'hkpd_2026_V350';
 
 let matches = [];
 let medals = {};
@@ -380,7 +380,7 @@ function addNewManualMatch() {
   alert('Đã thêm trận đấu thủ công thành công!');
 }
 
-// THUẬT TOÁN ĐỌC ĐÚNG TUYỆT ĐỐI THEO VỊ TRÍ Ô TRONG EXCEL
+// THUẬT TOÁN ĐỌC CHÍNH XÁC TUYỆT ĐỐI THEO ĐÚNG Ý THẦY: KIỂM TRA Ô TRÊN/DƯỚI, NẾU CÓ TRẬN THÌ "THẮNG TRẬN X", CÒN LẠI GIỮ NGUYÊN TÊN ĐỘI ĐẶC CÁCH
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = sheetName.replace(/[^a-zA-Z0-9]/g, '');
@@ -430,43 +430,41 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
       let tAFeed = null, tBFeed = null;
       let tA = "Chưa xác định", tB = "Chưa xác định";
 
-      // Kiểm tra ô lân cận (quét lên trên hoặc xuống dưới tìm xem có nhãn Trận vòng trước hay tên VĐV đặc cách)
-      function scanSource(startRow, direction) {
-        let r = startRow;
-        while (r >= 0 && r < jsonMatrix.length) {
-          // Kiểm tra cột hiện tại hoặc cột bên trái (mCol, mCol - 1)
-          for (let c = mCol; c >= Math.max(0, mCol - 1); c--) {
-            let cellVal = jsonMatrix[r] ? jsonMatrix[r][c] : null;
-            if (cellVal) {
-              let sVal = String(cellVal).trim();
-              if (sVal) {
-                // Nếu gặp nhãn trận vòng trước
-                let mPrev = sVal.match(/\(Trận\s*(\d+)\)/i);
-                if (mPrev) {
-                  let pNum = parseInt(mPrev[1]);
-                  return { feed: `${safeSportId}_M${pNum}`, name: `Thắng Trận ${pNum}` };
-                }
-                // Nếu gặp tên đội cụ thể (đội đặc cách không đấu vòng 1)
-                if (!sVal.startsWith("(Trận") && !sVal.toUpperCase().includes("BẢNG") && !sVal.toUpperCase().includes("MÔN")) {
-                  return { feed: null, name: sVal };
-                }
+      // Hàm quét tìm nguồn ô lân cận
+      function inspectCell(rIdx) {
+        if (rIdx < 0 || rIdx >= jsonMatrix.length) return { feed: null, name: "Chưa xác định" };
+        for (let c = mCol; c >= Math.max(0, mCol - 1); c--) {
+          let val = jsonMatrix[rIdx] ? jsonMatrix[rIdx][c] : null;
+          if (val !== null && val !== undefined) {
+            let sVal = String(val).trim();
+            if (sVal) {
+              // Nếu cell chứa nhãn trận vòng trước (VD: Trận 1, Trận 2...)
+              let mPrev = sVal.match(/\(Trận\s*(\d+)\)/i);
+              if (mPrev) {
+                let pNum = parseInt(mPrev[1]);
+                return { feed: `${safeSportId}_M${pNum}`, name: `Thắng Trận ${pNum}` };
+              }
+              // Nếu cell chứa tên đội đặc cách trực tiếp
+              if (!sVal.startsWith("(Trận") && !sVal.toUpperCase().includes("BẢNG") && !sVal.toUpperCase().includes("MÔN")) {
+                return { feed: null, name: sVal };
               }
             }
           }
-          r += direction;
-          // Giới hạn khoảng quét tối đa 4 hàng để không bị lấy nhầm đội quá xa
-          if (Math.abs(r - startRow) > 4) break;
         }
         return { feed: null, name: "Chưa xác định" };
       }
 
-      // Quét phía trên tìm Đội A
-      let resA = scanSource(mRow - 1, -1);
+      // Quét phía trên tìm Đội A (thử hàng mRow - 1, sau đó mRow - 2)
+      let resA = inspectCell(mRow - 1);
+      if (resA.name === "Chưa xác định") resA = inspectCell(mRow - 2);
+      if (resA.name === "Chưa xác định") resA = inspectCell(mRow - 3);
       tA = resA.name;
       tAFeed = resA.feed;
 
-      // Quét phía dưới tìm Đội B
-      let resB = scanSource(mRow + 1, 1);
+      // Quét phía dưới tìm Đội B (thử hàng mRow + 1, sau đó mRow + 2)
+      let resB = inspectCell(mRow + 1);
+      if (resB.name === "Chưa xác định") resB = inspectCell(mRow + 2);
+      if (resB.name === "Chưa xác định") resB = inspectCell(mRow + 3);
       tB = resB.name;
       tBFeed = resB.feed;
 
@@ -486,6 +484,7 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     }
   });
 
+  // Tự động nhận diện trận tranh Hạng 3 (Thua Bán kết 1 đấu Thua Bán kết 2)
   let semiMatches = matchesList.filter(x => x.round.includes("Bán Kết") || x.round.includes("Vòng 3") || x.matchCode.endsWith('_M10') || x.matchCode.endsWith('_M9') || x.matchCode.endsWith('_M12') || x.matchCode.endsWith('_M13') || x.matchCode.endsWith('_M14') || x.matchCode.endsWith('_M15') || x.matchCode.endsWith('_M16') || x.matchCode.endsWith('_M17'));
   if (semiMatches.length >= 2 && !matchesList.some(x => x.type === 'bronze')) {
     matchesList.push({
@@ -949,7 +948,7 @@ function updateMatch(id) {
   if(!m) return;
   m.teamA = document.getElementById(`tA_${id}`).value.trim();
   m.teamB = document.getElementById(`tB_${id}`).value.trim();
-  m.scoreA = Number(document.getElementById(`scA_${id}`).value);
+  m.scoreA = Number(document.getElementById(`scA_${id}` ).value);
   m.scoreB = Number(document.getElementById(`scB_${id}`).value);
   m.status = document.getElementById(`st_${id}`).value;
   syncDataToCloud(true);
@@ -977,7 +976,7 @@ function importExcelFile() {
       let workbook = XLSX.read(data, {type: 'array'});
       
       let newMatchesList = [];
-      let mIdCount = 99900;
+      let mIdCount = 99950;
 
       workbook.SheetNames.forEach(sheetName => {
         let worksheet = workbook.Sheets[sheetName];
@@ -1009,7 +1008,7 @@ function importExcelFile() {
         matches = newMatchesList;
         syncDataToCloud(true);
         initApp();
-        alert(`Đã nạp file Excel thành công với thuật toán nhận diện đúng đội đặc cách và đội thắng vòng 1!`);
+        alert(`Đã nạp file Excel thành công với quy luật ghép cặp chuẩn xác theo ý thầy!`);
       } else {
         alert('Không tìm thấy danh sách trận hợp lệ trong file Excel.');
       }
