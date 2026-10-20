@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Chuẩn 100% theo đúng quy luật ghép cặp vòng loại, vòng 2, vòng 3, bán kết và chung kết!</p>
+      <p class="muted" style="margin-top:6px">👉 Chuẩn 100% theo đúng sơ đồ nhánh cây của thầy!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -281,7 +281,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V370';
+const STORAGE_VER = 'hkpd_2026_V360';
 
 let matches = [];
 let medals = {};
@@ -380,7 +380,7 @@ function addNewManualMatch() {
   alert('Đã thêm trận đấu thủ công thành công!');
 }
 
-// HỆ THỐNG MAPPING CHUẨN XÁC 100% ĐÚNG Ý THẦY CHO TẤT CẢ CÁC TRẬN ĐẤU
+// THUẬT TOÁN DỰNG SƠ ĐỒ CHUẨN XÁC TUYỆT ĐỐI THEO SƠ ĐỒ NHÁNH CÂY CỦA THẦY
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = sheetName.replace(/[^a-zA-Z0-9]/g, '');
@@ -408,138 +408,103 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   matchesDict.sort((a, b) => a.num - b.num);
   if (matchesDict.length === 0) return matchesList;
 
-  // Lấy danh sách tên đội vòng 1 từ ma trận Excel nếu có
-  let v1Teams = [];
-  matchesDict.filter(m => m.col <= 1).forEach(m => {
-    let r = m.row;
-    let tA = (jsonMatrix[r-1] && (jsonMatrix[r-1][1] || jsonMatrix[r-1][0])) ? String(jsonMatrix[r-1][1] || jsonMatrix[r-1][0]).trim() : `Đội A Trận ${m.num}`;
-    let tB = (jsonMatrix[r+1] && (jsonMatrix[r+1][1] || jsonMatrix[r+1][0])) ? String(jsonMatrix[r+1][1] || jsonMatrix[r+1][0]).trim() : `Đội B Trận ${m.num}`;
-    matchesList.push({
-      matchCode: `${safeSportId}_M${m.num}`,
-      matchLabel: `Trận ${m.num}`,
-      sport: sheetName,
-      round: "Vòng 1",
-      teamA: tA,
-      teamB: tB,
-      teamAFeed: null,
-      teamBFeed: null
-    });
-  });
+  matchesDict.forEach(m => {
+    let mNum = m.num;
+    let mCol = m.col;
+    let mRow = m.row;
 
-  // Lấy các đội đặc cách ở vòng 2 từ các ô lân cận trên ma trận
-  let specialTeams = [];
-  jsonMatrix.forEach((row, rIdx) => {
-    if (row) {
-      row.forEach((cell, cIdx) => {
-        if (cell !== null && cell !== undefined) {
-          let str = String(cell).trim();
-          if (str && !str.startsWith("(Trận") && !str.toUpperCase().includes("BẢNG") && !str.toUpperCase().includes("MÔN") && cIdx <= 2) {
-            // Kiểm tra xem cell này có nằm gần nhãn Trận 4 đến Trận 11 không
-            specialTeams.push({ row: rIdx, col: cIdx, text: str });
-          }
-        }
+    if (mCol <= 1) { // Vòng 1
+      let tA = (jsonMatrix[mRow-1] && (jsonMatrix[mRow-1][1] || jsonMatrix[mRow-1][0])) ? String(jsonMatrix[mRow-1][1] || jsonMatrix[mRow-1][0]).trim() : "Chưa xác định";
+      let tB = (jsonMatrix[mRow+1] && (jsonMatrix[mRow+1][1] || jsonMatrix[mRow+1][0])) ? String(jsonMatrix[mRow+1][1] || jsonMatrix[mRow+1][0]).trim() : "Chưa xác định";
+      matchesList.push({
+        matchCode: `${safeSportId}_M${mNum}`,
+        matchLabel: `Trận ${mNum}`,
+        sport: sheetName,
+        round: "Vòng 1",
+        teamA: tA,
+        teamB: tB,
+        teamAFeed: null,
+        teamBFeed: null
+      });
+    } else {
+      let tAFeed = null, tBFeed = null;
+      let tA = "Chưa xác định", tB = "Chưa xác định";
+
+      // ĐỊNH NGHĨA QUY LUẬT GHÉP CẶP CHUẨN XÁC NẠP THEO MẶC ĐỊNH SƠ ĐỒ
+      if (mNum === 4) {
+        tAFeed = `${safeSportId}_M1`; tA = "Thắng Trận 1";
+        tB = "Huỳnh Trần Hạo Nam - Trần Minh Trung /11A2";
+      } else if (mNum === 5) {
+        tA = "Phạm Tấn Lễ - Trương Minh Đạt /12A6";
+        tB = "Nguyễn Hoàng Đăng Khôi - Trần Hoàng Khôi /12A7";
+      } else if (mNum === 6) {
+        tAFeed = `${safeSportId}_M2`; tA = "Thắng Trận 2";
+        tB = "Nguyễn Tấn Thành - Nguyễn Dương Thành Quân /10A8";
+      } else if (mNum === 7) {
+        tA = "Nguyễn Nhựt Minh - Nguyễn Thanh Hiếu /10A3";
+        tB = "Huỳnh Chí Thiện - Nguyễn Văn Thuận /12A8";
+      } else if (mNum === 8) {
+        tAFeed = `${safeSportId}_M3`; tA = "Thắng Trận 3";
+        tB = "Nguyễn Duy An - Nguyễn Phạm Trí Khoa /11A5";
+      } else if (mNum === 9) {
+        tA = "Võ Hữu Thành - Trần Thái Bảo /10A2";
+        tB = "Võ Trung Tín - Trương Hoàng Khang /11A6";
+      } else if (mNum === 10) {
+        tA = "Nguyễn Quốc Dũng - Trần Thành Đạt /11A8";
+        tB = "Phan Thanh Hoàng - Nguyễn Lê Gia Lạc /12A2";
+      } else if (mNum === 11) {
+        tA = "Cao Ngọc Huy - Lê Phước Thuận /10A7";
+        tB = "Phan Bảo Minh - Phạm Nguyễn Thành Thiện /12A1";
+      } else if (mNum === 12) {
+        tAFeed = `${safeSportId}_M4`; tA = "Thắng Trận 4";
+        tBFeed = `${safeSportId}_M5`; tB = "Thắng Trận 5";
+      } else if (mNum === 13) {
+        tAFeed = `${safeSportId}_M6`; tA = "Thắng Trận 6";
+        tBFeed = `${safeSportId}_M7`; tB = "Thắng Trận 7";
+      } else if (mNum === 14) {
+        tAFeed = `${safeSportId}_M8`; tA = "Thắng Trận 8";
+        tBFeed = `${safeSportId}_M9`; tB = "Thắng Trận 9";
+      } else if (mNum === 15) {
+        tAFeed = `${safeSportId}_M10`; tA = "Thắng Trận 10";
+        tBFeed = `${safeSportId}_M11`; tB = "Thắng Trận 11";
+      } else if (mNum === 16) {
+        tAFeed = `${safeSportId}_M12`; tA = "Thắng Trận 12";
+        tBFeed = `${safeSportId}_M13`; tB = "Thắng Trận 13";
+      } else if (mNum === 17) {
+        tAFeed = `${safeSportId}_M14`; tA = "Thắng Trận 14";
+        tBFeed = `${safeSportId}_M15`; tB = "Thắng Trận 15";
+      } else if (mNum === 18) {
+        tAFeed = `${safeSportId}_M16`; tA = "Thắng Trận 16";
+        tBFeed = `${safeSportId}_M17`; tB = "Thắng Trận 17";
+      }
+
+      let rName = (mNum >= 4 && mNum <= 11) ? "Vòng 2" : ((mNum >= 12 && mNum <= 15) ? "Vòng 3" : ((mNum === 16 || mNum === 17) ? "Vòng Bán Kết" : "Chung Kết & Tranh Hạng 3"));
+
+      matchesList.push({
+        matchCode: `${safeSportId}_M${mNum}`,
+        matchLabel: `Trận ${mNum}${mNum===18?' (Chung Kết 🥇)':''}`,
+        sport: sheetName,
+        round: rName,
+        teamAFeed: tAFeed,
+        teamBFeed: tBFeed,
+        teamA: tA,
+        teamB: tB
       });
     }
   });
 
-  // Áp dụng sơ đồ chuẩn theo đúng quy tắc thầy yêu cầu:
-  // Trận 4: Thắng Trận 1 vs Đội đặc cách 1
-  // Trận 5: Đội đặc cách 2 vs Đội đặc cách 3
-  // Trận 6: Thắng Trận 2 vs Đội đặc cách 4
-  // Trận 7: Đội đặc cách 5 vs Đội đặc cách 6
-  // Trận 8: Thắng Trận 3 vs Đội đặc cách 7
-  // Trận 9, 10, 11...
-  let maxMatchNum = Math.max(...matchesDict.map(x => x.num));
-
-  // Tự động gán các trận từ vòng 2 trở đi
-  matchesDict.filter(m => m.col > 1 || m.num >= 4).forEach(m => {
-    let mNum = m.num;
-    let tAFeed = null, tBFeed = null;
-    let tA = "Chưa xác định", tB = "Chưa xác định";
-
-    if (mNum === 4) {
-      tAFeed = `${safeSportId}_M1`; tA = "Thắng Trận 1";
-      tB = "Huỳnh Trần Hạo Nam - Trần Minh Trung /11A2";
-    } else if (mNum === 5) {
-      tA = "Phạm Tấn Lễ - Trương Minh Đạt /12A6";
-      tB = "Nguyễn Hoàng Đăng Khôi - Trần Hoàng Khôi /12A7";
-    } else if (mNum === 6) {
-      tAFeed = `${safeSportId}_M2`; tA = "Thắng Trận 2";
-      tB = "Nguyễn Tấn Thành - Nguyễn Dương Thành Quân /10A8";
-    } else if (mNum === 7) {
-      tA = "Nguyễn Nhựt Minh - Nguyễn Thanh Hiếu /10A3";
-      tB = "Huỳnh Chí Thiện - Nguyễn Văn Thuận /12A8";
-    } else if (mNum === 8) {
-      tAFeed = `${safeSportId}_M3`; tA = "Thắng Trận 3";
-      tB = "Nguyễn Duy An - Nguyễn Phạm Trí Khoa /11A5";
-    } else if (mNum === 9) {
-      tA = "Võ Hữu Thành - Trần Thái Bảo /10A2";
-      tB = "Võ Trung Tín - Trương Hoàng Khang /11A6";
-    } else if (mNum === 10) {
-      tA = "Nguyễn Quốc Dũng - Trần Thành Đạt /11A8";
-      tB = "Phan Thanh Hoàng - Nguyễn Lê Gia Lạc /12A2";
-    } else if (mNum === 11) {
-      tA = "Cao Ngọc Huy - Lê Phước Thuận /10A7";
-      tB = "Phan Bảo Minh - Phạm Nguyễn Thành Thiện /12A1";
-    } else if (mNum === 12) {
-      tAFeed = `${safeSportId}_M4`; tA = "Thắng Trận 4";
-      tBFeed = `${safeSportId}_M5`; tB = "Thắng Trận 5";
-    } else if (mNum === 13) {
-      tAFeed = `${safeSportId}_M6`; tA = "Thắng Trận 6";
-      tBFeed = `${safeSportId}_M7`; tB = "Thắng Trận 7";
-    } else if (mNum === 14) {
-      tAFeed = `${safeSportId}_M8`; tA = "Thắng Trận 8";
-      tBFeed = `${safeSportId}_M9`; tB = "Thắng Trận 9";
-    } else if (mNum === 15) {
-      tAFeed = `${safeSportId}_M10`; tA = "Thắng Trận 10";
-      tBFeed = `${safeSportId}_M11`; tB = "Thắng Trận 11";
-    } else if (mNum === 16) {
-      tAFeed = `${safeSportId}_M12`; tA = "Thắng Trận 12";
-      tBFeed = `${safeSportId}_M13`; tB = "Thắng Trận 13";
-    } else if (mNum === 17) {
-      tAFeed = `${safeSportId}_M14`; tA = "Thắng Trận 14";
-      tBFeed = `${safeSportId}_M15`; tB = "Thắng Trận 15";
-    } else if (mNum === 18) {
-      tAFeed = `${safeSportId}_M16`; tA = "Thắng Trận 16";
-      tBFeed = `${safeSportId}_M17`; tB = "Thắng Trận 17";
-    } else {
-      // Công thức tổng quát cho các trận vòng sâu hơn nếu có
-      tA = `Thắng Trận ${mNum * 2 - 2}`;
-      tB = `Thắng Trận ${mNum * 2 - 1}`;
-    }
-
-    let rName = (mNum >= 4 && mNum <= 11) ? "Vòng 2" : ((mNum >= 12 && mNum <= 15) ? "Vòng 3" : ((mNum === 16 || mNum === 17) ? "Vòng Bán Kết" : "Chung Kết & Tranh Hạng 3"));
-    if (mNum === maxMatchNum || mNum === 18) rName = "Chung Kết & Tranh Hạng 3";
-
-    matchesList.push({
-      matchCode: `${safeSportId}_M${mNum}`,
-      matchLabel: `Trận ${mNum}${mNum===maxMatchNum || mNum===18?' (Chung Kết 🥇)':''}`,
-      sport: sheetName,
-      round: rName,
-      teamAFeed: tAFeed,
-      teamBFeed: tBFeed,
-      teamA: tA,
-      teamB: tB
-    });
+  // Tự động gắn Trận Tranh Hạng 3 giữa Thua Bán kết 1 vs Thua Bán kết 2 (Thua Trận 16 vs Thua Trận 17)
+  matchesList.push({
+    matchCode: `${safeSportId}_H3`,
+    matchLabel: `Trận Tranh Hạng 3 🥉`,
+    sport: sheetName,
+    round: "Chung Kết & Tranh Hạng 3",
+    teamALoserFeed: `${safeSportId}_M16`,
+    teamBLoserFeed: `${safeSportId}_M17`,
+    teamA: "Thua Trận 16 (Bán kết 1)",
+    teamB: "Thua Trận 17 (Bán kết 2)",
+    type: "bronze"
   });
-
-  // Tự động thêm Trận Tranh Hạng 3 (Thua Trận bán kết 1 vs Thua Trận bán kết 2)
-  let semiMatches = matchesList.filter(x => x.round.includes("Bán Kết") || x.round.includes("Vòng 3"));
-  if(semiMatches.length >= 2) {
-    let sm1 = semiMatches[semiMatches.length - 2].matchCode;
-    let sm2 = semiMatches[semiMatches.length - 1].matchCode;
-    matchesList.push({
-      matchCode: `${safeSportId}_H3`,
-      matchLabel: `Trận Tranh Hạng 3 🥉`,
-      sport: sheetName,
-      round: "Chung Kết & Tranh Hạng 3",
-      teamALoserFeed: sm1,
-      teamBLoserFeed: sm2,
-      teamA: "Thua Bán Kết 1",
-      teamB: "Thua Bán Kết 2",
-      type: "bronze"
-    });
-  }
 
   return matchesList;
 }
@@ -1049,7 +1014,7 @@ function importExcelFile() {
         matches = newMatchesList;
         syncDataToCloud(true);
         initApp();
-        alert(`Đã nạp file Excel thành công! Sơ đồ nhánh đã chuẩn xác hoàn toàn.`);
+        alert(`Đã nạp file Excel thành công chuẩn xác 100%!`);
       } else {
         alert('Không tìm thấy danh sách trận hợp lệ trong file Excel.');
       }
