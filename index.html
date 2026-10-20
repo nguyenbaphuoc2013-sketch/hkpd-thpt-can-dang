@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Chuẩn 100% theo đúng sơ đồ nhánh cây của thầy!</p>
+      <p class="muted" style="margin-top:6px">👉 Chuẩn 100% sơ đồ nhánh và cơ chế tính huy chương chính xác!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -161,7 +161,7 @@ nav{width:100%}
   <section id="medals" class="page hidden">
     <div class="hero"><h1>🏅 Bảng tổng sắp huy chương các lớp (Tổng hợp tự động)</h1></div>
     <div class="card">
-      <p class="muted" style="margin-bottom:12px">👉 Hệ thống tự động tổng hợp số lượng Huy chương từ kết quả các trận Chung Kết & Tranh Hạng 3.</p>
+      <p class="muted" style="margin-bottom:12px">👉 Tổng hợp chuẩn xác: Chung Kết (Vàng/Bạc) và Tranh Hạng 3 (Đồng).</p>
       <div class="table-wrap" id="medalTable"></div>
     </div>
   </section>
@@ -281,7 +281,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V360';
+const STORAGE_VER = 'hkpd_2026_V380';
 
 let matches = [];
 let medals = {};
@@ -380,7 +380,6 @@ function addNewManualMatch() {
   alert('Đã thêm trận đấu thủ công thành công!');
 }
 
-// THUẬT TOÁN DỰNG SƠ ĐỒ CHUẨN XÁC TUYỆT ĐỐI THEO SƠ ĐỒ NHÁNH CÂY CỦA THẦY
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = sheetName.replace(/[^a-zA-Z0-9]/g, '');
@@ -411,11 +410,11 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   matchesDict.forEach(m => {
     let mNum = m.num;
     let mCol = m.col;
-    let mRow = m.row;
 
     if (mCol <= 1) { // Vòng 1
-      let tA = (jsonMatrix[mRow-1] && (jsonMatrix[mRow-1][1] || jsonMatrix[mRow-1][0])) ? String(jsonMatrix[mRow-1][1] || jsonMatrix[mRow-1][0]).trim() : "Chưa xác định";
-      let tB = (jsonMatrix[mRow+1] && (jsonMatrix[mRow+1][1] || jsonMatrix[mRow+1][0])) ? String(jsonMatrix[mRow+1][1] || jsonMatrix[mRow+1][0]).trim() : "Chưa xác định";
+      let r = m.row;
+      let tA = (jsonMatrix[r-1] && (jsonMatrix[r-1][1] || jsonMatrix[r-1][0])) ? String(jsonMatrix[r-1][1] || jsonMatrix[r-1][0]).trim() : "Chưa xác định";
+      let tB = (jsonMatrix[r+1] && (jsonMatrix[r+1][1] || jsonMatrix[r+1][0])) ? String(jsonMatrix[r+1][1] || jsonMatrix[r+1][0]).trim() : "Chưa xác định";
       matchesList.push({
         matchCode: `${safeSportId}_M${mNum}`,
         matchLabel: `Trận ${mNum}`,
@@ -430,7 +429,6 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
       let tAFeed = null, tBFeed = null;
       let tA = "Chưa xác định", tB = "Chưa xác định";
 
-      // ĐỊNH NGHĨA QUY LUẬT GHÉP CẶP CHUẨN XÁC NẠP THEO MẶC ĐỊNH SƠ ĐỒ
       if (mNum === 4) {
         tAFeed = `${safeSportId}_M1`; tA = "Thắng Trận 1";
         tB = "Huỳnh Trần Hạo Nam - Trần Minh Trung /11A2";
@@ -476,9 +474,13 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
       } else if (mNum === 18) {
         tAFeed = `${safeSportId}_M16`; tA = "Thắng Trận 16";
         tBFeed = `${safeSportId}_M17`; tB = "Thắng Trận 17";
+      } else {
+        tA = `Thắng Trận ${mNum * 2 - 2}`;
+        tB = `Thắng Trận ${mNum * 2 - 1}`;
       }
 
       let rName = (mNum >= 4 && mNum <= 11) ? "Vòng 2" : ((mNum >= 12 && mNum <= 15) ? "Vòng 3" : ((mNum === 16 || mNum === 17) ? "Vòng Bán Kết" : "Chung Kết & Tranh Hạng 3"));
+      if (mNum === 18) rName = "Chung Kết & Tranh Hạng 3";
 
       matchesList.push({
         matchCode: `${safeSportId}_M${mNum}`,
@@ -493,7 +495,7 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     }
   });
 
-  // Tự động gắn Trận Tranh Hạng 3 giữa Thua Bán kết 1 vs Thua Bán kết 2 (Thua Trận 16 vs Thua Trận 17)
+  // Trận Tranh Hạng 3 (Thua Bán kết 1 vs Thua Bán kết 2 -> Thua Trận 16 vs Thua Trận 17)
   matchesList.push({
     matchCode: `${safeSportId}_H3`,
     matchLabel: `Trận Tranh Hạng 3 🥉`,
@@ -565,17 +567,19 @@ function extractClassCode(str) {
   return null;
 }
 
+// LOGIC TÍNH HUY CHƯƠNG CHUẨN XÁC TUYỆT ĐỐI
 function computeAutomaticMedals() {
   let autoMedals = {};
   matches.forEach(m => {
     if (m.status === 'done') {
       let isFinal = m.matchCode && (m.matchCode.endsWith('_M18') || m.round.includes('Chung Kết') || m.round.includes('CK'));
-      let isBronze = m.matchCode && (m.matchCode.endsWith('_H3') || m.round.includes('Hạng 3') || m.round.includes('🥉'));
+      let isBronze = m.matchCode && (m.matchCode.endsWith('_H3') || m.round.includes('Hạng 3') || m.round.includes('🥉') || m.type === 'bronze');
       
       let w = getWinnerOfMatch(m.matchCode);
       let l = getLoserOfMatch(m.matchCode);
 
       if (isFinal) {
+        // Trận chung kết: Thắng được Vàng (Gold), Thua được Bạc (Silver)
         if (w) {
           let clsW = extractClassCode(w);
           if (clsW) {
@@ -591,6 +595,7 @@ function computeAutomaticMedals() {
           }
         }
       } else if (isBronze) {
+        // Trận tranh hạng 3: Thắng chỉ được Đồng (Bronze), Thua không tính huy chương
         if (w) {
           let clsW = extractClassCode(w);
           if (clsW) {
@@ -960,7 +965,7 @@ function updateMatch(id) {
   syncDataToCloud(true);
   initApp();
   renderAdminMatches();
-  alert('Đã cập nhật tỷ số & tổng hợp bảng huy chương thành công!');
+  alert('Đã cập nhật tỷ số & tổng hợp bảng huy chương chính xác!');
 }
 
 function deleteMatch(id) {
@@ -1014,7 +1019,7 @@ function importExcelFile() {
         matches = newMatchesList;
         syncDataToCloud(true);
         initApp();
-        alert(`Đã nạp file Excel thành công chuẩn xác 100%!`);
+        alert(`Đã nạp file Excel thành công! Tổng hợp huy chương chuẩn xác.`);
       } else {
         alert('Không tìm thấy danh sách trận hợp lệ trong file Excel.');
       }
@@ -1038,7 +1043,7 @@ function saveMedal() {
   syncDataToCloud(true);
   renderMedals();
   renderAdminMedalTable();
-  alert('Đã cập nhật huy chương!');
+  alert('Đã cập nhật huy chương thủ công!');
 }
 
 function renderAdminMedalTable() {
