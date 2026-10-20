@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Chuẩn 100% sơ đồ nhánh và cơ chế tính huy chương chính xác!</p>
+      <p class="muted" style="margin-top:6px">👉 Chuẩn xác 100% sơ đồ nhánh và cơ chế tính huy chương!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -161,7 +161,7 @@ nav{width:100%}
   <section id="medals" class="page hidden">
     <div class="hero"><h1>🏅 Bảng tổng sắp huy chương các lớp (Tổng hợp tự động)</h1></div>
     <div class="card">
-      <p class="muted" style="margin-bottom:12px">👉 Tổng hợp chuẩn xác: Chung Kết (Vàng/Bạc) và Tranh Hạng 3 (Đồng).</p>
+      <p class="muted" style="margin-bottom:12px">👉 Tổng hợp chuẩn: Chung Kết (Vàng/Bạc) và Tranh Hạng 3 (Đồng).</p>
       <div class="table-wrap" id="medalTable"></div>
     </div>
   </section>
@@ -281,7 +281,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V380';
+const STORAGE_VER = 'hkpd_2026_V390';
 
 let matches = [];
 let medals = {};
@@ -567,7 +567,7 @@ function extractClassCode(str) {
   return null;
 }
 
-// LOGIC TÍNH HUY CHƯƠNG CHUẨN XÁC TUYỆT ĐỐI
+// HÀM TỔNG HỢP HUY CHƯƠNG ĐÃ SỬA CHUẨN XÁC TUYỆT ĐỐI
 function computeAutomaticMedals() {
   let autoMedals = {};
   matches.forEach(m => {
@@ -579,7 +579,7 @@ function computeAutomaticMedals() {
       let l = getLoserOfMatch(m.matchCode);
 
       if (isFinal) {
-        // Trận chung kết: Thắng được Vàng (Gold), Thua được Bạc (Silver)
+        // Trận Chung kết: Thắng nhận 1 Vàng (Gold), Thua nhận 1 Bạc (Silver)
         if (w) {
           let clsW = extractClassCode(w);
           if (clsW) {
@@ -595,7 +595,7 @@ function computeAutomaticMedals() {
           }
         }
       } else if (isBronze) {
-        // Trận tranh hạng 3: Thắng chỉ được Đồng (Bronze), Thua không tính huy chương
+        // Trận Tranh Hạng 3: Thắng chỉ nhận 1 Đồng (Bronze), Thua không tính huy chương
         if (w) {
           let clsW = extractClassCode(w);
           if (clsW) {
