@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Hệ thống tự động phân tích cấu trúc sơ đồ từ file Excel!</p>
+      <p class="muted" style="margin-top:6px">👉 Sơ đồ nhánh chuẩn và tính toán huy chương tự động chuẩn xác!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -161,7 +161,7 @@ nav{width:100%}
   <section id="medals" class="page hidden">
     <div class="hero"><h1>🏅 Bảng tổng sắp huy chương các lớp</h1></div>
     <div class="card">
-      <p class="muted" style="margin-bottom:12px">👉 Tổng hợp tự động từ các trận Chung Kết & Tranh Hạng 3, đồng thời cho phép thầy quản lý thủ công trong trang Quản trị.</p>
+      <p class="muted" style="margin-bottom:12px">👉 Quy chuẩn: Thắng Chung Kết = 🥇 1 Vàng | Thua Chung Kết = 🥈 1 Bạc | Thắng Tranh Hạng 3 = 🥉 1 Đồng (Thua Tranh Hạng 3 không có HC).</p>
       <div class="table-wrap" id="medalTable"></div>
     </div>
   </section>
@@ -174,7 +174,7 @@ nav{width:100%}
   <section id="admin" class="page hidden">
     <div class="hero">
       <h1>⚙ Ban Tổ Chức Quản Trị</h1>
-      <div class="muted">Nạp file Excel tự động, điều chỉnh huy chương thủ công và cập nhật tỷ số</div>
+      <div class="muted">Quản lý toàn diện lịch thi đấu và bảng tổng sắp huy chương</div>
     </div>
 
     <div id="login">
@@ -222,7 +222,6 @@ nav{width:100%}
 
       <div class="card admin-card">
         <h2>📝 Cập Nhật Tỷ Số & Đội Thắng Vòng Tiếp Theo</h2>
-        <p class="muted" style="margin-bottom:10px">💡 Khi trận trước có kết quả, tên đội thắng sẽ tự động chuyển tiếp lên vòng sau!</p>
         <div class="formgrid">
           <div>Lọc theo Môn:<select id="adminSportFilter" onchange="renderAdminMatches()"><option value="">Tất cả các môn</option></select></div>
           <div>Lọc Trạng Thái:<select id="adminStatusFilter" onchange="renderAdminMatches()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="live">Đang đấu</option><option value="done">Đã kết thúc</option></select></div>
@@ -230,16 +229,19 @@ nav{width:100%}
         <div id="adminMatches" style="margin-top:10px"></div>
       </div>
 
+      <!-- MỤC QUẢN TRỊ HUY CHƯƠNG ĐẦY ĐỦ CÁC CỘT + CHỨC NĂNG THÊM/SỬA/XÓA -->
       <div class="card admin-card" style="background:#fffbeb;border-color:#fde68a">
-        <h3 style="margin-top:0;color:#b45309">🏅 Quản Lý, Thêm, Sửa, Xóa Thủ Công Huy Chương Lớp</h3>
-        <p class="muted" style="margin-bottom:10px">Thầy có thể thêm mới, điều chỉnh số lượng hoặc xóa bất kỳ huy chương nào của lớp khi có sai sót thực tế.</p>
+        <h3 style="margin-top:0;color:#b45309">🏅 Quản Lý Bảng Tổng Sắp Huy Chương Các Lớp</h3>
+        <p class="muted" style="margin-bottom:10px">Thầy có thể thêm mới lớp hoặc Sửa/Xóa số lượng huy chương thực tế của các lớp bên dưới.</p>
         <div class="formgrid">
-          <input id="medTeam" placeholder="Tên Lớp (VD: 12A6)">
-          <input id="gold" type="number" placeholder="Số Vàng" value="0">
-          <input id="silver" type="number" placeholder="Số Bạc" value="0">
-          <input id="bronze" type="number" placeholder="Số Đồng" value="0">
+          <div>Tên Lớp / Đơn vị:<input id="medTeam" placeholder="VD: 10A1"></div>
+          <div>🥇 Số Vàng:<input id="gold" type="number" value="0"></div>
+          <div>🥈 Số Bạc:<input id="silver" type="number" value="0"></div>
+          <div>🥉 Số Đồng:<input id="bronze" type="number" value="0"></div>
         </div>
-        <button class="btn ok" onclick="saveMedal()" style="margin-bottom:14px;background:#d97706">💾 Lưu / Cập Nhật Huy Chương Lớp Này</button>
+        <button class="btn ok" onclick="saveMedal()" style="margin-bottom:14px;background:#d97706;width:100%">💾 Cập Nhật / Thêm Huy Chương Lớp Này</button>
+        
+        <h4 style="margin:10px 0 6px;color:var(--primary)">Bảng Xem & Điều Chỉnh Trực Tiếp Các Lớp:</h4>
         <div class="table-wrap" id="adminMedalTable"></div>
       </div>
 
@@ -282,7 +284,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V400';
+const STORAGE_VER = 'hkpd_2026_V410';
 
 let matches = [];
 let medals = {};
@@ -330,7 +332,7 @@ async function syncDataToCloud(showAlert = false) {
       body: JSON.stringify(payload)
     });
     if(res.ok && showAlert) {
-      alert('Đồng bộ dữ liệu lên đám mây thành công!');
+      alert('Đồng bộ dữ liệu thành công!');
     }
   } catch(e) {
     if(showAlert) alert('Lỗi đồng bộ: ' + e.message);
@@ -381,7 +383,6 @@ function addNewManualMatch() {
   alert('Đã thêm trận đấu thủ công thành công!');
 }
 
-// HỆ THỐNG THÔNG MINH: TỰ ĐỘNG QUÉT VÀ HIỂU CẤU TRÚC SƠ ĐỒ TỪ EXCEL
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = sheetName.replace(/[^a-zA-Z0-9]/g, '');
@@ -430,36 +431,14 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
         teamBFeed: null
       });
     } else {
-      // Tự động suy luận đội từ các ô lân cận bên trái (cột cIdx - 1 hoặc cIdx - 2)
       let tA = "Chưa xác định", tB = "Chưa xác định";
       let tAFeed = null, tBFeed = null;
 
-      // Quét các ô xung quanh để tự hiểu tên đội hoặc trận nguồn trước đó
-      for(let dr = -1; dr <= 1; dr += 2) {
-        let checkRow = r + dr;
-        if(jsonMatrix[checkRow]) {
-          for(let dc = Math.max(0, mCol - 2); dc < mCol; dc++) {
-            let val = jsonMatrix[checkRow][dc];
-            if(val !== null && val !== undefined) {
-              let valStr = String(val).trim();
-              if(valStr) {
-                if(dr === -1) tA = valStr;
-                if(dr === 1) tB = valStr;
-              }
-            }
-          }
-        }
-      }
-
-      // Tự động liên kết chuỗi thắng từ vòng trước nếu có cấu trúc cây chuẩn
       if (mNum >= 4 && mNum <= 11) {
         if (mNum === 4) { tAFeed = `${safeSportId}_M1`; tA = "Thắng Trận 1"; }
         if (mNum === 6) { tAFeed = `${safeSportId}_M2`; tA = "Thắng Trận 2"; }
         if (mNum === 8) { tAFeed = `${safeSportId}_M3`; tA = "Thắng Trận 3"; }
       } else if (mNum >= 12) {
-        let feed1 = `${safeSportId}_M${mNum * 2 - 8}`; // Tự động quy nạp nhánh cây
-        let feed2 = `${safeSportId}_M${mNum * 2 - 7}`;
-        // Hoặc gắn trực tiếp theo thứ tự trận trước
         tA = `Thắng Trận ${mNum * 2 - 8}`;
         tB = `Thắng Trận ${mNum * 2 - 7}`;
       }
@@ -480,7 +459,7 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     }
   });
 
-  // Tự động gán trận Tranh Hạng 3 nếu có từ 2 trận bán kết trở lên
+  // Tự động gán trận Tranh Hạng 3
   let semiMatches = matchesList.filter(x => x.round.includes("Bán Kết") || x.round.includes("Vòng 3") || x.round.includes("Vòng 2"));
   if(semiMatches.length >= 2) {
     let sm1 = semiMatches[semiMatches.length - 2].matchCode;
@@ -557,17 +536,24 @@ function extractClassCode(str) {
   return null;
 }
 
+// LOGIC CỘNG HUY CHƯƠNG TỰ ĐỘNG CHUẨN XÁC TUYỆT ĐỐI
 function computeAutomaticMedals() {
   let autoMedals = {};
   matches.forEach(m => {
     if (m.status === 'done') {
-      let isFinal = m.matchCode && (m.round.includes('Chung Kết') || m.matchLabel.includes('Chung Kết') || m.matchCode.endsWith('_M18'));
-      let isBronze = m.matchCode && (m.round.includes('Hạng 3') || m.type === 'bronze' || m.matchCode.endsWith('_H3'));
-      
+      let matchCodeStr = String(m.matchCode || '');
+      let labelStr = String(m.matchLabel || '');
+      let typeStr = String(m.type || '');
+
+      // Kiểm tra trận Chung kết hay Hạng 3
+      let isBronze = matchCodeStr.endsWith('_H3') || labelStr.includes('Hạng 3') || typeStr === 'bronze';
+      let isFinal = !isBronze && (labelStr.includes('Chung Kết') || matchCodeStr.endsWith('_M18') || matchCodeStr.endsWith('_FINAL'));
+
       let w = getWinnerOfMatch(m.matchCode);
       let l = getLoserOfMatch(m.matchCode);
 
       if (isFinal) {
+        // TRẬN CHUNG KẾT: Thắng = +1 VÀNG, Thua = +1 BẠC
         if (w) {
           let clsW = extractClassCode(w);
           if (clsW) {
@@ -583,13 +569,15 @@ function computeAutomaticMedals() {
           }
         }
       } else if (isBronze) {
+        // TRẬN TRANH HẠNG 3: Thắng = +1 ĐỒNG, Thua = KHÔNG CÓ GIỜ HẾT
         if (w) {
           let clsW = extractClassCode(w);
           if (clsW) {
             if (!autoMedals[clsW]) autoMedals[clsW] = { gold: 0, silver: 0, bronze: 0 };
-            autoMedals[clsW].bronze++;
+            autoMedals[clsW].bronze++; // Đội thắng hạng 3 ĐƯỢC HUY CHƯƠNG ĐỒNG
           }
         }
+        // Đội thua (l) KHÔNG LÀM GÌ CẢ (không cộng huy chương)
       }
     }
   });
@@ -598,11 +586,11 @@ function computeAutomaticMedals() {
 
 function getMergedMedals() {
   let merged = {};
-  // Cộng huy chương nhập thủ công trước
+  // 1. Nhập huy chương thủ công từ admin
   for (let cls in medals) {
     merged[cls] = { gold: medals[cls].gold || 0, silver: medals[cls].silver || 0, bronze: medals[cls].bronze || 0 };
   }
-  // Cộng tự động từ kết quả trận đấu
+  // 2. Cộng thêm huy chương tự động từ kết quả thi đấu
   let auto = computeAutomaticMedals();
   for (let cls in auto) {
     if (!merged[cls]) merged[cls] = { gold: 0, silver: 0, bronze: 0 };
@@ -809,7 +797,8 @@ function renderMedalTableContainer(containerId) {
           <th>🥇 Vàng</th>
           <th>🥈 Bạc</th>
           <th>🥉 Đồng</th>
-          <th>Tổng điểm quy đổi</th>
+          <th>Tổng HC</th>
+          <th>Điểm quy đổi</th>
         </tr>
       </thead>
       <tbody>
@@ -819,7 +808,7 @@ function renderMedalTableContainer(containerId) {
   })).sort((a,b) => b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze || b.total - a.total);
 
   if(sorted.length === 0) {
-    html += `<tr><td colspan="6" class="muted">Chưa có dữ liệu huy chương.</td></tr>`;
+    html += `<tr><td colspan="7" class="muted">Chưa có dữ liệu huy chương.</td></tr>`;
   } else {
     sorted.forEach((item, idx) => {
       let sumMedals = (item.gold||0) + (item.silver||0) + (item.bronze||0);
@@ -828,9 +817,10 @@ function renderMedalTableContainer(containerId) {
           <td><b>${idx+1}</b></td>
           <td style="text-align:left;font-weight:bold;color:var(--primary)">${item.cls}</td>
           <td style="color:#d97706;font-weight:bold">${item.gold||0}</td>
-          <td>${item.silver||0}</td>
-          <td>${item.bronze||0}</td>
-          <td><b>${item.total}</b> (${sumMedals} HC)</td>
+          <td style="color:#64748b;font-weight:bold">${item.silver||0}</td>
+          <td style="color:#b45309;font-weight:bold">${item.bronze||0}</td>
+          <td><b>${sumMedals}</b></td>
+          <td><b>${item.total}</b></td>
         </tr>
       `;
     });
@@ -954,7 +944,7 @@ function updateMatch(id) {
   syncDataToCloud(true);
   initApp();
   renderAdminMatches();
-  alert('Đã cập nhật tỷ số & tổng hợp bảng huy chương thành công!');
+  alert('Đã cập nhật tỷ số & tự động tính toán lại Huy chương!');
 }
 
 function deleteMatch(id) {
@@ -1019,18 +1009,15 @@ function importExcelFile() {
   reader.readAsArrayBuffer(fileInput.files[0]);
 }
 
-// QUẢN LÝ HUY CHƯƠNG THỦ CÔNG (THÊM / SỬA / XÓA)
+// LƯU/CẬP NHẬT HUY CHƯƠNG TRONG TRANG QUẢN TRỊ
 function saveMedal() {
   let team = document.getElementById('medTeam').value.trim().toUpperCase();
   let gold = Number(document.getElementById('gold').value) || 0;
   let silver = Number(document.getElementById('silver').value) || 0;
   let bronze = Number(document.getElementById('bronze').value) || 0;
-  if(!team) { alert('Vui lòng nhập tên lớp / đơn vị!'); return; }
+  if(!team) { alert('Vui lòng nhập tên Lớp / Đơn vị!'); return; }
   
-  if(!medals[team]) medals[team] = { gold: 0, silver: 0, bronze: 0 };
-  medals[team].gold = gold;
-  medals[team].silver = silver;
-  medals[team].bronze = bronze;
+  medals[team] = { gold, silver, bronze };
 
   syncDataToCloud(true);
   renderMedals();
@@ -1039,26 +1026,54 @@ function saveMedal() {
   document.getElementById('gold').value = 0;
   document.getElementById('silver').value = 0;
   document.getElementById('bronze').value = 0;
-  alert('Đã lưu/cập nhật huy chương thủ công thành công!');
+  alert(`Đã cập nhật huy chương cho lớp ${team}!`);
 }
 
+// BẢNG QUẢN TRỊ HUY CHƯƠNG ĐẦY ĐỦ CÁC CỘT VÀ CHỨC NĂNG SỬA/XÓA
 function renderAdminMedalTable() {
-  let merged = getMergedMedals();
-  let html = `<table class="medal"><thead><tr><th>Lớp</th><th>Vàng</th><th>Bạc</th><th>Đồng</th><th>Thao tác</th></tr></thead><tbody>`;
-  for(let cls in merged) {
-    let m = merged[cls];
-    html += `
-      <tr>
-        <td><b>${cls}</b></td>
-        <td>${m.gold}</td>
-        <td>${m.silver}</td>
-        <td>${m.bronze}</td>
-        <td>
-          <button class="btn" style="padding:4px 8px;font-size:11px" onclick="editMedal('${cls}', ${m.gold}, ${m.silver}, ${m.bronze})">Sửa</button>
-          <button class="danger" style="padding:4px 8px;font-size:11px" onclick="deleteMedal('${cls}')">Xóa</button>
-        </td>
-      </tr>
-    `;
+  let mergedMedals = getMergedMedals();
+  let html = `
+    <table class="medal">
+      <thead>
+        <tr>
+          <th>Hạng</th>
+          <th>Lớp / Đơn vị</th>
+          <th>🥇 Vàng</th>
+          <th>🥈 Bạc</th>
+          <th>🥉 Đồng</th>
+          <th>Tổng HC</th>
+          <th>Điểm</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  let sorted = Object.keys(mergedMedals).map(cls => ({
+    cls, ...mergedMedals[cls], total: (mergedMedals[cls].gold||0)*3 + (mergedMedals[cls].silver||0)*2 + (mergedMedals[cls].bronze||0)
+  })).sort((a,b) => b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze || b.total - a.total);
+
+  if(sorted.length === 0) {
+    html += `<tr><td colspan="8" class="muted">Chưa có dữ liệu huy chương.</td></tr>`;
+  } else {
+    sorted.forEach((item, idx) => {
+      let sumMedals = (item.gold||0) + (item.silver||0) + (item.bronze||0);
+      html += `
+        <tr>
+          <td><b>${idx+1}</b></td>
+          <td style="text-align:left;font-weight:bold;color:var(--primary)">${item.cls}</td>
+          <td style="color:#d97706;font-weight:bold">${item.gold||0}</td>
+          <td style="color:#64748b;font-weight:bold">${item.silver||0}</td>
+          <td style="color:#b45309;font-weight:bold">${item.bronze||0}</td>
+          <td><b>${sumMedals}</b></td>
+          <td><b>${item.total}</b></td>
+          <td>
+            <button class="btn" style="padding:4px 8px;font-size:11px;background:#0877e8" onclick="editMedal('${item.cls}', ${item.gold||0}, ${item.silver||0}, ${item.bronze||0})">Sửa</button>
+            <button class="danger" style="padding:4px 8px;font-size:11px" onclick="deleteMedal('${item.cls}')">Xóa</button>
+          </td>
+        </tr>
+      `;
+    });
   }
   html += `</tbody></table>`;
   document.getElementById('adminMedalTable').innerHTML = html;
@@ -1073,12 +1088,12 @@ function editMedal(cls, g, s, b) {
 }
 
 function deleteMedal(cls) {
-  if(confirm(`Thầy có muốn xóa dữ liệu huy chương của lớp ${cls} không?`)) {
+  if(confirm(`Thầy có chắc chắn muốn xóa/đặt lại dữ liệu huy chương của lớp ${cls} không?`)) {
     if(medals[cls]) delete medals[cls];
     syncDataToCloud(true);
     renderMedals();
     renderAdminMedalTable();
-    alert('Đã xóa thành công!');
+    alert(`Đã xóa dữ liệu huy chương của lớp ${cls}!`);
   }
 }
 
