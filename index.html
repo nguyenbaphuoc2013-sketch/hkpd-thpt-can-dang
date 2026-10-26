@@ -284,7 +284,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V410';
+const STORAGE_VER = 'hkpd_2026_V415';
 
 let matches = [];
 let medals = {};
@@ -545,7 +545,6 @@ function computeAutomaticMedals() {
       let labelStr = String(m.matchLabel || '');
       let typeStr = String(m.type || '');
 
-      // Kiểm tra trận Chung kết hay Hạng 3
       let isBronze = matchCodeStr.endsWith('_H3') || labelStr.includes('Hạng 3') || typeStr === 'bronze';
       let isFinal = !isBronze && (labelStr.includes('Chung Kết') || matchCodeStr.endsWith('_M18') || matchCodeStr.endsWith('_FINAL'));
 
@@ -569,7 +568,7 @@ function computeAutomaticMedals() {
           }
         }
       } else if (isBronze) {
-        // TRẬN TRANH HẠNG 3: Thắng = +1 ĐỒNG, Thua = KHÔNG CÓ GIỜ HẾT
+        // TRẬN TRANH HẠNG 3: Thắng = +1 ĐỒNG, Thua = KHÔNG CÓ HUY CHƯƠNG GÌ CẢ
         if (w) {
           let clsW = extractClassCode(w);
           if (clsW) {
@@ -577,7 +576,7 @@ function computeAutomaticMedals() {
             autoMedals[clsW].bronze++; // Đội thắng hạng 3 ĐƯỢC HUY CHƯƠNG ĐỒNG
           }
         }
-        // Đội thua (l) KHÔNG LÀM GÌ CẢ (không cộng huy chương)
+        // Đội thua trận Hạng 3 KHÔNG ĐƯỢC CỘNG BẤT KỲ HUY CHƯƠNG NÀO
       }
     }
   });
@@ -586,11 +585,9 @@ function computeAutomaticMedals() {
 
 function getMergedMedals() {
   let merged = {};
-  // 1. Nhập huy chương thủ công từ admin
   for (let cls in medals) {
     merged[cls] = { gold: medals[cls].gold || 0, silver: medals[cls].silver || 0, bronze: medals[cls].bronze || 0 };
   }
-  // 2. Cộng thêm huy chương tự động từ kết quả thi đấu
   let auto = computeAutomaticMedals();
   for (let cls in auto) {
     if (!merged[cls]) merged[cls] = { gold: 0, silver: 0, bronze: 0 };
