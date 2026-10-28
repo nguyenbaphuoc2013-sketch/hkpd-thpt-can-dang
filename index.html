@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Sơ đồ nhánh chuẩn và tính toán huy chương tự động chuẩn xác!</p>
+      <p class="muted" style="margin-top:6px">👉 Tự động liên kết mượt mà từ Vòng 1 lên các vòng tiếp theo!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -284,7 +284,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V415';
+const STORAGE_VER = 'hkpd_2026_V420';
 
 let matches = [];
 let medals = {};
@@ -358,7 +358,7 @@ function addNewManualMatch() {
     return;
   }
   
-  let safeSportId = sport.replace(/[^a-zA-Z0-9]/g, '');
+  let safeSportId = encodeURIComponent(sport);
   let newMatch = {
     id: Date.now(),
     matchCode: `${safeSportId}_MANUAL_${Date.now()}`,
@@ -383,9 +383,15 @@ function addNewManualMatch() {
   alert('Đã thêm trận đấu thủ công thành công!');
 }
 
+// HÀM TẠO MÃ ĐỊNH DANH AN TOÀN CHO MỌI TIẾNG VIỆT
+function getSafeSportId(sportName) {
+  return encodeURIComponent(sportName.trim());
+}
+
+// HỆ THỐNG ĐỌC EXCEL THÔNG MINH - HỖ TRỢ ĐẦY ĐỦ TIẾNG VIỆT & TỰ ĐỘNG NỐI NHÁNH
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
-  let safeSportId = sheetName.replace(/[^a-zA-Z0-9]/g, '');
+  let safeSportId = getSafeSportId(sheetName);
 
   let matchesDict = [];
   jsonMatrix.forEach((row, rIdx) => {
@@ -434,13 +440,21 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
       let tA = "Chưa xác định", tB = "Chưa xác định";
       let tAFeed = null, tBFeed = null;
 
+      // Tự động liên kết các cặp trận tiến vào vòng trong (Match mapping logic)
       if (mNum >= 4 && mNum <= 11) {
-        if (mNum === 4) { tAFeed = `${safeSportId}_M1`; tA = "Thắng Trận 1"; }
-        if (mNum === 6) { tAFeed = `${safeSportId}_M2`; tA = "Thắng Trận 2"; }
-        if (mNum === 8) { tAFeed = `${safeSportId}_M3`; tA = "Thắng Trận 3"; }
+        let feedNumA = (mNum - 3) * 2 - 1;
+        let feedNumB = (mNum - 3) * 2;
+        tAFeed = `${safeSportId}_M${feedNumA}`;
+        tBFeed = `${safeSportId}_M${feedNumB}`;
+        tA = `Thắng Trận ${feedNumA}`;
+        tB = `Thắng Trận ${feedNumB}`;
       } else if (mNum >= 12) {
-        tA = `Thắng Trận ${mNum * 2 - 8}`;
-        tB = `Thắng Trận ${mNum * 2 - 7}`;
+        let feedNumA = mNum * 2 - 16;
+        let feedNumB = mNum * 2 - 15;
+        tAFeed = `${safeSportId}_M${feedNumA}`;
+        tBFeed = `${safeSportId}_M${feedNumB}`;
+        tA = `Thắng Trận ${feedNumA}`;
+        tB = `Thắng Trận ${feedNumB}`;
       }
 
       let rName = mCol <= 3 ? "Vòng 2" : (mCol <= 5 ? "Vòng 3" : (mNum === maxNum ? "Chung Kết & Tranh Hạng 3" : "Vòng Bán Kết"));
@@ -459,7 +473,7 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     }
   });
 
-  // Tự động gán trận Tranh Hạng 3
+  // Tự động thêm trận Tranh Hạng 3 dựa trên 2 trận Bán kết hoặc vòng sát chung kết
   let semiMatches = matchesList.filter(x => x.round.includes("Bán Kết") || x.round.includes("Vòng 3") || x.round.includes("Vòng 2"));
   if(semiMatches.length >= 2) {
     let sm1 = semiMatches[semiMatches.length - 2].matchCode;
@@ -941,7 +955,7 @@ function updateMatch(id) {
   syncDataToCloud(true);
   initApp();
   renderAdminMatches();
-  alert('Đã cập nhật tỷ số & tự động tính toán lại Huy chương!');
+  alert('Đã cập nhật tỷ số & tự động đẩy đội thắng lên vòng sau!');
 }
 
 function deleteMatch(id) {
@@ -995,7 +1009,7 @@ function importExcelFile() {
         matches = newMatchesList;
         syncDataToCloud(true);
         initApp();
-        alert(`Đã đọc và phân tích file Excel thành công!`);
+        alert(`Đã đọc và phân tích file Excel thành công! Các nhánh đấu đã liên kết đầy đủ.`);
       } else {
         alert('Không tìm thấy danh sách trận hợp lệ trong file Excel.');
       }
@@ -1006,7 +1020,6 @@ function importExcelFile() {
   reader.readAsArrayBuffer(fileInput.files[0]);
 }
 
-// LƯU/CẬP NHẬT HUY CHƯƠNG TRONG TRANG QUẢN TRỊ
 function saveMedal() {
   let team = document.getElementById('medTeam').value.trim().toUpperCase();
   let gold = Number(document.getElementById('gold').value) || 0;
@@ -1026,7 +1039,6 @@ function saveMedal() {
   alert(`Đã cập nhật huy chương cho lớp ${team}!`);
 }
 
-// BẢNG QUẢN TRỊ HUY CHƯƠNG ĐẦY ĐỦ CÁC CỘT VÀ CHỨC NĂNG SỬA/XÓA
 function renderAdminMedalTable() {
   let mergedMedals = getMergedMedals();
   let html = `
