@@ -283,7 +283,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V470';
+const STORAGE_VER = 'hkpd_2026_V480';
 
 let matches = [];
 let medals = {};
@@ -386,7 +386,7 @@ function getSafeSportId(sportName) {
   return encodeURIComponent(sportName.trim());
 }
 
-// HÀM QUÉT EXCEL AN TOÀN TUYỆT ĐỐI KHÔNG BỊ TRÀN STACK
+// BỘ QUÉT EXCEL GỌN GÀNG: CHỈ LẤY ĐÚNG TÊN HOẶC GHI "Chưa xác định" / "Thắng Trận X"
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = getSafeSportId(sheetName);
@@ -423,6 +423,10 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
 
     let cellA = (jsonMatrix[r-1] && (jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0])) ? String(jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0]).trim() : "";
     let cellB = (jsonMatrix[r+1] && (jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0])) ? String(jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0]).trim() : "";
+
+    // Làm sạch cell nếu chứa chữ rác hoặc rỗng
+    if(cellA.toLowerCase().includes('trận') || cellA.length < 2) cellA = "";
+    if(cellB.toLowerCase().includes('trận') || cellB.length < 2) cellB = "";
 
     if (mCol <= 1) {
       matchesList.push({
@@ -491,7 +495,6 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   return matchesList;
 }
 
-// HÀM TRUY VẤN AN TOÀN TRÁNH ĐỆ QUY VÔ TẬN
 function getWinnerOfMatch(matchCode) {
   if (!matchCode) return null;
   let m = matches.find(x => x.matchCode === matchCode);
@@ -522,19 +525,12 @@ function getTeamBName(m) {
   return getTeamBNameSafe(m, 0);
 }
 
+// HÀM LẤY TÊN GỌN GÀNG, KHÔNG BỊ GỘP CHUỖI DÀI
 function getTeamANameSafe(m, depth) {
   if (depth > 5) return m.teamA || "Chưa xác định";
   if (m.teamAFeed) {
     let w = getWinnerOfMatch(m.teamAFeed);
-    if (w) return w;
-    let feedMatch = matches.find(x => x.matchCode === m.teamAFeed);
-    if (feedMatch) {
-      let fTA = getTeamANameSafe(feedMatch, depth + 1);
-      let fTB = getTeamBNameSafe(feedMatch, depth + 1);
-      if (fTA && fTA !== "Chưa xác định" && fTB && fTB !== "Chưa xác định") {
-        return `${fTA} / ${fTB}`;
-      }
-    }
+    if (w) return w; // Nếu trận trước đã xong, lấy ngay tên đội thắng
   }
   if (m.teamALoserFeed) {
     let l = getLoserOfMatch(m.teamALoserFeed);
@@ -547,15 +543,7 @@ function getTeamBNameSafe(m, depth) {
   if (depth > 5) return m.teamB || "Chưa xác định";
   if (m.teamBFeed) {
     let w = getWinnerOfMatch(m.teamBFeed);
-    if (w) return w;
-    let feedMatch = matches.find(x => x.matchCode === m.teamBFeed);
-    if (feedMatch) {
-      let fTA = getTeamANameSafe(feedMatch, depth + 1);
-      let fTB = getTeamBNameSafe(feedMatch, depth + 1);
-      if (fTA && fTA !== "Chưa xác định" && fTB && fTB !== "Chưa xác định") {
-        return `${fTA} / ${fTB}`;
-      }
-    }
+    if (w) return w; // Nếu trận trước đã xong, lấy ngay tên đội thắng
   }
   if (m.teamBLoserFeed) {
     let l = getLoserOfMatch(m.teamBLoserFeed);
@@ -879,7 +867,7 @@ function openNewsModal(id) {
 
 function openPhotoModal(url, title) {
   document.getElementById('modalBody').innerHTML = `<h3 style="margin-top:0">${title}</h3><img src="${url}" class="modal-img">`;
-  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.getElementById('modalOverlay').classList.add('hidden');
 }
 
 function closeModal(e) {
