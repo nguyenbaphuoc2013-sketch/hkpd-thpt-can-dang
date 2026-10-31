@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Đọc trực tiếp file Excel và liên kết các vòng đấu hoàn hảo!</p>
+      <p class="muted" style="margin-top:6px">👉 Cập nhật tức thì tên VĐV lên vòng sau ngay khi hoàn thành trận đấu!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -177,11 +177,12 @@ nav{width:100%}
       <div class="muted">Quản lý toàn diện lịch thi đấu và bảng tổng sắp huy chương</div>
     </div>
 
+    <!-- ĐÃ ẨN TÀI KHOẢN VÀ MẬT KHẨU GỢI Ý ĐỂ BẢO MẬT KHỎI NGƯỜI NGOÀI -->
     <div id="login">
       <div class="card" style="max-width:400px;margin:30px auto">
         <h3 style="margin-top:0">Đăng nhập Ban Tổ Chức</h3>
-        <input id="email" type="text" placeholder="Tài khoản (admin)">
-        <input id="password" type="password" placeholder="Mật khẩu (123456)">
+        <input id="email" type="text" placeholder="Tên tài khoản quản trị">
+        <input id="password" type="password" placeholder="Mật khẩu bảo mật">
         <button class="btn" style="width:100%" onclick="login()">Đăng nhập ngay</button>
         <p id="loginMsg" style="color:red;margin-top:8px;font-size:13px"></p>
       </div>
@@ -283,7 +284,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V450';
+const STORAGE_VER = 'hkpd_2026_V460';
 
 let matches = [];
 let medals = {};
@@ -386,7 +387,6 @@ function getSafeSportId(sportName) {
   return encodeURIComponent(sportName.trim());
 }
 
-// BỘ QUÉT TỐI ƯU SIÊU MẠNH: ĐỌC MỌI DẠNG Ô CHỨA CHỮ TRẬN TRONG FILE EXCEL
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = getSafeSportId(sheetName);
@@ -421,37 +421,39 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     let mCol = m.col;
     let r = m.row;
 
+    // ĐỌC THÔNG TIN VĐV ĐÃ CÓ TỪ FILE EXCEL
+    let cellA = (jsonMatrix[r-1] && (jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0])) ? String(jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0]).trim() : "";
+    let cellB = (jsonMatrix[r+1] && (jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0])) ? String(jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0]).trim() : "";
+
     if (mCol <= 1) { // Vòng 1
-      let tA = (jsonMatrix[r-1] && (jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0])) ? String(jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0]).trim() : "Chưa xác định";
-      let tB = (jsonMatrix[r+1] && (jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0])) ? String(jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0]).trim() : "Chưa xác định";
       matchesList.push({
         matchCode: `${safeSportId}_M${mNum}`,
         matchLabel: `Trận ${mNum}`,
         sport: sheetName,
         round: "Vòng 1",
-        teamA: tA,
-        teamB: tB,
+        teamA: cellA || "Chưa xác định",
+        teamB: cellB || "Chưa xác định",
         teamAFeed: null,
         teamBFeed: null
       });
     } else {
-      let tA = "Chưa xác định", tB = "Chưa xác định";
       let tAFeed = null, tBFeed = null;
+      let tA = cellA, tB = cellB;
 
       if (mNum >= 4 && mNum <= 11) {
         let feedNumA = (mNum - 3) * 2 - 1;
         let feedNumB = (mNum - 3) * 2;
         tAFeed = `${safeSportId}_M${feedNumA}`;
         tBFeed = `${safeSportId}_M${feedNumB}`;
-        tA = `Thắng Trận ${feedNumA}`;
-        tB = `Thắng Trận ${feedNumB}`;
+        if(!tA) tA = `Thắng Trận ${feedNumA}`;
+        if(!tB) tB = `Thắng Trận ${feedNumB}`;
       } else if (mNum >= 12) {
         let feedNumA = mNum * 2 - 16;
         let feedNumB = mNum * 2 - 15;
         tAFeed = `${safeSportId}_M${feedNumA}`;
         tBFeed = `${safeSportId}_M${feedNumB}`;
-        tA = `Thắng Trận ${feedNumA}`;
-        tB = `Thắng Trận ${feedNumB}`;
+        if(!tA) tA = `Thắng Trận ${feedNumA}`;
+        if(!tB) tB = `Thắng Trận ${feedNumB}`;
       }
 
       let rName = mCol <= 3 ? "Vòng 2" : (mCol <= 5 ? "Vòng 3" : (mNum === maxNum ? "Chung Kết & Tranh Hạng 3" : "Vòng Bán Kết"));
@@ -464,8 +466,8 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
         round: rName,
         teamAFeed: tAFeed,
         teamBFeed: tBFeed,
-        teamA: tA,
-        teamB: tB
+        teamA: tA || "Chưa xác định",
+        teamB: tB || "Chưa xác định"
       });
     }
   });
@@ -512,14 +514,23 @@ function getLoserOfMatch(matchCode) {
   return null;
 }
 
+// LẤY TÊN VĐV HIỂN THỊ CHUẨN XÁC KHI CẬP NHẬT TỶ SỐ
 function getTeamAName(m) {
   if (m.teamAFeed) {
     let w = getWinnerOfMatch(m.teamAFeed);
-    return w ? w : m.teamA;
+    if (w) return w; // ĐÃ CÓ ĐỘI THẮNG ĐƯỢC CẬP NHẬT NÊN TRẢ VỀ TÊN VĐV NGAY
+    let feedMatch = matches.find(x => x.matchCode === m.teamAFeed);
+    if (feedMatch) {
+      let fTA = getTeamAName(feedMatch);
+      let fTB = getTeamBName(feedMatch);
+      if (fTA && fTA !== "Chưa xác định" && fTB && fTB !== "Chưa xác định") {
+        return `${fTA} / ${fTB}`;
+      }
+    }
   }
   if (m.teamALoserFeed) {
     let l = getLoserOfMatch(m.teamALoserFeed);
-    return l ? l : m.teamA;
+    if (l) return l;
   }
   return m.teamA || "Chưa xác định";
 }
@@ -527,11 +538,19 @@ function getTeamAName(m) {
 function getTeamBName(m) {
   if (m.teamBFeed) {
     let w = getWinnerOfMatch(m.teamBFeed);
-    return w ? w : m.teamB;
+    if (w) return w; // ĐÃ CÓ ĐỘI THẮNG ĐƯỢC CẬP NHẬT NÊN TRẢ VỀ TÊN VĐV NGAY
+    let feedMatch = matches.find(x => x.matchCode === m.teamBFeed);
+    if (feedMatch) {
+      let fTA = getTeamAName(feedMatch);
+      let fTB = getTeamBName(feedMatch);
+      if (fTA && fTA !== "Chưa xác định" && fTB && fTB !== "Chưa xác định") {
+        return `${fTA} / ${fTB}`;
+      }
+    }
   }
   if (m.teamBLoserFeed) {
     let l = getLoserOfMatch(m.teamBLoserFeed);
-    return l ? l : m.teamB;
+    if (l) return l;
   }
   return m.teamB || "Chưa xác định";
 }
@@ -947,7 +966,7 @@ function updateMatch(id) {
   syncDataToCloud(true);
   initApp();
   renderAdminMatches();
-  alert('Đã cập nhật tỷ số thành công!');
+  alert('Đã cập nhật tỷ số & đẩy ngay đội thắng lên vòng tiếp theo!');
 }
 
 function deleteMatch(id) {
