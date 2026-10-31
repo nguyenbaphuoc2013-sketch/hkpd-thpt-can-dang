@@ -177,7 +177,6 @@ nav{width:100%}
       <div class="muted">Quản lý toàn diện lịch thi đấu và bảng tổng sắp huy chương</div>
     </div>
 
-    <!-- ĐÃ ẨN TÀI KHOẢN VÀ MẬT KHẨU GỢI Ý ĐỂ BẢO MẬT KHỎI NGƯỜI NGOÀI -->
     <div id="login">
       <div class="card" style="max-width:400px;margin:30px auto">
         <h3 style="margin-top:0">Đăng nhập Ban Tổ Chức</h3>
@@ -284,7 +283,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V460';
+const STORAGE_VER = 'hkpd_2026_V470';
 
 let matches = [];
 let medals = {};
@@ -387,6 +386,7 @@ function getSafeSportId(sportName) {
   return encodeURIComponent(sportName.trim());
 }
 
+// HÀM QUÉT EXCEL AN TOÀN TUYỆT ĐỐI KHÔNG BỊ TRÀN STACK
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = getSafeSportId(sheetName);
@@ -421,11 +421,10 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     let mCol = m.col;
     let r = m.row;
 
-    // ĐỌC THÔNG TIN VĐV ĐÃ CÓ TỪ FILE EXCEL
     let cellA = (jsonMatrix[r-1] && (jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0])) ? String(jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0]).trim() : "";
     let cellB = (jsonMatrix[r+1] && (jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0])) ? String(jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0]).trim() : "";
 
-    if (mCol <= 1) { // Vòng 1
+    if (mCol <= 1) {
       matchesList.push({
         matchCode: `${safeSportId}_M${mNum}`,
         matchLabel: `Trận ${mNum}`,
@@ -492,12 +491,13 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   return matchesList;
 }
 
+// HÀM TRUY VẤN AN TOÀN TRÁNH ĐỆ QUY VÔ TẬN
 function getWinnerOfMatch(matchCode) {
   if (!matchCode) return null;
   let m = matches.find(x => x.matchCode === matchCode);
   if (!m || m.status !== 'done') return null;
-  let tA = getTeamAName(m);
-  let tB = getTeamBName(m);
+  let tA = getTeamANameSafe(m, 0);
+  let tB = getTeamBNameSafe(m, 0);
   if (Number(m.scoreA) > Number(m.scoreB)) return tA;
   if (Number(m.scoreB) > Number(m.scoreA)) return tB;
   return null;
@@ -507,22 +507,30 @@ function getLoserOfMatch(matchCode) {
   if (!matchCode) return null;
   let m = matches.find(x => x.matchCode === matchCode);
   if (!m || m.status !== 'done') return null;
-  let tA = getTeamAName(m);
-  let tB = getTeamBName(m);
+  let tA = getTeamANameSafe(m, 0);
+  let tB = getTeamBNameSafe(m, 0);
   if (Number(m.scoreA) > Number(m.scoreB)) return tB;
   if (Number(m.scoreB) > Number(m.scoreA)) return tA;
   return null;
 }
 
-// LẤY TÊN VĐV HIỂN THỊ CHUẨN XÁC KHI CẬP NHẬT TỶ SỐ
 function getTeamAName(m) {
+  return getTeamANameSafe(m, 0);
+}
+
+function getTeamBName(m) {
+  return getTeamBNameSafe(m, 0);
+}
+
+function getTeamANameSafe(m, depth) {
+  if (depth > 5) return m.teamA || "Chưa xác định";
   if (m.teamAFeed) {
     let w = getWinnerOfMatch(m.teamAFeed);
-    if (w) return w; // ĐÃ CÓ ĐỘI THẮNG ĐƯỢC CẬP NHẬT NÊN TRẢ VỀ TÊN VĐV NGAY
+    if (w) return w;
     let feedMatch = matches.find(x => x.matchCode === m.teamAFeed);
     if (feedMatch) {
-      let fTA = getTeamAName(feedMatch);
-      let fTB = getTeamBName(feedMatch);
+      let fTA = getTeamANameSafe(feedMatch, depth + 1);
+      let fTB = getTeamBNameSafe(feedMatch, depth + 1);
       if (fTA && fTA !== "Chưa xác định" && fTB && fTB !== "Chưa xác định") {
         return `${fTA} / ${fTB}`;
       }
@@ -535,14 +543,15 @@ function getTeamAName(m) {
   return m.teamA || "Chưa xác định";
 }
 
-function getTeamBName(m) {
+function getTeamBNameSafe(m, depth) {
+  if (depth > 5) return m.teamB || "Chưa xác định";
   if (m.teamBFeed) {
     let w = getWinnerOfMatch(m.teamBFeed);
-    if (w) return w; // ĐÃ CÓ ĐỘI THẮNG ĐƯỢC CẬP NHẬT NÊN TRẢ VỀ TÊN VĐV NGAY
+    if (w) return w;
     let feedMatch = matches.find(x => x.matchCode === m.teamBFeed);
     if (feedMatch) {
-      let fTA = getTeamAName(feedMatch);
-      let fTB = getTeamBName(feedMatch);
+      let fTA = getTeamANameSafe(feedMatch, depth + 1);
+      let fTB = getTeamBNameSafe(feedMatch, depth + 1);
       if (fTA && fTA !== "Chưa xác định" && fTB && fTB !== "Chưa xác định") {
         return `${fTA} / ${fTB}`;
       }
