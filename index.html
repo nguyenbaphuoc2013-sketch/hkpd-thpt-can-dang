@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Cập nhật tức thì tên VĐV lên vòng sau ngay khi hoàn thành trận đấu!</p>
+      <p class="muted" style="margin-top:6px">👉 Trận 1, 2 hiển thị tên VĐV. Trận 3 có "Thắng Trận 1". Các trận khác "Chưa xác định" và tự cập nhật khi có kết quả quản trị!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -283,7 +283,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V480';
+const STORAGE_VER = 'hkpd_2026_V490';
 
 let matches = [];
 let medals = {};
@@ -386,7 +386,7 @@ function getSafeSportId(sportName) {
   return encodeURIComponent(sportName.trim());
 }
 
-// BỘ QUÉT EXCEL GỌN GÀNG: CHỈ LẤY ĐÚNG TÊN HOẶC GHI "Chưa xác định" / "Thắng Trận X"
+// BỘ QUÉT EXCEL TUÂN THỦ ĐÚNG QUY LUẬT THẦY VỪA NÊU
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = getSafeSportId(sheetName);
@@ -424,11 +424,11 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     let cellA = (jsonMatrix[r-1] && (jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0])) ? String(jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0]).trim() : "";
     let cellB = (jsonMatrix[r+1] && (jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0])) ? String(jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0]).trim() : "";
 
-    // Làm sạch cell nếu chứa chữ rác hoặc rỗng
     if(cellA.toLowerCase().includes('trận') || cellA.length < 2) cellA = "";
     if(cellB.toLowerCase().includes('trận') || cellB.length < 2) cellB = "";
 
     if (mCol <= 1) {
+      // Vòng 1: Nếu có tên VĐV thì lấy, nếu không có thì để "Chưa xác định"
       matchesList.push({
         matchCode: `${safeSportId}_M${mNum}`,
         matchLabel: `Trận ${mNum}`,
@@ -443,7 +443,16 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
       let tAFeed = null, tBFeed = null;
       let tA = cellA, tB = cellB;
 
-      if (mNum >= 4 && mNum <= 11) {
+      // Áp dụng đúng quy luật: Trận 3 đấu với Trận 1, Trận 7 đấu với Trận 2...
+      if (mNum === 3) {
+        tAFeed = `${safeSportId}_M1`;
+        if(!tA) tA = `Thắng Trận 1`;
+        if(!tB) tB = cellB || "Chưa xác định";
+      } else if (mNum === 7) {
+        tAFeed = `${safeSportId}_M2`;
+        if(!tA) tA = `Thắng Trận 2`;
+        if(!tB) tB = cellB || "Chưa xác định";
+      } else if (mNum >= 4 && mNum <= 11) {
         let feedNumA = (mNum - 3) * 2 - 1;
         let feedNumB = (mNum - 3) * 2;
         tAFeed = `${safeSportId}_M${feedNumA}`;
@@ -525,12 +534,12 @@ function getTeamBName(m) {
   return getTeamBNameSafe(m, 0);
 }
 
-// HÀM LẤY TÊN GỌN GÀNG, KHÔNG BỊ GỘP CHUỖI DÀI
+// LẤY TÊN VĐV HOẶC TỰ ĐỘNG THAY THẾ KHI CÓ KẾT QUẢ QUẢN TRỊ
 function getTeamANameSafe(m, depth) {
   if (depth > 5) return m.teamA || "Chưa xác định";
   if (m.teamAFeed) {
     let w = getWinnerOfMatch(m.teamAFeed);
-    if (w) return w; // Nếu trận trước đã xong, lấy ngay tên đội thắng
+    if (w) return w;
   }
   if (m.teamALoserFeed) {
     let l = getLoserOfMatch(m.teamALoserFeed);
@@ -543,7 +552,7 @@ function getTeamBNameSafe(m, depth) {
   if (depth > 5) return m.teamB || "Chưa xác định";
   if (m.teamBFeed) {
     let w = getWinnerOfMatch(m.teamBFeed);
-    if (w) return w; // Nếu trận trước đã xong, lấy ngay tên đội thắng
+    if (w) return w;
   }
   if (m.teamBLoserFeed) {
     let l = getLoserOfMatch(m.teamBLoserFeed);
@@ -867,7 +876,7 @@ function openNewsModal(id) {
 
 function openPhotoModal(url, title) {
   document.getElementById('modalBody').innerHTML = `<h3 style="margin-top:0">${title}</h3><img src="${url}" class="modal-img">`;
-  document.getElementById('modalOverlay').classList.add('hidden');
+  document.getElementById('modalOverlay').classList.remove('hidden');
 }
 
 function closeModal(e) {
