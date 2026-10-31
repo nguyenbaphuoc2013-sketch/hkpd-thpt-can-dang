@@ -283,7 +283,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V440';
+const STORAGE_VER = 'hkpd_2026_V450';
 
 let matches = [];
 let medals = {};
@@ -386,7 +386,7 @@ function getSafeSportId(sportName) {
   return encodeURIComponent(sportName.trim());
 }
 
-// BỘ QUÉT EXCEL CỰC KỲ LINH HOẠT: BẮT MỌI ĐỊNH DẠNG (Trận 1, Trận1, (Trận 1)...)
+// BỘ QUÉT TỐI ƯU SIÊU MẠNH: ĐỌC MỌI DẠNG Ô CHỨA CHỮ TRẬN TRONG FILE EXCEL
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = getSafeSportId(sheetName);
@@ -397,7 +397,6 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
       row.forEach((cell, cIdx) => {
         if (cell !== null && cell !== undefined) {
           let str = String(cell).trim();
-          // Bắt mọi biến thể: "Trận 1", "Trận1", "(Trận 1)", "Trận8"
           let m = str.match(/trận\s*(\d+)/i);
           if (m) {
             matchesDict.push({
@@ -889,3 +888,286 @@ function checkLoginState() {
     renderAdminNews();
     renderAdminPhotos();
   } else {
+    document.getElementById('login').classList.remove('hidden');
+    document.getElementById('adminPanel').classList.add('hidden');
+  }
+}
+
+function saveLiveLinks() {
+  savedLiveLinks.facebook = document.getElementById('liveFbInput').value.trim();
+  savedLiveLinks.tiktok = document.getElementById('liveTtInput').value.trim();
+  syncDataToCloud(true);
+  alert('Đã lưu đường link Live!');
+}
+
+function renderAdminMatches() {
+  let sF = document.getElementById('adminSportFilter').value;
+  let sSt = document.getElementById('adminStatusFilter').value;
+  let filtered = matches.filter(m => (!sF || m.sport === sF) && (!sSt || m.status === sSt));
+
+  document.getElementById('adminMatches').innerHTML = filtered.map(m => {
+    let tA = getTeamAName(m);
+    let tB = getTeamBName(m);
+    return `
+      <div class="admin-row">
+        <div style="font-weight:bold;margin-bottom:6px;color:#0877e8">${m.sport} • ${m.matchLabel} (${m.round})</div>
+        <div style="font-size:13px;margin-bottom:8px;background:#f8fafc;padding:6px;border-radius:6px;border:1px solid #e2e8f0">
+          👉 Đội thực tế hiện tại: <b style="color:#198754">${tA}</b> vs <b style="color:#198754">${tB}</b>
+        </div>
+        <div class="formgrid">
+          <div>Tên Đội A (Gốc):<input type="text" id="tA_${m.id}" value="${m.teamA}"></div>
+          <div>Tên Đội B (Gốc):<input type="text" id="tB_${m.id}" value="${m.teamB}"></div>
+          <div>Điểm Đội A:<input type="number" id="scA_${m.id}" value="${m.scoreA}"></div>
+          <div>Điểm Đội B:<input type="number" id="scB_${m.id}" value="${m.scoreB}"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <div style="flex:1;margin-right:10px">Trạng thái:
+            <select id="st_${m.id}">
+              <option value="upcoming" ${m.status==='upcoming'?'selected':''}>Sắp đấu</option>
+              <option value="live" ${m.status==='live'?'selected':''}>Đang đấu</option>
+              <option value="done" ${m.status==='done'?'selected':''}>Đã kết thúc</option>
+            </select>
+          </div>
+          <button class="danger" onclick="deleteMatch(${m.id})" style="padding:8px 12px">🗑 Xóa trận này</button>
+        </div>
+        <button class="btn ok" style="margin-top:8px;width:100%" onclick="updateMatch(${m.id})">💾 Lưu Tỷ Số & Cập Nhật Vòng Sau</button>
+      </div>
+    `;
+  }).join('') || '<p class="muted">Không có trận đấu nào.</p>';
+}
+
+function updateMatch(id) {
+  let m = matches.find(x => x.id === id);
+  if(!m) return;
+  m.teamA = document.getElementById(`tA_${id}`).value.trim();
+  m.teamB = document.getElementById(`tB_${id}`).value.trim();
+  m.scoreA = Number(document.getElementById(`scA_${id}`).value);
+  m.scoreB = Number(document.getElementById(`scB_${id}`).value);
+  m.status = document.getElementById(`st_${id}`).value;
+  syncDataToCloud(true);
+  initApp();
+  renderAdminMatches();
+  alert('Đã cập nhật tỷ số thành công!');
+}
+
+function deleteMatch(id) {
+  if(confirm('Thầy có chắc chắn muốn xóa trận đấu này không?')) {
+    matches = matches.filter(x => x.id !== id);
+    syncDataToCloud(true);
+    initApp();
+    renderAdminMatches();
+  }
+}
+
+function importExcelFile() {
+  let fileInput = document.getElementById('excelFileInput');
+  if(!fileInput.files || !fileInput.files[0]) { alert('Vui lòng chọn file Excel!'); return; }
+  let reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      let data = new Uint8Array(e.target.result);
+      let workbook = XLSX.read(data, {type: 'array'});
+      
+      let newMatchesList = [];
+      let mIdCount = 99990;
+
+      workbook.SheetNames.forEach(sheetName => {
+        let worksheet = workbook.Sheets[sheetName];
+        let jsonMatrix = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+        
+        let created = buildMatchesFromExcelSheet(sheetName, jsonMatrix);
+        created.forEach(m => {
+          newMatchesList.push({
+            id: mIdCount++,
+            matchCode: m.matchCode,
+            matchLabel: m.matchLabel,
+            teamAFeed: m.teamAFeed || null,
+            teamBFeed: m.teamBFeed || null,
+            teamALoserFeed: m.teamALoserFeed || null,
+            teamBLoserFeed: m.teamBLoserFeed || null,
+            type: m.type || null,
+            sport: sheetName,
+            round: m.round,
+            teamA: m.teamA,
+            teamB: m.teamB,
+            scoreA: 0, scoreB: 0,
+            status: "upcoming",
+            venue: "Sân Cần Đăng"
+          });
+        });
+      });
+
+      if(newMatchesList.length > 0) {
+        matches = newMatchesList;
+        syncDataToCloud(true);
+        initApp();
+        alert(`Đọc file Excel thành công! Đã tải ${newMatchesList.length} trận đấu từ các sheet.`);
+      } else {
+        alert('Không tìm thấy danh sách trận hợp lệ trong file Excel.');
+      }
+    } catch(err) {
+      alert('Lỗi đọc file Excel: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(fileInput.files[0]);
+}
+
+function saveMedal() {
+  let team = document.getElementById('medTeam').value.trim().toUpperCase();
+  let gold = Number(document.getElementById('gold').value) || 0;
+  let silver = Number(document.getElementById('silver').value) || 0;
+  let bronze = Number(document.getElementById('bronze').value) || 0;
+  if(!team) { alert('Vui lòng nhập tên Lớp / Đơn vị!'); return; }
+  
+  medals[team] = { gold, silver, bronze };
+
+  syncDataToCloud(true);
+  renderMedals();
+  renderAdminMedalTable();
+  document.getElementById('medTeam').value = '';
+  document.getElementById('gold').value = 0;
+  document.getElementById('silver').value = 0;
+  document.getElementById('bronze').value = 0;
+  alert(`Đã cập nhật huy chương cho lớp ${team}!`);
+}
+
+function renderAdminMedalTable() {
+  let mergedMedals = getMergedMedals();
+  let html = `
+    <table class="medal">
+      <thead>
+        <tr>
+          <th>Hạng</th>
+          <th>Lớp / Đơn vị</th>
+          <th>🥇 Vàng</th>
+          <th>🥈 Bạc</th>
+          <th>🥉 Đồng</th>
+          <th>Tổng HC</th>
+          <th>Điểm</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  let sorted = Object.keys(mergedMedals).map(cls => ({
+    cls, ...mergedMedals[cls], total: (mergedMedals[cls].gold||0)*3 + (mergedMedals[cls].silver||0)*2 + (mergedMedals[cls].bronze||0)
+  })).sort((a,b) => b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze || b.total - a.total);
+
+  if(sorted.length === 0) {
+    html += `<tr><td colspan="8" class="muted">Chưa có dữ liệu huy chương.</td></tr>`;
+  } else {
+    sorted.forEach((item, idx) => {
+      let sumMedals = (item.gold||0) + (item.silver||0) + (item.bronze||0);
+      html += `
+        <tr>
+          <td><b>${idx+1}</b></td>
+          <td style="text-align:left;font-weight:bold;color:var(--primary)">${item.cls}</td>
+          <td style="color:#d97706;font-weight:bold">${item.gold||0}</td>
+          <td style="color:#64748b;font-weight:bold">${item.silver||0}</td>
+          <td style="color:#b45309;font-weight:bold">${item.bronze||0}</td>
+          <td><b>${sumMedals}</b></td>
+          <td><b>${item.total}</b></td>
+          <td>
+            <button class="btn" style="padding:4px 8px;font-size:11px;background:#0877e8" onclick="editMedal('${item.cls}', ${item.gold||0}, ${item.silver||0}, ${item.bronze||0})">Sửa</button>
+            <button class="danger" style="padding:4px 8px;font-size:11px" onclick="deleteMedal('${item.cls}')">Xóa</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+  html += `</tbody></table>`;
+  document.getElementById('adminMedalTable').innerHTML = html;
+}
+
+function editMedal(cls, g, s, b) {
+  document.getElementById('medTeam').value = cls;
+  document.getElementById('gold').value = g;
+  document.getElementById('silver').value = s;
+  document.getElementById('bronze').value = b;
+  window.scrollTo({top: document.getElementById('medTeam').offsetTop - 100, behavior: 'smooth'});
+}
+
+function deleteMedal(cls) {
+  if(confirm(`Thầy có chắc chắn muốn xóa/đặt lại dữ liệu huy chương của lớp ${cls} không?`)) {
+    if(medals[cls]) delete medals[cls];
+    syncDataToCloud(true);
+    renderMedals();
+    renderAdminMedalTable();
+    alert(`Đã xóa dữ liệu huy chương của lớp ${cls}!`);
+  }
+}
+
+function addNews() {
+  let title = document.getElementById('newsTitle').value.trim();
+  let body = document.getElementById('newsBody').value.trim();
+  if(!title || !body) { alert('Vui lòng nhập tiêu đề và nội dung!'); return; }
+  let today = new Date().toLocaleDateString('vi-VN');
+  newsData.unshift({ id: Date.now(), title, body, date: today });
+  syncDataToCloud(true);
+  initApp();
+  renderAdminNews();
+  alert('Đăng bài viết thành công!');
+}
+
+function renderAdminNews() {
+  document.getElementById('adminNewsList').innerHTML = newsData.map(n => `
+    <div class="admin-row" style="display:flex;justify-content:space-between;align-items:center">
+      <div><b>${n.title}</b><div class="muted">${n.date}</div></div>
+      <button class="danger" onclick="deleteNews(${n.id})">Xóa</button>
+    </div>
+  `).join('');
+}
+
+function deleteNews(id) {
+  newsData = newsData.filter(n => n.id !== id);
+  syncDataToCloud(true);
+  initApp();
+  renderAdminNews();
+}
+
+function addPhoto() {
+  let title = document.getElementById('photoTitle').value.trim() || 'Ảnh hoạt động';
+  let url = document.getElementById('photoUrlInput').value.trim();
+  if(!url) { alert('Vui lòng dán liên kết hình ảnh!'); return; }
+  photos.unshift({ id: Date.now(), title, url });
+  syncDataToCloud(true);
+  renderPhotos();
+  renderAdminPhotos();
+  document.getElementById('photoUrlInput').value = '';
+  alert('Thêm hình ảnh thành công!');
+}
+
+function renderAdminPhotos() {
+  document.getElementById('adminPhotoList').innerHTML = photos.map(p => `
+    <div class="admin-row" style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:center;gap:10px">
+        <img src="${p.url}" style="width:40px;height:40px;object-fit:cover;border-radius:4px">
+        <span><b>${p.title}</b></span>
+      </div>
+      <button class="danger" onclick="deletePhoto(${p.id})">Xóa</button>
+    </div>
+  `).join('');
+}
+
+function deletePhoto(id) {
+  photos = photos.filter(p => p.id !== id);
+  syncDataToCloud(true);
+  renderPhotos();
+  renderAdminPhotos();
+}
+
+function clearAllDataAbsoluteZero() {
+  if(confirm('CẢNH BÁO: Thầy có chắc chắn muốn XÓA SẠCH TRẮNG toàn bộ dữ liệu cũ không?')) {
+    matches = [];
+    medals = {};
+    newsData = [];
+    photos = [];
+    syncDataToCloud(true);
+    initApp();
+    alert('Đã xóa sạch toàn bộ dữ liệu!');
+  }
+}
+</script>
+</body>
+</html>
