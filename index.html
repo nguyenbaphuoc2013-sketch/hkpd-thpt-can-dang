@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Trận 1, 2 hiển thị tên VĐV. Trận 3 có "Thắng Trận 1". Các trận khác "Chưa xác định" và tự cập nhật khi có kết quả quản trị!</p>
+      <p class="muted" style="margin-top:6px">👉 Các vòng sau hiển thị "Thắng Trận X", Chung kết hiển thị "Thắng Bán Kết 1 vs Thắng Bán Kết 2" và tự động cập nhật khi có kết quả!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -283,7 +283,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V490';
+const STORAGE_VER = 'hkpd_2026_V500';
 
 let matches = [];
 let medals = {};
@@ -386,7 +386,7 @@ function getSafeSportId(sportName) {
   return encodeURIComponent(sportName.trim());
 }
 
-// BỘ QUÉT EXCEL TUÂN THỦ ĐÚNG QUY LUẬT THẦY VỪA NÊU
+// BỘ QUÉT EXCEL CHUẨN XÁC: LOẠI BỎ HOÀN TOÀN TÊN GÁN SẴN Ở CHUNG KẾT, CHỈ DÙNG THẮNG TRẬN X / THUA BÁN KẾT
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = getSafeSportId(sheetName);
@@ -428,7 +428,7 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     if(cellB.toLowerCase().includes('trận') || cellB.length < 2) cellB = "";
 
     if (mCol <= 1) {
-      // Vòng 1: Nếu có tên VĐV thì lấy, nếu không có thì để "Chưa xác định"
+      // Vòng 1: Nếu có tên thì lấy, không có thì "Chưa xác định"
       matchesList.push({
         matchCode: `${safeSportId}_M${mNum}`,
         matchLabel: `Trận ${mNum}`,
@@ -441,31 +441,43 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
       });
     } else {
       let tAFeed = null, tBFeed = null;
-      let tA = cellA, tB = cellB;
+      let tA = "", tB = "";
 
-      // Áp dụng đúng quy luật: Trận 3 đấu với Trận 1, Trận 7 đấu với Trận 2...
+      // Xác định Feed tự động theo quy luật nhánh đấu
       if (mNum === 3) {
         tAFeed = `${safeSportId}_M1`;
-        if(!tA) tA = `Thắng Trận 1`;
-        if(!tB) tB = cellB || "Chưa xác định";
+        tA = "Thắng Trận 1";
+        tB = cellB || "Chưa xác định";
       } else if (mNum === 7) {
         tAFeed = `${safeSportId}_M2`;
-        if(!tA) tA = `Thắng Trận 2`;
-        if(!tB) tB = cellB || "Chưa xác định";
+        tA = "Thắng Trận 2";
+        tB = cellB || "Chưa xác định";
+      } else if (mNum === maxNum) {
+        // Trận Chung kết: Đảm bảo luôn lấy Thắng Bán kết 1 vs Thắng Bán kết 2
+        let semiMatches = matchesList.filter(x => x.round.includes("Bán Kết") || x.round.includes("Vòng 3") || x.round.includes("Vòng 2"));
+        if(semiMatches.length >= 2) {
+          tAFeed = semiMatches[semiMatches.length - 2].matchCode;
+          tBFeed = semiMatches[semiMatches.length - 1].matchCode;
+          tA = "Thắng Trận " + semiMatches[semiMatches.length - 2].matchLabel.replace(/\D/g, '');
+          tB = "Thắng Trận " + semiMatches[semiMatches.length - 1].matchLabel.replace(/\D/g, '');
+        } else {
+          tA = "Thắng Bán Kết 1";
+          tB = "Thắng Bán Kết 2";
+        }
       } else if (mNum >= 4 && mNum <= 11) {
         let feedNumA = (mNum - 3) * 2 - 1;
         let feedNumB = (mNum - 3) * 2;
         tAFeed = `${safeSportId}_M${feedNumA}`;
         tBFeed = `${safeSportId}_M${feedNumB}`;
-        if(!tA) tA = `Thắng Trận ${feedNumA}`;
-        if(!tB) tB = `Thắng Trận ${feedNumB}`;
+        tA = `Thắng Trận ${feedNumA}`;
+        tB = `Thắng Trận ${feedNumB}`;
       } else if (mNum >= 12) {
         let feedNumA = mNum * 2 - 16;
         let feedNumB = mNum * 2 - 15;
         tAFeed = `${safeSportId}_M${feedNumA}`;
         tBFeed = `${safeSportId}_M${feedNumB}`;
-        if(!tA) tA = `Thắng Trận ${feedNumA}`;
-        if(!tB) tB = `Thắng Trận ${feedNumB}`;
+        tA = `Thắng Trận ${feedNumA}`;
+        tB = `Thắng Trận ${feedNumB}`;
       }
 
       let rName = mCol <= 3 ? "Vòng 2" : (mCol <= 5 ? "Vòng 3" : (mNum === maxNum ? "Chung Kết & Tranh Hạng 3" : "Vòng Bán Kết"));
@@ -478,12 +490,13 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
         round: rName,
         teamAFeed: tAFeed,
         teamBFeed: tBFeed,
-        teamA: tA || "Chưa xác định",
-        teamB: tB || "Chưa xác định"
+        teamA: tA,
+        teamB: tB
       });
     }
   });
 
+  // Thêm trận Tranh Hạng 3 chính xác cho Thua Bán Kết 1 vs Thua Bán Kết 2
   let semiMatches = matchesList.filter(x => x.round.includes("Bán Kết") || x.round.includes("Vòng 3") || x.round.includes("Vòng 2"));
   if(semiMatches.length >= 2) {
     let sm1 = semiMatches[semiMatches.length - 2].matchCode;
@@ -534,7 +547,7 @@ function getTeamBName(m) {
   return getTeamBNameSafe(m, 0);
 }
 
-// LẤY TÊN VĐV HOẶC TỰ ĐỘNG THAY THẾ KHI CÓ KẾT QUẢ QUẢN TRỊ
+// LẤY TÊN ĐỘI / VĐV: CHỈ THAY THẾ KHI TRẬN TRƯỚC ĐÃ ĐẤU XONG (STATUS === 'DONE')
 function getTeamANameSafe(m, depth) {
   if (depth > 5) return m.teamA || "Chưa xác định";
   if (m.teamAFeed) {
