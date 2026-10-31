@@ -143,7 +143,7 @@ nav{width:100%}
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Đọc đúng nguyên văn các cặp đấu từ file Excel. Khi có kết quả cập nhật trong Quản trị, người thắng tự động tiến vào vòng trong!</p>
+      <p class="muted" style="margin-top:6px">👉 Đọc nguyên bản 100% các cặp đấu từ tệp Excel của thầy. Khi cập nhật kết quả trong phần Quản trị, người thắng sẽ tự động tiến vào các vòng trong!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -161,7 +161,7 @@ nav{width:100%}
   <section id="medals" class="page hidden">
     <div class="hero"><h1>🏅 Bảng tổng sắp huy chương các lớp</h1></div>
     <div class="card">
-      <p class="muted" style="margin-bottom:12px">👉 Quy chuẩn: Thắng Chung Kết = 🥇 1 Vàng | Thua Chung Kết = 🥈 1 Bạc | Thắng Tranh Hạng 3 = 🥉 1 Đồng (Thua Tranh Hạng 3 không có HC).</p>
+      <p class="muted" style="margin-bottom:12px">👉 Quy chuẩn: Thắng Chung Kết = 🥇 1 Vàng | Thua Chung Kết = 🥈 1 Bạc | Thắng Tranh Hạng 3 = 🥉 1 Đồng.</p>
       <div class="table-wrap" id="medalTable"></div>
     </div>
   </section>
@@ -190,7 +190,7 @@ nav{width:100%}
     <div id="adminPanel" class="hidden">
       <div class="card admin-card" style="background:#f0f7ff;border-color:#bfdbfe">
         <h3 style="margin-top:0;color:#0869d7">📂 Tải File Excel Tự Động Đọc Cây Sơ Đồ</h3>
-        <p class="muted" style="margin-bottom:10px">Hệ thống sẽ tự động bóc tách các trận đấu, vòng đấu và đội thi từ tệp Excel.</p>
+        <p class="muted" style="margin-bottom:10px">Hệ thống sẽ tự động đọc nguyên bản các cặp đấu từ tệp Excel.</p>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
         <button class="btn ok" onclick="importExcelFile()">📥 Đọc Tất Cả Các Sheet Tự Động</button>
       </div>
@@ -283,7 +283,7 @@ const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V540';
+const STORAGE_VER = 'hkpd_2026_V550';
 
 let matches = [];
 let medals = {};
@@ -386,7 +386,7 @@ function getSafeSportId(sportName) {
   return encodeURIComponent(sportName.trim());
 }
 
-// BỘ QUÉT EXCEL ĐÚNG NGUYÊN BẢN FILE EXCEL: ĐỌC TẤT CẢ TÊN CÓ SẴN TRONG FILE, KHÔNG BỊA ĐẶT
+// ĐỌC NGUYÊN BẢN 100% TỪ FILE EXCEL, KHÔNG TỰ Ý THAY ĐỔI
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = getSafeSportId(sheetName);
@@ -431,7 +431,7 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     let tA = cellA || "";
     let tB = cellB || "";
 
-    // Nếu ô trên/dưới trong Excel trống, lập nhánh feed chuẩn theo sơ đồ nhánh loại trực tiếp
+    // Liên kết feed chuẩn tự động cho vòng trong nếu trong excel để trống
     if (mNum === 3) {
       tAFeed = `${safeSportId}_M1`;
       if(!tA) tA = "Thắng Trận 1";
@@ -475,7 +475,7 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     });
   });
 
-  // Trận Tranh Hạng 3 chuẩn cho Thua Bán Kết 1 vs Thua Bán Kết 2
+  // Trận Tranh Hạng 3 chuẩn
   let semiMatches = matchesList.filter(x => x.round.includes("Bán Kết") || x.round.includes("Vòng 3") || x.round.includes("Vòng 2"));
   if(semiMatches.length >= 2) {
     let sm1 = semiMatches[semiMatches.length - 2].matchCode;
@@ -526,7 +526,6 @@ function getTeamBName(m) {
   return getTeamBNameSafe(m, 0);
 }
 
-// HỆ THỐNG TỰ ĐỘNG THAY THẾ TÊN VĐV KHI TRẬN TRƯỚC ĐÃ ĐẤU XONG (DONE)
 function getTeamANameSafe(m, depth) {
   if (depth > 5) return m.teamA || "Chưa xác định";
   if (m.teamAFeed) {
