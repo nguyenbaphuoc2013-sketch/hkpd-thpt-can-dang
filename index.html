@@ -6,55 +6,67 @@
 <title>HKPĐ THPT Cần Đăng 2026-2027</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--primary:#073b8f;--accent:#0877e8;--bg:#f4f7fb;--card:#ffffff;--text:#172033;--border:#e4eaf2;--success:#198754;--danger:#dc3545}
+:root{--primary:#073b8f;--accent:#0877e8;--bg:#f4f7fb;--card:#ffffff;--text:#172033;--border:#e4eaf2;--success:#198754;--danger:#dc3545;--gold:#d97706}
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%}
 header{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:14px 4%;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.15)}
 .wrap{max-width:1180px;margin:auto}
 .top{display:flex;justify-content:space-between;gap:12px;align-items:center}
 .brand{font-weight:800;font-size:19px;line-height:1.2}
 .brand small{display:block;font-size:11px;opacity:.85;font-weight:400}
-nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:4px 0}
-nav button{flex:0 0 auto;white-space:nowrap;background:rgba(255,255,255,0.18);color:#fff;border:0;border-radius:8px;padding:8px 13px;font-weight:700;font-size:13px;cursor:pointer}
-nav button.active{background:#fff!important;color:var(--primary)!important}
-.page{padding:16px 4%}
+nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:4px 0}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;white-space:nowrap;background:rgba(255,255,255,0.18);color:#fff;border:0;border-radius:8px;padding:8px 13px;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s}
+nav button.active{background:#fff!important;color:var(--primary)!important;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+.page{padding:16px 4%;min-width:0}
 .hero,.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
 .hero{background:linear-gradient(120deg,#eaf4ff,#fff);border-left:5px solid var(--accent)}
 h1{margin:0 0 6px;font-size:22px;color:var(--primary)}
-h2{margin:0 0 12px;font-size:18px;color:var(--primary)}
+h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:center;justify-content:space-between}
 .muted{color:#667085;font-size:13px}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .stat{text-align:center;padding:12px 8px}
 .stat strong{display:block;font-size:24px;margin-top:4px;color:var(--accent)}
+.two{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
 .match{display:grid;grid-template-columns:minmax(0,1fr) 85px minmax(0,1fr);gap:6px;align-items:center;border-bottom:1px solid #edf0f4;padding:10px 0}
-.team{text-align:center;font-weight:700;font-size:13px}
+.match:last-child{border-bottom:0}
+.team{text-align:center;font-weight:700;font-size:13px;word-break:break-word}
 .score{text-align:center;font-size:19px;font-weight:800;color:var(--primary)}
 .meta{text-align:center;font-size:11px;color:#667085;margin-top:2px}
 .badge{font-size:10px;padding:3px 7px;border-radius:99px;background:#eaf2ff;color:#0757bd;font-weight:700;display:inline-block}
+.live{background:#ffe4e4;color:#c00000}
+.table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.medal{width:100%;border-collapse:collapse;min-width:340px}
+.medal th,.medal td{padding:9px 8px;border-bottom:1px solid #edf0f4;text-align:center;font-size:13px}
+.medal th{background:#f0f5fb;color:var(--primary)}
 .hidden{display:none!important}
-.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{opacity:0.9}
 .danger{background:var(--danger);color:#fff;border:0;border-radius:8px;padding:6px 10px;font-weight:700;cursor:pointer;font-size:11px}
 .ok{background:var(--success);color:#fff;border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}
 .formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-radius:8px;margin:4px 0 8px;font-size:14px;background:#fff}
-.bracket-wrap{width:100%;overflow-x:auto;padding:6px 0}
+input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-radius:8px;box-sizing:border-box;margin:4px 0 8px;font-size:14px;background:#fff}
+
+.bracket-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0}
 .bracket{display:flex;gap:20px;min-width:max-content}
 .round{min-width:270px;max-width:320px;background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #cbd5e1;display:flex;flex-direction:column;justify-content:space-around}
 .round-title{text-align:center;color:var(--accent);font-weight:bold;font-size:13px;margin:0 0 10px;padding-bottom:4px;border-bottom:1px solid #cbd5e1;text-transform:uppercase}
-.slot{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;font-size:12px;margin:5px 0}
+.slot{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;font-size:12px;margin:5px 0;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.slot.final-slot{border:2px solid #dc3545;background:#fff8f8}
+.slot.bronze-slot{border:2px solid #d97706;background:#fffdf5}
 .slot div{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f1f5f9}
-.slot .name{font-weight:600;color:#1e293b}
-.admin-row{background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:12px;margin-bottom:10px}
-table.medal{width:100%;border-collapse:collapse}
-table.medal th,table.medal td{padding:9px 8px;border-bottom:1px solid #edf0f4;text-align:center;font-size:13px}
-table.medal th{background:#f0f5fb;color:var(--primary)}
+.slot div:last-child{border:0}
+.slot .name{font-weight:600;color:#1e293b;word-break:break-word;padding-right:6px}
+.slot .score{font-weight:800;color:var(--primary);font-size:13px;background:#eef2ff;padding:2px 6px;border-radius:4px}
+.winner-highlight{color:#198754!important;font-weight:bold!important}
+.admin-row{background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
 </style>
 </head>
 <body>
 
 <header>
   <div class="wrap top">
-    <div class="brand">🏆 HKPĐ THPT CẦN ĐĂNG<small>Năm học 2026-2027 • Quản lý thi đấu</small></div>
+    <div class="brand">🏆 HKPĐ THPT CẦN ĐĂNG<small>Năm học 2026-2027 • Cổng thông tin thi đấu</small></div>
     <nav>
       <button onclick="page('home')" id="n-home" class="active">Trang chủ</button>
       <button onclick="page('schedule')" id="n-schedule">Lịch & Kết quả</button>
@@ -69,17 +81,17 @@ table.medal th{background:#f0f5fb;color:var(--primary)}
   <section id="home" class="page">
     <div class="hero">
       <h1>HỘI KHỎE PHÙ ĐỔNG 2026 - 2027</h1>
-      <div class="muted">Hệ thống quản lý lịch thi đấu chính thức trường THPT Cần Đăng</div>
+      <div class="muted">Trường THPT Cần Đăng • Cổng thông tin thi đấu tự động thời gian thực</div>
     </div>
     <div class="grid">
-      <div class="card stat">Tổng trận<strong id="sTotal">0</strong></div>
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
+      <div class="card stat">🔴 Đang đấu<strong id="sLive">0</strong></div>
       <div class="card stat">🥇 Tổng Vàng<strong id="sGold">0</strong></div>
       <div class="card stat">Môn thi<strong id="sSports">0</strong></div>
     </div>
     <div class="card">
-      <h2>🏅 Bảng tổng sắp huy chương</h2>
-      <div id="homeMedals"></div>
+      <h2>🏅 Bảng tổng sắp huy chương các lớp</h2>
+      <div class="table-wrap" id="homeMedals"></div>
     </div>
   </section>
 
@@ -87,47 +99,76 @@ table.medal th{background:#f0f5fb;color:var(--primary)}
     <div class="hero"><h1>Lịch thi đấu & Kết quả</h1></div>
     <div class="card">
       <div class="formgrid">
-        <div>Chọn Môn thi đấu<select id="sportFilter" onchange="renderSchedule()"></select></div>
-        <div>Trạng thái<select id="statusFilter" onchange="renderSchedule()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="done">Đã kết thúc</option></select></div>
+        <div>Lọc theo Môn thi đấu<select id="sportFilter" onchange="renderSchedule()"></select></div>
+        <div>Lọc theo Trạng thái<select id="statusFilter" onchange="renderSchedule()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="done">Đã kết thúc</option></select></div>
       </div>
     </div>
     <div id="scheduleList"></div>
   </section>
 
   <section id="bracket" class="page hidden">
-    <div class="hero"><h1>Sơ đồ nhánh thi đấu</h1></div>
+    <div class="hero"><h1>Sơ đồ nhánh thi đấu tự động</h1></div>
     <div class="card">
-      <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn nội dung môn thi:</label>
+      <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
+      <p class="muted" style="margin-top:6px">👉 Chuẩn sơ đồ loại trực tiếp: Người thắng ở vòng trước sẽ tự động tiến vào ô đấu của vòng tiếp theo!</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
 
   <section id="medals" class="page hidden">
     <div class="hero"><h1>🏅 Bảng tổng sắp huy chương các lớp</h1></div>
-    <div class="card"><div id="medalTable"></div></div>
+    <div class="card">
+      <div class="table-wrap" id="medalTable"></div>
+    </div>
   </section>
 
   <section id="admin" class="page hidden">
-    <div class="hero"><h1>⚙ Quản Trị Ban Tổ Chức</h1></div>
-    <div id="login" class="card" style="max-width:400px;margin:20px auto">
-      <h3>Đăng nhập Quản Trị</h3>
-      <input id="email" type="text" placeholder="Tài khoản (admin)">
-      <input id="password" type="password" placeholder="Mật khẩu (123456)">
-      <button class="btn" style="width:100%" onclick="login()">Đăng nhập</button>
-      <p id="loginMsg" style="color:red;margin-top:8px;font-size:13px"></p>
+    <div class="hero">
+      <h1>⚙ Ban Tổ Chức Quản Trị</h1>
+      <div class="muted">Quản lý toàn diện lịch thi đấu và bảng tổng sắp huy chương</div>
+    </div>
+
+    <div id="login">
+      <div class="card" style="max-width:400px;margin:30px auto">
+        <h3 style="margin-top:0">Đăng nhập Ban Tổ Chức</h3>
+        <input id="email" type="text" placeholder="Tên tài khoản quản trị">
+        <input id="password" type="password" placeholder="Mật khẩu bảo mật">
+        <button class="btn" style="width:100%" onclick="login()">Đăng nhập ngay</button>
+        <p id="loginMsg" style="color:red;margin-top:8px;font-size:13px"></p>
+      </div>
     </div>
 
     <div id="adminPanel" class="hidden">
-      <div class="card" style="background:#f0f7ff">
-        <h3>📂 Tải File Excel Sơ Đồ Cây Nhánh</h3>
+      <div class="card admin-card" style="background:#f0f7ff;border-color:#bfdbfe">
+        <h3 style="margin-top:0;color:#0869d7">📂 Tải File Excel Tự Động Đọc Cây Sơ Đồ</h3>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="margin-bottom:10px">
-        <button class="btn ok" onclick="importExcelFile()">📥 Đọc File Excel Chính Xác 100%</button>
+        <button class="btn ok" onclick="importExcelFile()">📥 Đọc Tất Cả Các Sheet Tự Động</button>
+      </div>
+
+      <div class="card admin-card">
+        <h2>📝 Cập Nhật Tỷ Số & Đội Thắng Vòng Tiếp Theo</h2>
+        <div class="formgrid">
+          <div>Lọc theo Môn:<select id="adminSportFilter" onchange="renderAdminMatches()"><option value="">Tất cả các môn</option></select></div>
+          <div>Lọc Trạng Thái:<select id="adminStatusFilter" onchange="renderAdminMatches()"><option value="">Tất cả</option><option value="upcoming">Sắp đấu</option><option value="done">Đã kết thúc</option></select></div>
+        </div>
+        <div id="adminMatches" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card admin-card" style="background:#fffbeb;border-color:#fde68a">
+        <h3 style="margin-top:0;color:#b45309">🏅 Quản Lý Bảng Tổng Sắp Huy Chương Các Lớp</h3>
+        <div class="formgrid">
+          <div>Tên Lớp / Đơn vị:<input id="medTeam" placeholder="VD: 10A1"></div>
+          <div>🥇 Số Vàng:<input id="gold" type="number" value="0"></div>
+          <div>🥈 Số Bạc:<input id="silver" type="number" value="0"></div>
+          <div>🥉 Số Đồng:<input id="bronze" type="number" value="0"></div>
+        </div>
+        <button class="btn ok" onclick="saveMedal()" style="margin-bottom:14px;background:#d97706;width:100%">💾 Cập Nhật / Thêm Huy Chương Lớp Này</button>
+        <div class="table-wrap" id="adminMedalTable"></div>
       </div>
 
       <div class="card">
-        <h2>📝 Cập nhật kết quả các trận đấu</h2>
-        <div id="adminMatches"></div>
+        <button class="danger" style="width:100%;padding:12px;font-size:14px" onclick="logout()">Thoát Tài Khoản Quản Trị</button>
       </div>
     </div>
   </section>
@@ -137,7 +178,7 @@ table.medal th{background:#f0f5fb;color:var(--primary)}
 const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V600';
+const STORAGE_VER = 'hkpd_2026_V700';
 
 let matches = [];
 let medals = {};
@@ -176,9 +217,10 @@ function saveData() {
   localStorage.setItem(STORAGE_VER + '_medals', JSON.stringify(medals));
 }
 
-// BỘ ĐỌC EXCEL ĐÚNG CHUẨN NGUYÊN BẢN TỪNG Ô
+// BỘ ĐỌC EXCEL THEO QUY LUẬT CHUẨN LOẠI TRỰC TIẾP TỪ MACRO
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
-  let list = [];
+  let matchesList = [];
+  let safeSportId = encodeURIComponent(sheetName.trim());
   let matchesDict = [];
 
   jsonMatrix.forEach((row, rIdx) => {
@@ -196,33 +238,125 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   });
 
   matchesDict.sort((a,b) => a.num - b.num);
-  if(matchesDict.length === 0) return list;
+  if(matchesDict.length === 0) return matchesList;
+
+  let maxNum = Math.max(...matchesDict.map(x => x.num));
 
   matchesDict.forEach(m => {
+    let mNum = m.num;
+    let mCol = m.col;
     let r = m.row;
+
     let cellA = (jsonMatrix[r-1] && (jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0])) ? String(jsonMatrix[r-1][1] !== undefined ? jsonMatrix[r-1][1] : jsonMatrix[r-1][0]).trim() : "";
     let cellB = (jsonMatrix[r+1] && (jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0])) ? String(jsonMatrix[r+1][1] !== undefined ? jsonMatrix[r+1][1] : jsonMatrix[r+1][0]).trim() : "";
 
-    if(cellA.toLowerCase().includes('trận') || cellA.length < 2) cellA = "Chưa xác định";
-    if(cellB.toLowerCase().includes('trận') || cellB.length < 2) cellB = "Chưa xác định";
+    if(cellA.toLowerCase().includes('trận') || cellA.length < 2) cellA = "";
+    if(cellB.toLowerCase().includes('trận') || cellB.length < 2) cellB = "";
 
-    let rName = m.col <= 1 ? "Vòng 1" : (m.col <= 3 ? "Vòng 2" : "Vòng Chung Kết");
+    let tAFeed = null, tBFeed = null;
+    let tA = cellA || "";
+    let tB = cellB || "";
 
-    list.push({
-      id: Date.now() + Math.random(),
-      matchCode: `${sheetName}_M${m.num}`,
-      matchLabel: `Trận ${m.num}`,
+    // Thiết lập quy luật feed đội thắng từ trận trước theo đúng cấu trúc cây đấu
+    if (mNum === 3) { tAFeed = `${safeSportId}_M1`; if(!tA) tA = "Thắng Trận 1"; }
+    else if (mNum === 7) { tAFeed = `${safeSportId}_M2`; if(!tA) tA = "Thắng Trận 2"; }
+
+    if (mNum >= 4 && mNum <= 11 && mNum !== 7) {
+      let feedNumA = (mNum - 3) * 2 - 1;
+      let feedNumB = (mNum - 3) * 2;
+      if(!tA && feedNumA > 0) { tAFeed = `${safeSportId}_M${feedNumA}`; tA = `Thắng Trận ${feedNumA}`; }
+      if(!tB && feedNumB > 0) { tBFeed = `${safeSportId}_M${feedNumB}`; tB = `Thắng Trận ${feedNumB}`; }
+    } else if (mNum >= 12 && mNum < maxNum) {
+      let feedNumA = mNum * 2 - 16;
+      let feedNumB = mNum * 2 - 15;
+      if(!tA && feedNumA > 0) { tAFeed = `${safeSportId}_M${feedNumA}`; tA = `Thắng Trận ${feedNumA}`; }
+      if(!tB && feedNumB > 0) { tBFeed = `${safeSportId}_M${feedNumB}`; tB = `Thắng Trận ${feedNumB}`; }
+    } else if (mNum === maxNum) {
+      let semiMatches = matchesList.filter(x => x.round.includes("Bán Kết") || x.round.includes("Vòng 3") || x.round.includes("Vòng 2"));
+      if(semiMatches.length >= 2) {
+        tAFeed = semiMatches[semiMatches.length - 2].matchCode;
+        tBFeed = semiMatches[semiMatches.length - 1].matchCode;
+        if(!tA) tA = `Thắng Trận ${semiMatches[semiMatches.length - 2].matchLabel.replace(/\D/g, '')}`;
+        if(!tB) tB = `Thắng Trận ${semiMatches[semiMatches.length - 1].matchLabel.replace(/\D/g, '')}`;
+      }
+    }
+
+    let rName = mCol <= 1 ? "Vòng 1" : (mCol <= 3 ? "Vòng 2" : (mCol <= 5 ? "Vòng 3" : (mNum === maxNum ? "Chung Kết & Tranh Hạng 3" : "Vòng Bán Kết")));
+    if (mNum === maxNum) rName = "Chung Kết & Tranh Hạng 3";
+
+    matchesList.push({
+      matchCode: `${safeSportId}_M${mNum}`,
+      matchLabel: `Trận ${mNum}${mNum===maxNum?' (Chung Kết 🥇)':''}`,
       sport: sheetName,
       round: rName,
-      teamA: cellA,
-      teamB: cellB,
+      teamAFeed: tAFeed,
+      teamBFeed: tBFeed,
+      teamA: tA || "Chưa xác định",
+      teamB: tB || "Chưa xác định",
       scoreA: 0,
       scoreB: 0,
       status: "upcoming"
     });
   });
 
-  return list;
+  // Trận tranh hạng 3
+  let semiMatches = matchesList.filter(x => x.round.includes("Bán Kết") || x.round.includes("Vòng 3") || x.round.includes("Vòng 2"));
+  if(semiMatches.length >= 2) {
+    let sm1 = semiMatches[semiMatches.length - 2].matchCode;
+    let sm2 = semiMatches[semiMatches.length - 1].matchCode;
+    matchesList.push({
+      matchCode: `${safeSportId}_H3`,
+      matchLabel: `Trận Tranh Hạng 3 🥉`,
+      sport: sheetName,
+      round: "Chung Kết & Tranh Hạng 3",
+      teamALoserFeed: sm1,
+      teamBLoserFeed: sm2,
+      teamA: "Thua Bán Kết 1",
+      teamB: "Thua Bán Kết 2",
+      type: "bronze",
+      scoreA: 0,
+      scoreB: 0,
+      status: "upcoming"
+    });
+  }
+
+  return matchesList;
+}
+
+function getWinnerOfMatch(matchCode) {
+  if (!matchCode) return null;
+  let m = matches.find(x => x.matchCode === matchCode);
+  if (!m || m.status !== 'done') return null;
+  let tA = getTeamANameSafe(m, 0);
+  let tB = getTeamBNameSafe(m, 0);
+  if (Number(m.scoreA) > Number(m.scoreB)) return tA;
+  if (Number(m.scoreB) > Number(m.scoreA)) return tB;
+  return null;
+}
+
+function getLoserOfMatch(matchCode) {
+  if (!matchCode) return null;
+  let m = matches.find(x => x.matchCode === matchCode);
+  if (!m || m.status !== 'done') return null;
+  let tA = getTeamANameSafe(m, 0);
+  let tB = getTeamBNameSafe(m, 0);
+  if (Number(m.scoreA) > Number(m.scoreB)) return tB;
+  if (Number(m.scoreB) > Number(m.scoreA)) return tA;
+  return null;
+}
+
+function getTeamANameSafe(m, depth) {
+  if (depth > 5) return m.teamA || "Chưa xác định";
+  if (m.teamAFeed) { let w = getWinnerOfMatch(m.teamAFeed); if (w) return w; }
+  if (m.teamALoserFeed) { let l = getLoserOfMatch(m.teamALoserFeed); if (l) return l; }
+  return m.teamA || "Chưa xác định";
+}
+
+function getTeamBNameSafe(m, depth) {
+  if (depth > 5) return m.teamB || "Chưa xác định";
+  if (m.teamBFeed) { let w = getWinnerOfMatch(m.teamBFeed); if (w) return w; }
+  if (m.teamBLoserFeed) { let l = getLoserOfMatch(m.teamBLoserFeed); if (l) return l; }
+  return m.teamB || "Chưa xác định";
 }
 
 function importExcelFile() {
@@ -248,7 +382,7 @@ function importExcelFile() {
         initApp();
         alert(`Đọc thành công ${newMatches.length} trận đấu từ file Excel!`);
       } else {
-        alert('Không tìm thấy cấu trúc trận đấu hợp lệ trong file.');
+        alert('Không tìm thấy cấu trúc trận đấu hợp lệ.');
       }
     } catch(err) { alert('Lỗi đọc file: ' + err.message); }
   };
@@ -274,16 +408,22 @@ function initApp() {
 }
 
 function renderHome() {
-  document.getElementById('sTotal').innerText = matches.length;
   document.getElementById('sDone').innerText = matches.filter(m => m.status === 'done').length;
   let sports = [...new Set(matches.map(m => m.sport))];
   document.getElementById('sSports').innerText = sports.length;
+  
+  let totalGold = 0;
+  for(let cls in medals) { totalGold += Number(medals[cls].gold || 0); }
+  document.getElementById('sGold').innerText = totalGold;
   renderMedalTableContainer('homeMedals');
 }
 
 function renderScheduleOptions() {
   let sports = [...new Set(matches.map(m => m.sport))];
-  document.getElementById('sportFilter').innerHTML = '<option value="">Tất cả các môn</option>' + sports.map(s => `<option value="${s}">${s}</option>`).join('');
+  let html = '<option value="">Tất cả các môn</option>' + sports.map(s => `<option value="${s}">${s}</option>`).join('');
+  document.getElementById('sportFilter').innerHTML = html;
+  let adminSel = document.getElementById('adminSportFilter');
+  if(adminSel) adminSel.innerHTML = html;
 }
 
 function renderSchedule() {
@@ -301,12 +441,14 @@ function renderSchedule() {
   for(let sport in grouped) {
     html += `<div class="card"><h2>${sport}</h2>`;
     grouped[sport].forEach(m => {
+      let tA = getTeamANameSafe(m, 0);
+      let tB = getTeamBNameSafe(m, 0);
       let badge = m.status==='done'?'<span class="badge">Đã kết thúc</span>':'<span class="badge" style="background:#eee;color:#333">Sắp đấu</span>';
       html += `
         <div class="match">
-          <div class="team">${m.teamA}</div>
+          <div class="team">${tA}</div>
           <div class="score">${m.status==='upcoming'?'VS':`${m.scoreA}-${m.scoreB}`}<div class="meta">${m.matchLabel} • ${badge}</div></div>
-          <div class="team">${m.teamB}</div>
+          <div class="team">${tB}</div>
         </div>
       `;
     });
@@ -317,7 +459,8 @@ function renderSchedule() {
 
 function renderBracketOptions() {
   let sports = [...new Set(matches.map(m => m.sport))];
-  document.getElementById('bracketFilter').innerHTML = sports.map(s => `<option value="${s}">${s}</option>`).join('');
+  let el = document.getElementById('bracketFilter');
+  if(el) el.innerHTML = sports.map(s => `<option value="${s}">${s}</option>`).join('');
 }
 
 function renderBracket() {
@@ -336,11 +479,21 @@ function renderBracket() {
   for(let rName in roundsMap) {
     html += `<div class="round"><div class="round-title">${rName}</div>`;
     roundsMap[rName].forEach(m => {
+      let tA = getTeamANameSafe(m, 0);
+      let tB = getTeamBNameSafe(m, 0);
+      let isFinal = m.matchCode && (m.round.includes('Chung Kết') || m.matchLabel.includes('Chung Kết'));
+      let isBronze = m.matchCode && (m.round.includes('Hạng 3') || m.type === 'bronze');
+      let slotClass = isFinal ? 'slot final-slot' : (isBronze ? 'slot bronze-slot' : 'slot');
+      
+      let w = getWinnerOfMatch(m.matchCode);
+      let winA = w && w === tA;
+      let winB = w && w === tB;
+
       html += `
-        <div class="slot">
+        <div class="${slotClass}">
           <div style="margin-bottom:4px;font-size:11px;color:#0877e8;font-weight:bold">${m.matchLabel}</div>
-          <div><span class="name">${m.teamA}</span><span style="font-weight:bold">${m.status==='upcoming'?'-':m.scoreA}</span></div>
-          <div><span class="name">${m.teamB}</span><span style="font-weight:bold">${m.status==='upcoming'?'-':m.scoreB}</span></div>
+          <div><span class="name ${winA?'winner-highlight':''}">${tA}</span><span class="score">${m.status==='upcoming'?'-':m.scoreA}</span></div>
+          <div><span class="name ${winB?'winner-highlight':''}">${tB}</span><span class="score">${m.status==='upcoming'?'-':m.scoreB}</span></div>
         </div>
       `;
     });
@@ -373,11 +526,17 @@ function login() {
   } else { document.getElementById('loginMsg').innerText = 'Sai tài khoản hoặc mật khẩu!'; }
 }
 
+function logout() {
+  localStorage.removeItem(AUTH_KEY);
+  checkLoginState();
+}
+
 function checkLoginState() {
   if(localStorage.getItem(AUTH_KEY) === 'true') {
     document.getElementById('login').classList.add('hidden');
     document.getElementById('adminPanel').classList.remove('hidden');
     renderAdminMatches();
+    renderAdminMedalTable();
   } else {
     document.getElementById('login').classList.remove('hidden');
     document.getElementById('adminPanel').classList.add('hidden');
@@ -385,34 +544,83 @@ function checkLoginState() {
 }
 
 function renderAdminMatches() {
-  document.getElementById('adminMatches').innerHTML = matches.map(m => `
-    <div class="admin-row">
-      <div style="font-weight:bold;color:#0877e8">${m.sport} • ${m.matchLabel}</div>
-      <div class="formgrid">
-        <div>Đội A: <b>${m.teamA}</b><br>Điểm:<input type="number" id="scA_${m.id}" value="${m.scoreA}"></div>
-        <div>Đội B: <b>${m.teamB}</b><br>Điểm:<input type="number" id="scB_${m.id}" value="${m.scoreB}"></div>
+  let sF = document.getElementById('adminSportFilter') ? document.getElementById('adminSportFilter').value : '';
+  let filtered = matches.filter(m => !sF || m.sport === sF);
+
+  document.getElementById('adminMatches').innerHTML = filtered.map(m => {
+    let tA = getTeamANameSafe(m, 0);
+    let tB = getTeamBNameSafe(m, 0);
+    return `
+      <div class="admin-row">
+        <div style="font-weight:bold;color:#0877e8;margin-bottom:4px">${m.sport} • ${m.matchLabel} (${m.round})</div>
+        <div style="font-size:12px;color:#198754;margin-bottom:6px">👉 Đội thực tế: <b>${tA}</b> vs <b>${tB}</b></div>
+        <div class="formgrid">
+          <div>Điểm A:<input type="number" id="scA_${m.matchCode}" value="${m.scoreA}"></div>
+          <div>Điểm B:<input type="number" id="scB_${m.matchCode}" value="${m.scoreB}"></div>
+        </div>
+        <div>Trạng thái:
+          <select id="st_${m.matchCode}">
+            <option value="upcoming" ${m.status==='upcoming'?'selected':''}>Sắp đấu</option>
+            <option value="done" ${m.status==='done'?'selected':''}>Đã kết thúc</option>
+          </select>
+        </div>
+        <button class="btn ok" style="margin-top:6px;width:100%" onclick="updateMatch('${m.matchCode}')">💾 Lưu Tỷ Số & Đẩy Đội Thắng</button>
       </div>
-      <div>Trạng thái:
-        <select id="st_${m.id}">
-          <option value="upcoming" ${m.status==='upcoming'?'selected':''}>Sắp đấu</option>
-          <option value="done" ${m.status==='done'?'selected':''}>Đã kết thúc</option>
-        </select>
-      </div>
-      <button class="btn ok" style="margin-top:6px;width:100%" onclick="updateMatch(${m.id})">💾 Lưu Kết Quả</button>
-    </div>
-  `).join('') || '<p class="muted">Chưa có trận đấu nào.</p>';
+    `;
+  }).join('') || '<p class="muted">Chưa có trận đấu nào.</p>';
 }
 
-function updateMatch(id) {
-  let m = matches.find(x => x.id === id);
+function updateMatch(matchCode) {
+  let m = matches.find(x => x.matchCode === matchCode);
   if(!m) return;
-  m.scoreA = Number(document.getElementById(`scA_${id}`).value);
-  m.scoreB = Number(document.getElementById(`scB_${id}`).value);
-  m.status = document.getElementById(`st_${id}`).value;
+  m.scoreA = Number(document.getElementById(`scA_${matchCode}`).value);
+  m.scoreB = Number(document.getElementById(`scB_${matchCode}`).value);
+  m.status = document.getElementById(`st_${matchCode}`).value;
   syncDataToCloud();
   initApp();
   renderAdminMatches();
-  alert('Đã cập nhật kết quả thành công!');
+  alert('Đã cập nhật kết quả và tự động đẩy đội thắng lên vòng tiếp theo!');
+}
+
+function saveMedal() {
+  let team = document.getElementById('medTeam').value.trim().toUpperCase();
+  let gold = Number(document.getElementById('gold').value) || 0;
+  let silver = Number(document.getElementById('silver').value) || 0;
+  let bronze = Number(document.getElementById('bronze').value) || 0;
+  if(!team) { alert('Vui lòng nhập tên lớp!'); return; }
+  medals[team] = { gold, silver, bronze };
+  syncDataToCloud();
+  initApp();
+  renderAdminMedalTable();
+  document.getElementById('medTeam').value = '';
+  document.getElementById('gold').value = 0;
+  document.getElementById('silver').value = 0;
+  document.getElementById('bronze').value = 0;
+  alert('Đã cập nhật huy chương thành công!');
+}
+
+function renderAdminMedalTable() {
+  let html = `<table class="medal"><thead><tr><th>Lớp</th><th>Vàng</th><th>Bạc</th><th>Đồng</th><th>Thao tác</th></tr></thead><tbody>`;
+  let keys = Object.keys(medals);
+  if(keys.length === 0) {
+    html += `<tr><td colspan="5" class="muted">Chưa có dữ liệu huy chương.</td></tr>`;
+  } else {
+    keys.forEach(cls => {
+      html += `<tr><td><b>${cls}</b></td><td>${medals[cls].gold||0}</td><td>${medals[cls].silver||0}</td><td>${medals[cls].bronze||0}</td><td><button class="danger" onclick="deleteMedal('${cls}')" style="padding:4px 8px">Xóa</button></td></tr>`;
+    });
+  }
+  html += `</tbody></table>`;
+  let el = document.getElementById('adminMedalTable');
+  if(el) el.innerHTML = html;
+}
+
+function deleteMedal(cls) {
+  if(confirm(`Xóa huy chương lớp ${cls}?`)) {
+    delete medals[cls];
+    syncDataToCloud();
+    initApp();
+    renderAdminMedalTable();
+  }
 }
 </script>
 </body>
