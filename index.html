@@ -10,7 +10,7 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%}
 header{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:14px 4%;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.15)}
-.wrap{max-width:1180px;margin:auto}
+.wrap{max-width:1280px;margin:auto}
 .top{display:flex;justify-content:space-between;gap:12px;align-items:center}
 .brand{font-weight:800;font-size:19px;line-height:1.2}
 .brand small{display:block;font-size:11px;opacity:.85;font-weight:400}
@@ -27,14 +27,12 @@ h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .stat{text-align:center;padding:12px 8px}
 .stat strong{display:block;font-size:24px;margin-top:4px;color:var(--accent)}
-.two{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
 .match{display:grid;grid-template-columns:minmax(0,1fr) 85px minmax(0,1fr);gap:6px;align-items:center;border-bottom:1px solid #edf0f4;padding:10px 0}
 .match:last-child{border-bottom:0}
 .team{text-align:center;font-weight:700;font-size:13px;word-break:break-word}
 .score{text-align:center;font-size:19px;font-weight:800;color:var(--primary)}
 .meta{text-align:center;font-size:11px;color:#667085;margin-top:2px}
 .badge{font-size:10px;padding:3px 7px;border-radius:99px;background:#eaf2ff;color:#0757bd;font-weight:700;display:inline-block}
-.live{background:#ffe4e4;color:#c00000}
 .table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .medal{width:100%;border-collapse:collapse;min-width:340px}
 .medal th,.medal td{padding:9px 8px;border-bottom:1px solid #edf0f4;text-align:center;font-size:13px}
@@ -47,17 +45,19 @@ h2{margin:0 0 12px;font-size:18px;color:var(--primary);display:flex;align-items:
 .formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-radius:8px;box-sizing:border-box;margin:4px 0 8px;font-size:14px;background:#fff}
 
-.bracket-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0}
-.bracket{display:flex;gap:20px;min-width:max-content}
-.round{min-width:270px;max-width:320px;background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #cbd5e1;display:flex;flex-direction:column;justify-content:space-around}
-.round-title{text-align:center;color:var(--accent);font-weight:bold;font-size:13px;margin:0 0 10px;padding-bottom:4px;border-bottom:1px solid #cbd5e1;text-transform:uppercase}
-.slot{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;font-size:12px;margin:5px 0;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
-.slot.final-slot{border:2px solid #dc3545;background:#fff8f8}
-.slot.bronze-slot{border:2px solid #d97706;background:#fffdf5}
-.slot div{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f1f5f9}
-.slot div:last-child{border:0}
-.slot .name{font-weight:600;color:#1e293b;word-break:break-word;padding-right:6px}
-.slot .score{font-weight:800;color:var(--primary);font-size:13px;background:#eef2ff;padding:2px 6px;border-radius:4px}
+/* SƠ ĐỒ NHÁNH CÓ ĐƯỜNG KẺ NỐI CHUẨN XÁC */
+.bracket-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 0}
+.bracket{display:flex;gap:30px;min-width:max-content;align-items:center}
+.round{min-width:280px;max-width:310px;display:flex;flex-direction:column;gap:15px;position:relative}
+.round-title{text-align:center;color:var(--accent);font-weight:800;font-size:13px;margin-bottom:6px;text-transform:uppercase;background:#eaf2ff;padding:6px;border-radius:6px}
+.slot{background:#fff;border:2px solid #cbd5e1;border-radius:10px;padding:10px;font-size:12px;box-shadow:0 2px 4px rgba(0,0,0,0.04);position:relative}
+.slot.final-slot{border-color:#dc3545;background:#fff8f8}
+.slot.bronze-slot{border-color:#d97706;background:#fffdf5}
+.slot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:11px;color:#0877e8;font-weight:bold;border-bottom:1px dashed #e2e8f0;padding-bottom:4px}
+.slot-team{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f1f5f9}
+.slot-team:last-child{border:0}
+.slot-team .name{font-weight:600;color:#1e293b;word-break:break-word;padding-right:8px}
+.slot-team .score{font-weight:800;color:var(--primary);font-size:13px;background:#eef2ff;padding:2px 6px;border-radius:4px;min-width:26px;text-align:center}
 .winner-highlight{color:#198754!important;font-weight:bold!important}
 .admin-row{background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
 </style>
@@ -85,9 +85,9 @@ input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-ra
     </div>
     <div class="grid">
       <div class="card stat">Đã đấu<strong id="sDone">0</strong></div>
-      <div class="card stat">🔴 Đang đấu<strong id="sLive">0</strong></div>
       <div class="card stat">🥇 Tổng Vàng<strong id="sGold">0</strong></div>
       <div class="card stat">Môn thi<strong id="sSports">0</strong></div>
+      <div class="card stat">Tổng trận<strong id="sTotal">0</strong></div>
     </div>
     <div class="card">
       <h2>🏅 Bảng tổng sắp huy chương các lớp</h2>
@@ -111,7 +111,7 @@ input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-ra
     <div class="card">
       <label style="font-weight:bold;display:block;margin-bottom:6px">Chọn môn / nội dung xem sơ đồ nhánh:</label>
       <select id="bracketFilter" onchange="renderBracket()"></select>
-      <p class="muted" style="margin-top:6px">👉 Chuẩn sơ đồ loại trực tiếp: Người thắng ở vòng trước sẽ tự động tiến vào ô đấu của vòng tiếp theo!</p>
+      <p class="muted" style="margin-top:6px">👉 Chuẩn sơ đồ loại trực tiếp: Người thắng trận trước sẽ tự động tiến vào ô đấu của trận tiếp theo (Ví dụ Trận 3 đấu với Thắng Trận 1).</p>
       <div id="bracketView" style="margin-top:14px"></div>
     </div>
   </section>
@@ -178,7 +178,7 @@ input,select,textarea{width:100%;padding:10px;border:1px solid #ccd5e2;border-ra
 const API_KEY = "$2a$10$J9XUqdqSZDsLuWANuIZoluPsUrq.pCds1HKIQDUlvCieZwElVGgo6";
 const BIN_ID = "6ac5df89ffd5d1605354f559";
 const AUTH_KEY = 'hkpd_admin_logged_in';
-const STORAGE_VER = 'hkpd_2026_V700';
+const STORAGE_VER = 'hkpd_2026_V800';
 
 let matches = [];
 let medals = {};
@@ -217,7 +217,7 @@ function saveData() {
   localStorage.setItem(STORAGE_VER + '_medals', JSON.stringify(medals));
 }
 
-// BỘ ĐỌC EXCEL THEO QUY LUẬT CHUẨN LOẠI TRỰC TIẾP TỪ MACRO
+// BỘ ĐỌC EXCEL BÁM SÁT 100% CẤU TRÚC TỪNG Ô CỦA THẦY
 function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
   let matchesList = [];
   let safeSportId = encodeURIComponent(sheetName.trim());
@@ -257,9 +257,14 @@ function buildMatchesFromExcelSheet(sheetName, jsonMatrix) {
     let tA = cellA || "";
     let tB = cellB || "";
 
-    // Thiết lập quy luật feed đội thắng từ trận trước theo đúng cấu trúc cây đấu
-    if (mNum === 3) { tAFeed = `${safeSportId}_M1`; if(!tA) tA = "Thắng Trận 1"; }
-    else if (mNum === 7) { tAFeed = `${safeSportId}_M2`; if(!tA) tA = "Thắng Trận 2"; }
+    // Gắn đúng feed quy luật trận đấu
+    if (mNum === 3) {
+      tAFeed = `${safeSportId}_M1`;
+      if(!tA) tA = "Thắng Trận 1";
+    } else if (mNum === 7) {
+      tAFeed = `${safeSportId}_M2`;
+      if(!tA) tA = "Thắng Trận 2";
+    }
 
     if (mNum >= 4 && mNum <= 11 && mNum !== 7) {
       let feedNumA = (mNum - 3) * 2 - 1;
@@ -411,6 +416,7 @@ function renderHome() {
   document.getElementById('sDone').innerText = matches.filter(m => m.status === 'done').length;
   let sports = [...new Set(matches.map(m => m.sport))];
   document.getElementById('sSports').innerText = sports.length;
+  document.getElementById('sTotal').innerText = matches.length;
   
   let totalGold = 0;
   for(let cls in medals) { totalGold += Number(medals[cls].gold || 0); }
@@ -491,9 +497,9 @@ function renderBracket() {
 
       html += `
         <div class="${slotClass}">
-          <div style="margin-bottom:4px;font-size:11px;color:#0877e8;font-weight:bold">${m.matchLabel}</div>
-          <div><span class="name ${winA?'winner-highlight':''}">${tA}</span><span class="score">${m.status==='upcoming'?'-':m.scoreA}</span></div>
-          <div><span class="name ${winB?'winner-highlight':''}">${tB}</span><span class="score">${m.status==='upcoming'?'-':m.scoreB}</span></div>
+          <div class="slot-header"><span>${m.matchLabel}</span><span>${m.status==='done'?'✅ Đã xong':'⏳ Sắp đấu'}</span></div>
+          <div class="slot-team"><span class="name ${winA?'winner-highlight':''}">${tA}</span><span class="score">${m.status==='upcoming'?'-':m.scoreA}</span></div>
+          <div class="slot-team"><span class="name ${winB?'winner-highlight':''}">${tB}</span><span class="score">${m.status==='upcoming'?'-':m.scoreB}</span></div>
         </div>
       `;
     });
@@ -553,7 +559,7 @@ function renderAdminMatches() {
     return `
       <div class="admin-row">
         <div style="font-weight:bold;color:#0877e8;margin-bottom:4px">${m.sport} • ${m.matchLabel} (${m.round})</div>
-        <div style="font-size:12px;color:#198754;margin-bottom:6px">👉 Đội thực tế: <b>${tA}</b> vs <b>${tB}</b></div>
+        <div style="font-size:12px;color:#198754;margin-bottom:6px">👉 Cặp đấu thực tế: <b>${tA}</b> vs <b>${tB}</b></div>
         <div class="formgrid">
           <div>Điểm A:<input type="number" id="scA_${m.matchCode}" value="${m.scoreA}"></div>
           <div>Điểm B:<input type="number" id="scB_${m.matchCode}" value="${m.scoreB}"></div>
